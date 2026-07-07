@@ -3,278 +3,230 @@
 Layer Processor for Garmin Export Plugin
 Процессор слоёв для плагина экспорта в Garmin
 
+Обрабатывает все части мультигеометрий (мультилинии, мультиполигоны),
+трансформирует координаты в WGS84 и готовит данные для MPGenerator.
+
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
 Year: 2025
 """
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsWkbTypes
+from qgis.core import (
+    QgsCoordinateReferenceSystem, QgsCoordinateTransform,
+    QgsProject, QgsWkbTypes
+)
 
 
 class LayerProcessor:
     """Процессор для обработки векторных слоёв"""
-    
+
     def __init__(self):
         # Целевая система координат - WGS84
         self.target_crs = QgsCoordinateReferenceSystem('EPSG:4326')
-    
-    def process_layer(self, layer, style_mapper, enabled_levels):
-        """Обработка слоя для экспорта"""
+
+    def process_layer(self, layer, style_mapper, enabled_levels, log_callback=None):
+        """Обработка слоя для экспорта.
+
+        Args:
+            layer: QgsVectorLayer
+            style_mapper: StyleMapper для получения сопоставления
+            enabled_levels: список включённых уровней
+            log_callback: функция для сообщений (str) -> None
+        """
         if not layer or not layer.isValid():
-            raise Exception("Недействительный слой")
-        
-        # Получаем информацию о слое
+            raise Exception('Недействительный слой')
+
         layer_name = layer.name()
         geometry_type = self._get_geometry_type(layer)
-        
-        # Получаем сопоставление стилей
+
+        if geometry_type == 'Unknown':
+            raise Exception(
+                'Неподдерживаемый тип геометрии слоя "{0}"'.format(layer_name))
+
         mapping_info = style_mapper.get_layer_mapping(layer_name, geometry_type)
-        
+
         # Настройка трансформации координат
         transform = None
         if layer.crs() != self.target_crs:
             transform = QgsCoordinateTransform(
-                layer.crs(),
-                self.target_crs,
-                QgsProject.instance()
-            )
-        
-        # Обрабатываем объекты
+                layer.crs(), self.target_crs, QgsProject.instance())
+
         features = []
-        feature_count = 0
-        
+        error_count = 0
+
         for feature in layer.getFeatures():
             try:
-                processed_feature = self._process_feature(
-                    feature, transform, mapping_info
-                )
-                
+                processed_feature = self._process_feature(feature, transform)
                 if processed_feature:
                     features.append(processed_feature)
-                    feature_count += 1
-                    
+                else:
+                    error_count += 1
             except Exception as e:
-                # Логируем ошибку, но продолжаем обработку
-                print(f"Ошибка обработки объекта в слое '{layer_name}': {str(e)}")
+                error_count += 1
+                if log_callback:
+                    log_callback('Ошибка обработки объекта {0} в слое "{1}": {2}'.format(
+                        feature.id(), layer_name, str(e)))
                 continue
-        
-        # Формируем результат
-        layer_data = {
+
+        if error_count and log_callback:
+            log_callback('Слой "{0}": пропущено объектов с ошибками/пустой геометрией: {1}'.format(
+                layer_name, error_count))
+
+        return {
             'layer_name': layer_name,
             'geometry_type': geometry_type,
-            'garmin_type': mapping_info.get('garmin_type', '0x01'),
+            'garmin_type': mapping_info.get('type', mapping_info.get('garmin_type', '0x01')),
             'label_field': mapping_info.get('label_field'),
             'level': mapping_info.get('level', 1),
             'features': features,
-            'feature_count': feature_count
+            'feature_count': len(features),
+            'error_count': error_count,
         }
-        
-        return layer_data
-    
+
     def _get_geometry_type(self, layer):
         """Определение типа геометрии слоя"""
         geom_type = layer.geometryType()
-        
+
         if geom_type == QgsWkbTypes.PointGeometry:
             return 'Point'
         elif geom_type == QgsWkbTypes.LineGeometry:
             return 'LineString'
         elif geom_type == QgsWkbTypes.PolygonGeometry:
             return 'Polygon'
-        else:
-            return 'Unknown'
-    
-    def _process_feature(self, feature, transform, mapping_info):
+        return 'Unknown'
+
+    def _process_feature(self, feature, transform):
         """Обработка отдельного объекта"""
         geometry = feature.geometry()
-        
+
         if not geometry or geometry.isEmpty():
             return None
-        
-        # Трансформируем координаты
+
+        # Трансформируем координаты (на копии, чтобы не менять слой)
         if transform:
-            try:
-                geometry.transform(transform)
-            except Exception as e:
-                print(f"Ошибка трансформации координат: {str(e)}")
+            geometry = type(geometry)(geometry)
+            result = geometry.transform(transform)
+            if result != 0:
                 return None
-        
-        # Получаем атрибуты
+
+        # Атрибуты как строки
         attributes = {}
         for field in feature.fields():
             field_name = field.name()
             value = feature[field_name]
-            
-            # Преобразуем значение в строку
-            if value is not None:
-                attributes[field_name] = str(value)
-            else:
-                attributes[field_name] = ""
-        
-        # Преобразуем геометрию в GeoJSON-подобный формат
+            attributes[field_name] = '' if value is None else str(value)
+
         geom_data = self._geometry_to_coords(geometry)
-        
         if not geom_data:
             return None
-        
+
         return {
             'geometry': geom_data,
-            'attributes': attributes
+            'attributes': attributes,
         }
-    
+
     def _geometry_to_coords(self, geometry):
-        """Преобразование геометрии QGIS в координаты"""
+        """Преобразование геометрии QGIS в структуру координат.
+
+        Возвращает словарь:
+            Point:      {'type': 'Point', 'coordinates': [x, y]}
+            LineString: {'type': 'LineString', 'parts': [[[x, y], ...], ...]}
+            Polygon:    {'type': 'Polygon', 'parts': [[ring1, ring2...], ...]}
+        Все части мультигеометрий сохраняются.
+        """
         if geometry.isEmpty():
             return None
-        
-        geom_type = geometry.wkbType()
-        
-        # Точка
-        if QgsWkbTypes.geometryType(geom_type) == QgsWkbTypes.PointGeometry:
+
+        geom_type = QgsWkbTypes.geometryType(geometry.wkbType())
+
+        if geom_type == QgsWkbTypes.PointGeometry:
             return self._point_to_coords(geometry)
-        
-        # Линия
-        elif QgsWkbTypes.geometryType(geom_type) == QgsWkbTypes.LineGeometry:
+        elif geom_type == QgsWkbTypes.LineGeometry:
             return self._linestring_to_coords(geometry)
-        
-        # Полигон
-        elif QgsWkbTypes.geometryType(geom_type) == QgsWkbTypes.PolygonGeometry:
+        elif geom_type == QgsWkbTypes.PolygonGeometry:
             return self._polygon_to_coords(geometry)
-        
+
         return None
-    
+
     def _point_to_coords(self, geometry):
-        """Преобразование точки в координаты"""
+        """Преобразование точки (для мультиточки берётся центроид части)"""
         try:
-            point = geometry.asPoint()
+            if geometry.isMultipart():
+                points = geometry.asMultiPoint()
+                if not points:
+                    return None
+                point = points[0]
+            else:
+                point = geometry.asPoint()
             return {
                 'type': 'Point',
-                'coordinates': [point.x(), point.y()]
+                'coordinates': [point.x(), point.y()],
             }
         except Exception:
             return None
-    
+
     def _linestring_to_coords(self, geometry):
-        """Преобразование линии в координаты"""
+        """Преобразование линии со всеми частями мультилинии"""
         try:
             if geometry.isMultipart():
-                # Мультилиния - берём первую часть
-                multiline = geometry.asMultiPolyline()
-                if multiline and len(multiline) > 0:
-                    line = multiline[0]
-                else:
-                    return None
+                lines = geometry.asMultiPolyline()
             else:
-                # Простая линия
                 line = geometry.asPolyline()
-            
-            if not line or len(line) < 2:
+                lines = [line] if line else []
+
+            parts = []
+            for line in lines:
+                if line and len(line) >= 2:
+                    parts.append([[p.x(), p.y()] for p in line])
+
+            if not parts:
                 return None
-            
-            coordinates = []
-            for point in line:
-                coordinates.append([point.x(), point.y()])
-            
+
             return {
                 'type': 'LineString',
-                'coordinates': coordinates
+                'parts': parts,
             }
-            
         except Exception:
             return None
-    
+
     def _polygon_to_coords(self, geometry):
-        """Преобразование полигона в координаты"""
+        """Преобразование полигона со всеми частями мультиполигона"""
         try:
             if geometry.isMultipart():
-                # Мультиполигон - берём первую часть
-                multipolygon = geometry.asMultiPolygon()
-                if multipolygon and len(multipolygon) > 0:
-                    polygon = multipolygon[0]
-                else:
-                    return None
+                polygons = geometry.asMultiPolygon()
             else:
-                # Простой полигон
                 polygon = geometry.asPolygon()
-            
-            if not polygon or len(polygon) == 0:
+                polygons = [polygon] if polygon else []
+
+            parts = []
+            for polygon in polygons:
+                rings = []
+                for ring in polygon:
+                    if len(ring) >= 3:
+                        rings.append([[p.x(), p.y()] for p in ring])
+                if rings:
+                    parts.append(rings)
+
+            if not parts:
                 return None
-            
-            # Преобразуем кольца полигона
-            rings = []
-            for ring in polygon:
-                if len(ring) < 3:  # Минимум 3 точки для кольца
-                    continue
-                
-                ring_coords = []
-                for point in ring:
-                    ring_coords.append([point.x(), point.y()])
-                
-                rings.append(ring_coords)
-            
-            if not rings:
-                return None
-            
+
             return {
                 'type': 'Polygon',
-                'coordinates': rings
+                'parts': parts,
             }
-            
         except Exception:
             return None
-    
-    def validate_geometry(self, geometry):
-        """Проверка корректности геометрии"""
-        if not geometry or geometry.isEmpty():
-            return False
-        
-        # Проверяем, что геометрия действительна
-        if not geometry.isGeosValid():
-            return False
-        
-        # Дополнительные проверки в зависимости от типа
-        geom_type = QgsWkbTypes.geometryType(geometry.wkbType())
-        
-        if geom_type == QgsWkbTypes.LineGeometry:
-            # Линия должна иметь минимум 2 точки
-            try:
-                if geometry.isMultipart():
-                    multiline = geometry.asMultiPolyline()
-                    return len(multiline) > 0 and len(multiline[0]) >= 2
-                else:
-                    line = geometry.asPolyline()
-                    return len(line) >= 2
-            except:
-                return False
-        
-        elif geom_type == QgsWkbTypes.PolygonGeometry:
-            # Полигон должен иметь минимум 3 точки
-            try:
-                if geometry.isMultipart():
-                    multipolygon = geometry.asMultiPolygon()
-                    return (len(multipolygon) > 0 and 
-                           len(multipolygon[0]) > 0 and 
-                           len(multipolygon[0][0]) >= 3)
-                else:
-                    polygon = geometry.asPolygon()
-                    return len(polygon) > 0 and len(polygon[0]) >= 3
-            except:
-                return False
-        
-        return True
-    
+
     def get_layer_statistics(self, layer):
         """Получение статистики слоя"""
         if not layer or not layer.isValid():
             return {}
-        
-        stats = {
+
+        return {
             'name': layer.name(),
             'geometry_type': self._get_geometry_type(layer),
             'feature_count': layer.featureCount(),
             'crs': layer.crs().authid(),
             'extent': layer.extent(),
-            'fields': [field.name() for field in layer.fields()]
+            'fields': [field.name() for field in layer.fields()],
         }
-        
-        return stats

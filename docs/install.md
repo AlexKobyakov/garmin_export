@@ -69,14 +69,22 @@ java -version
 
 ## 📦 Установка mkgmap
 
-### Скачивание mkgmap
-1. Перейдите на https://www.mkgmap.org.uk/
-2. В разделе "Download" скачайте последнюю версию
-3. Распакуйте архив в удобную папку (например, `C:\Tools\mkgmap\`)
+Начиная с версии 1.1, **mkgmap не нужно скачивать вручную**. Откройте плагин,
+перейдите на вкладку **«Инструменты»** и нажмите **«Скачать mkgmap»** — плагин
+сам получит последнюю версию с официального сайта (или с резервного
+Яндекс.Диска, если сайт недоступен) и сохранит её в профиле QGIS.
 
-### Альтернативные источники
-- GitHub releases: https://github.com/openstreetmap/mkgmap/releases
-- Mirror sites: проверьте актуальные ссылки на официальном сайте
+Если у вас уже есть `mkgmap.jar`, нажмите **«Добавить mkgmap»** и укажите файл.
+
+### Ручное скачивание (по желанию)
+1. Перейдите на https://www.mkgmap.org.uk/download/mkgmap.html
+2. Скачайте последнюю версию `mkgmap-rXXXX.jar`
+3. В плагине нажмите «Добавить mkgmap» и укажите путь к файлу
+
+### splitter (необязательно)
+Файл `splitter.jar` нужен только для нарезки очень больших карт на тайлы.
+Его можно скачать кнопкой «Скачать splitter» или взять с
+https://www.mkgmap.org.uk/download/splitter.html
 
 ## ✅ Проверка установки
 
@@ -90,9 +98,10 @@ java -version
 3. Должно открыться окно с интерфейсом экспорта
 
 ### Тест 3: Проверка зависимостей
-1. В плагине перейдите на вкладку "Настройки экспорта"
-2. Укажите путь к mkgmap.jar
-3. Плагин должен подтвердить корректность пути
+1. В плагине перейдите на вкладку "Инструменты"
+2. Нажмите "Скачать mkgmap" (или "Добавить mkgmap" для локального файла)
+3. Плагин должен подтвердить корректность пути (зелёная отметка ✅)
+4. Нажмите "Найти автоматически" рядом с Java — путь заполнится, если Java установлена
 
 ## 🐛 Решение проблем установки
 
@@ -131,26 +140,37 @@ plugins/garmin_export/
 ├── README.md
 ├── core/
 │   ├── __init__.py
-│   ├── export_worker.py
-│   ├── mp_generator.py
-│   ├── mkgmap_compiler.py
-│   ├── layer_processor.py
-│   └── style_mapper.py
+│   ├── export_worker.py       # оркестрация экспорта (Qt worker)
+│   ├── mp_generator.py        # Polish MP формат
+│   ├── mkgmap_command.py      # построитель команды mkgmap (по документации)
+│   ├── mkgmap_compiler.py     # запуск mkgmap, валидация jar, поиск Java
+│   ├── typ_generator.py       # генерация TYP из символики QGIS
+│   ├── layer_processor.py     # обработка геометрии слоёв
+│   ├── layer_manager.py       # доступ к слоям проекта
+│   ├── downloader.py          # логика скачивания mkgmap/splitter
+│   ├── download_worker.py     # Qt worker скачивания
+│   ├── settings_manager.py    # хранение настроек (QSettings)
+│   └── style_mapper.py        # сопоставление QGIS -> Garmin типы
 ├── gui/
 │   ├── __init__.py
 │   ├── gui_main.py
 │   ├── gui_components.py
 │   ├── gui_widgets.py
+│   ├── gui_mkgmap_widgets.py  # вкладки Инструменты/Тюнинг/TYP
 │   ├── gui_dialogs.py
-│   └── gui_handlers.py
+│   ├── gui_handlers.py
+│   └── simple_donation.py     # диалог поддержки (как в референсном плагине)
 ├── translations/
 │   ├── __init__.py
 │   ├── ru.py
 │   └── en.py
 ├── examples/
 │   └── default_mapping.json
+├── tests/                     # офлайн-тесты ядра (без QGIS)
+│   └── run_tests.py
 └── docs/
-    └── install.md
+    ├── install.md
+    └── user_guide.md
 ```
 
 ## 🔄 Обновление плагина

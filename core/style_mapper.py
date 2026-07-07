@@ -314,8 +314,9 @@ class StyleMapper:
     def export_mapping_to_json(self, file_path):
         """Экспорт сопоставления в JSON файл"""
         try:
+            data = self.mapping_data or self.default_mapping
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(self.mapping_data, f, indent=2, ensure_ascii=False)
+                json.dump(data, f, indent=2, ensure_ascii=False)
             return True
         except Exception:
             return False
