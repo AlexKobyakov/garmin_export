@@ -10,8 +10,10 @@ Year: 2025
 
 __all__ = [
     'gui_main',
-    'gui_components', 
+    'gui_components',
     'gui_widgets',
+    'gui_mkgmap_widgets',
     'gui_dialogs',
-    'gui_handlers'
+    'gui_handlers',
+    'simple_donation',
 ]

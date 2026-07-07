@@ -2,21 +2,24 @@
 name=Garmin Export
 qgisMinimumVersion=3.22
 description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
-version=1.0.0
+version=1.1.0
 author=Alex Kobyakov
 email=kobyakov@lesburo.ru
-about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using mkgmap compiler. Features include automatic style mapping, batch processing of all project layers, multilevel map support, and intuitive multilingual interface. Ideal for creating custom Garmin maps from GIS data including roads, POIs, polygons and routes.
+about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of mkgmap/splitter (QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, batch processing of all project layers, and a multilingual interface. Requires Java (JRE 8+) which the plugin can auto-detect.
 tracker=https://github.com/AlexKobyakov/garmin_export/issues
 repository=https://github.com/AlexKobyakov/garmin_export
-changelog=1.0.0 - Initial release with full functionality
-    - Vector data export to Polish MP format
-    - mkgmap integration for IMG compilation
-    - JSON-based style mapping system
-    - Multi-level map support (Level0-Level3)
-    - Batch processing of all layers
-    - Multilingual interface (EN/RU)
-    - Modern modular architecture
-tags=garmin, export, img, mkgmap, gps, vector, batch, multilingual, navigation, custom-maps
+changelog=1.1.0 - Major rework
+    - Download mkgmap/splitter from mkgmap.org.uk (variable link) or Yandex.Disk (permanent), or add local jar
+    - Automatic Java detection; runs mkgmap without console popups on Windows
+    - TYP styling generated from QGIS layer symbology (colors, line widths, POI icons)
+    - Correct Polish MP format (proper [END] markers, code-page aware, multipart geometry)
+    - mkgmap command builder follows official documentation (java opts before -jar)
+    - Advanced tuning tab: heap size, threads, generalization, draw priority, logging
+    - Persistent settings between sessions
+    - Author/Support dialogs identical to reference plugin
+    - Offline unit tests for core logic
+    1.0.0 - Initial release
+tags=garmin, export, img, mkgmap, gps, vector, typ, batch, multilingual, navigation, custom-maps
 homepage=https://github.com/AlexKobyakov/garmin_export
 category=Vector
 icon=icon.png

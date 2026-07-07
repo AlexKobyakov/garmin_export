@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Downloaded tools (never commit jars)
+*.jar
+
+# Build / temp output
+*.img
+*.mp
+mkgmap.log
+temp/
+*.part
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

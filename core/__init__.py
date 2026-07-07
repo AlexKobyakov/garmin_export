@@ -12,6 +12,12 @@ __all__ = [
     'export_worker',
     'mp_generator',
     'mkgmap_compiler',
+    'mkgmap_command',
     'layer_processor',
-    'style_mapper'
+    'layer_manager',
+    'style_mapper',
+    'typ_generator',
+    'downloader',
+    'download_worker',
+    'settings_manager',
 ]
