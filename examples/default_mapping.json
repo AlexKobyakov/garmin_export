@@ -1,0 +1,185 @@
+{
+  "layers": {
+    "roads": {
+      "geometry": "LineString",
+      "type": "0x06",
+      "label_field": "name",
+      "style": {
+        "color": "#FF0000",
+        "width": 2
+      },
+      "level": 1,
+      "description": "Основные дороги"
+    },
+    "highways": {
+      "geometry": "LineString",
+      "type": "0x01",
+      "label_field": "name",
+      "style": {
+        "color": "#FF8000",
+        "width": 3
+      },
+      "level": 0,
+      "description": "Автомагистрали и главные дороги"
+    },
+    "streets": {
+      "geometry": "LineString",
+      "type": "0x07",
+      "label_field": "name",
+      "style": {
+        "color": "#808080",
+        "width": 1
+      },
+      "level": 2,
+      "description": "Городские улицы"
+    },
+    "rivers": {
+      "geometry": "LineString",
+      "type": "0x1F",
+      "label_field": "name",
+      "style": {
+        "color": "#0000FF",
+        "width": 1
+      },
+      "level": 2,
+      "description": "Реки и ручьи"
+    },
+    "railways": {
+      "geometry": "LineString",
+      "type": "0x14",
+      "label_field": "name",
+      "style": {
+        "color": "#808080",
+        "width": 1
+      },
+      "level": 2,
+      "description": "Железные дороги"
+    },
+    "forests": {
+      "geometry": "Polygon",
+      "type": "0x16",
+      "label_field": "name",
+      "style": {
+        "fill_color": "#00FF00"
+      },
+      "level": 3,
+      "description": "Лесные массивы"
+    },
+    "water": {
+      "geometry": "Polygon",
+      "type": "0x3C",
+      "label_field": "name",
+      "style": {
+        "fill_color": "#0080FF"
+      },
+      "level": 2,
+      "description": "Водные объекты (озера, пруды)"
+    },
+    "buildings": {
+      "geometry": "Polygon",
+      "type": "0x13",
+      "label_field": "name",
+      "style": {
+        "fill_color": "#C0C0C0"
+      },
+      "level": 1,
+      "description": "Здания и сооружения"
+    },
+    "parks": {
+      "geometry": "Polygon",
+      "type": "0x1A",
+      "label_field": "name",
+      "style": {
+        "fill_color": "#90EE90"
+      },
+      "level": 2,
+      "description": "Парки и зеленые зоны"
+    },
+    "poi": {
+      "geometry": "Point",
+      "type": "0x2f00",
+      "label_field": "name",
+      "icon": "default",
+      "level": 1,
+      "description": "Общие точки интереса"
+    },
+    "cities": {
+      "geometry": "Point",
+      "type": "0x0100",
+      "label_field": "name",
+      "icon": "city",
+      "level": 0,
+      "description": "Крупные города"
+    },
+    "villages": {
+      "geometry": "Point",
+      "type": "0x0800",
+      "label_field": "name",
+      "icon": "village",
+      "level": 1,
+      "description": "Села и деревни"
+    },
+    "gas_stations": {
+      "geometry": "Point",
+      "type": "0x2B00",
+      "label_field": "name",
+      "icon": "fuel",
+      "level": 1,
+      "description": "Автозаправочные станции"
+    },
+    "restaurants": {
+      "geometry": "Point",
+      "type": "0x4100",
+      "label_field": "name",
+      "icon": "restaurant",
+      "level": 1,
+      "description": "Рестораны и кафе"
+    },
+    "hospitals": {
+      "geometry": "Point",
+      "type": "0x2A00",
+      "label_field": "name",
+      "icon": "hospital",
+      "level": 1,
+      "description": "Больницы и медицинские учреждения"
+    }
+  },
+  "settings": {
+    "default_level": 1,
+    "coordinate_system": "EPSG:4326",
+    "encoding": "UTF-8",
+    "description": "Пример JSON-сопоставления для экспорта данных QGIS в формат Garmin IMG"
+  },
+  "garmin_types_reference": {
+    "roads": {
+      "0x01": "Автомагистраль",
+      "0x02": "Главная дорога",
+      "0x03": "Второстепенная дорога",
+      "0x04": "Артериальная дорога",
+      "0x05": "Коллекторная дорога",
+      "0x06": "Жилая дорога",
+      "0x07": "Переулок",
+      "0x08": "Пешеходная дорога",
+      "0x14": "Железная дорога"
+    },
+    "water": {
+      "0x1F": "Река/ручей",
+      "0x3C": "Озеро/пруд",
+      "0x46": "Болото"
+    },
+    "areas": {
+      "0x13": "Здание",
+      "0x16": "Лес",
+      "0x1A": "Парк",
+      "0x1B": "Парковка"
+    },
+    "poi": {
+      "0x0100": "Город (большой)",
+      "0x0800": "Деревня",
+      "0x2A00": "Больница",
+      "0x2B00": "Заправка",
+      "0x2F00": "Общая POI",
+      "0x4100": "Ресторан"
+    }
+  }
+}

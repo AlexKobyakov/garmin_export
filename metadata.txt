@@ -1,0 +1,24 @@
+[general]
+name=Garmin Export
+qgisMinimumVersion=3.22
+description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
+version=1.0.0
+author=Alex Kobyakov
+email=kobyakov@lesburo.ru
+about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using mkgmap compiler. Features include automatic style mapping, batch processing of all project layers, multilevel map support, and intuitive multilingual interface. Ideal for creating custom Garmin maps from GIS data including roads, POIs, polygons and routes.
+tracker=https://github.com/AlexKobyakov/garmin_export/issues
+repository=https://github.com/AlexKobyakov/garmin_export
+changelog=1.0.0 - Initial release with full functionality
+    - Vector data export to Polish MP format
+    - mkgmap integration for IMG compilation
+    - JSON-based style mapping system
+    - Multi-level map support (Level0-Level3)
+    - Batch processing of all layers
+    - Multilingual interface (EN/RU)
+    - Modern modular architecture
+tags=garmin, export, img, mkgmap, gps, vector, batch, multilingual, navigation, custom-maps
+homepage=https://github.com/AlexKobyakov/garmin_export
+category=Vector
+icon=icon.png
+experimental=False
+deprecated=False
