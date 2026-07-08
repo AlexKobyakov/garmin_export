@@ -164,7 +164,10 @@ def download_tool(tool, dest_dir, progress_callback=None,
             _download_file(url, temp_path, progress_callback,
                            cancelled_callback, opener)
 
-            if not validate_jar(temp_path, config['jar_class_prefix']):
+            # temp_path заканчивается на .part, поэтому проверку расширения
+            # отключаем — валидируем только содержимое архива
+            if not validate_jar(temp_path, config['jar_class_prefix'],
+                                 check_extension=False):
                 os.remove(temp_path)
                 raise ValueError(
                     'Скачанный файл не является корректным {0}.jar'.format(tool))
