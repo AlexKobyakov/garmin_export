@@ -24,6 +24,9 @@ LANGUAGE_LABELS = [
     ('fr', '🇫🇷 Français'),
     ('pt', '🇧🇷 Português'),
     ('de', '🇩🇪 Deutsch'),
+    ('id', '🇮🇩 Bahasa Indonesia'),
+    ('th', '🇹🇭 ไทย'),
+    ('vi', '🇻🇳 Tiếng Việt'),
 ]
 
 
