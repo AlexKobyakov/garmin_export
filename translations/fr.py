@@ -213,8 +213,18 @@ translations = {
     'cp_1253': 'CP1253 (grec)',
     'cp_1254': 'CP1254 (turc)',
     'cp_1257': 'CP1257 (balte)',
-    'cp_65001': 'Unicode (pas tous les appareils)',
-
+    'cp_65001': 'UTF-8 / Unicode (toutes les langues)',
+    'cp_1255': 'CP1255 (hébreu)',
+    'cp_1256': 'CP1256 (arabe)',
+    'cp_1258': 'CP1258 (vietnamien)',
+    'cp_874': 'CP874 (thaï)',
+    'cp_932': 'CP932 (japonais, Shift-JIS)',
+    'cp_936': 'CP936 (chinois simplifié, GBK)',
+    'cp_949': 'CP949 (coréen)',
+    'cp_950': 'CP950 (chinois traditionnel, Big5)',
+    'cp_866': 'CP866 (cyrillique, DOS)',
+    'cp_850': "CP850 (Europe de l'Ouest, DOS)",
+    'cp_852': 'CP852 (Europe centrale, DOS)',
     # TYP tab
     'typ_info': 'Un fichier TYP définit l\'apparence des objets sur l\'appareil Garmin : '
                 'couleurs des polygones, épaisseur des lignes, icônes des points. L\'extension '

@@ -15,19 +15,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from .gui_components import create_styled_button, create_info_label
-
-
-# Поддерживаемые кодовые страницы: (код, ключ перевода названия)
-# см. --code-page в документации mkgmap
-CODE_PAGES = [
-    ('1251', 'cp_1251'),
-    ('1252', 'cp_1252'),
-    ('1250', 'cp_1250'),
-    ('1253', 'cp_1253'),
-    ('1254', 'cp_1254'),
-    ('1257', 'cp_1257'),
-    ('65001', 'cp_65001'),
-]
+from ..core.codepages import CODE_PAGES
 
 
 def _t(key):

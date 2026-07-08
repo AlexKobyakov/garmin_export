@@ -213,8 +213,18 @@ translations = {
     'cp_1253': 'CP1253 (grego)',
     'cp_1254': 'CP1254 (turco)',
     'cp_1257': 'CP1257 (báltico)',
-    'cp_65001': 'Unicode (nem todos os dispositivos)',
-
+    'cp_65001': 'UTF-8 / Unicode (todos os idiomas)',
+    'cp_1255': 'CP1255 (hebraico)',
+    'cp_1256': 'CP1256 (árabe)',
+    'cp_1258': 'CP1258 (vietnamita)',
+    'cp_874': 'CP874 (tailandês)',
+    'cp_932': 'CP932 (japonês, Shift-JIS)',
+    'cp_936': 'CP936 (chinês simplificado, GBK)',
+    'cp_949': 'CP949 (coreano)',
+    'cp_950': 'CP950 (chinês tradicional, Big5)',
+    'cp_866': 'CP866 (cirílico, DOS)',
+    'cp_850': 'CP850 (Europa Ocidental, DOS)',
+    'cp_852': 'CP852 (Europa Central, DOS)',
     # TYP tab
     'typ_info': 'Um arquivo TYP define a aparência dos objetos no dispositivo Garmin: '
                 'cores de polígonos, espessura de linhas, ícones de pontos. O complemento pode '

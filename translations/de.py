@@ -213,8 +213,18 @@ translations = {
     'cp_1253': 'CP1253 (Griechisch)',
     'cp_1254': 'CP1254 (Türkisch)',
     'cp_1257': 'CP1257 (Baltisch)',
-    'cp_65001': 'Unicode (nicht alle Geräte)',
-
+    'cp_65001': 'UTF-8 / Unicode (alle Sprachen)',
+    'cp_1255': 'CP1255 (Hebräisch)',
+    'cp_1256': 'CP1256 (Arabisch)',
+    'cp_1258': 'CP1258 (Vietnamesisch)',
+    'cp_874': 'CP874 (Thai)',
+    'cp_932': 'CP932 (Japanisch, Shift-JIS)',
+    'cp_936': 'CP936 (Vereinfachtes Chinesisch, GBK)',
+    'cp_949': 'CP949 (Koreanisch)',
+    'cp_950': 'CP950 (Traditionelles Chinesisch, Big5)',
+    'cp_866': 'CP866 (Kyrillisch, DOS)',
+    'cp_850': 'CP850 (Westeuropäisch, DOS)',
+    'cp_852': 'CP852 (Mitteleuropäisch, DOS)',
     # TYP tab
     'typ_info': 'Eine TYP-Datei legt fest, wie Objekte auf dem Garmin-Gerät aussehen: '
                 'Polygonfarben, Linienbreiten, Punktsymbole. Das Plugin kann eine TYP '

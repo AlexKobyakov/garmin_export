@@ -2,13 +2,18 @@
 name=Garmin Export
 qgisMinimumVersion=3.22
 description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
-version=1.1.1
+version=1.1.2
 author=Alex Kobyakov
 email=kobyakov@lesburo.ru
-about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of mkgmap/splitter (QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, batch processing of all project layers, and a 9-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR). Requires Java (JRE 8+) which the plugin can auto-detect.
+about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of mkgmap/splitter (QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, comprehensive label code-page support (UTF-8 plus Windows/DOS/CJK pages), batch processing of all project layers, and a 12-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI). Requires Java (JRE 8+) which the plugin can auto-detect.
 tracker=https://github.com/AlexKobyakov/garmin_export/issues
 repository=https://github.com/AlexKobyakov/garmin_export
-changelog=1.1.1 - Localization fix
+changelog=1.1.2 - More languages and code pages
+    - Added 3 more UI languages: Indonesian, Thai, Vietnamese (12 total)
+    - Comprehensive label code-page support (18 options): UTF-8/Unicode plus Windows
+      1250-1258, Thai 874, CJK 932/936/949/950, and DOS 850/852/866
+    - Expanded offline tests: UI translation consistency and code-page encoding round-trips
+    1.1.1 - Localization fix
     - Fixed empty language selector (white box); language names now display correctly
     - Added 7 more UI languages: German, Spanish, French, Portuguese, Chinese, Hindi, Arabic (9 total)
     - Right-to-left layout for Arabic; selected language is remembered between sessions

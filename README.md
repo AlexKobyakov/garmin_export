@@ -2,12 +2,12 @@
 
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.1.1  
+Версия: 1.1.2  
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026
 
-🌐 **Языки интерфейса / UI languages:** 🇷🇺 Русский · 🇺🇸 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇧🇷 Português · 🇨🇳 中文 · 🇮🇳 हिन्दी · 🇸🇦 العربية
+🌐 **Языки интерфейса / UI languages:** 🇷🇺 Русский · 🇺🇸 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇧🇷 Português · 🇨🇳 中文 · 🇮🇳 हिन्दी · 🇸🇦 العربية · 🇮🇩 Bahasa Indonesia · 🇹🇭 ไทย · 🇻🇳 Tiếng Việt
 
 🇬🇧 [English description](#-english) · 🇷🇺 [Русское описание](#-описание)
 
@@ -39,8 +39,11 @@ Garmin GPS devices.
 - ☕ **Java auto-detection**: the plugin finds Java on the system (PATH,
   JAVA_HOME, common install directories).
 - 🔄 **Batch processing**: export all project layers at once.
-- 🌐 **Multilingual interface**: 9 languages (EN, RU, DE, ES, FR, PT, ZH, HI, AR),
-  including right-to-left layout for Arabic.
+- 🌐 **Multilingual interface**: 12 languages (EN, RU, DE, ES, FR, PT, ZH, HI,
+  AR, ID, TH, VI), including right-to-left layout for Arabic.
+- 🔤 **Comprehensive label code pages**: 18 options — UTF-8/Unicode (covers every
+  language) plus Windows 1250–1258, Thai 874, CJK 932/936/949/950 and DOS
+  850/852/866 — so labels in any script export correctly.
 - 📋 **mkgmap logging**: optional mkgmap.log file with a configurable verbosity.
 - 💾 **Persistent settings** between sessions.
 
@@ -84,7 +87,8 @@ Garmin Export Plugin - это современный инструмент для
 - 🔧 **Тонкая настройка mkgmap**: память Java (-Xmx), число потоков (--max-jobs), генерализация, приоритет отрисовки, кодовая страница, адресный индекс — всё по официальной документации mkgmap
 - ☕ **Автопоиск Java**: плагин сам находит Java в системе (PATH, JAVA_HOME, типовые каталоги)
 - 🔄 **Пакетная обработка**: экспорт всех слоёв проекта одновременно
-- 🌐 **Многоязычный интерфейс**: 9 языков (RU, EN, DE, ES, FR, PT, ZH, HI, AR), включая письмо справа налево для арабского
+- 🌐 **Многоязычный интерфейс**: 12 языков (RU, EN, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI), включая письмо справа налево для арабского
+- 🔤 **Полный набор кодовых страниц подписей**: 18 вариантов — UTF-8/Unicode (покрывает любой язык), Windows 1250–1258, тайская 874, CJK 932/936/949/950 и DOS 850/852/866 — подписи на любом письме экспортируются корректно
 - 📋 **Логирование mkgmap**: опциональный файл журнала mkgmap.log с настраиваемым уровнем детализации
 - 💾 **Сохранение настроек** между сеансами работы
 

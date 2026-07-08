@@ -7,14 +7,15 @@ Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
 Organization: Lesburo
 Year: 2025-2026
-Version: 1.1.1
+Version: 1.1.2
 
 Modular Architecture:
 - garmin_exporter.py: Main plugin class
 - gui/: GUI components and design
-- translations/: Multi-language support (EN, RU, DE, ES, FR, PT, ZH, HI, AR)
+- translations/: Multi-language support (EN, RU, DE, ES, FR, PT, ZH, HI, AR,
+  ID, TH, VI)
 - core/: Core functionality modules (MP/TYP generation, mkgmap command,
-  downloader, settings, layer processing)
+  downloader, settings, layer processing, code pages)
 """
 
 def classFactory(iface):
