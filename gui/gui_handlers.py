@@ -36,11 +36,19 @@ class GuiEventHandlers:
 
     def onLanguageChanged(self, index):
         """Обработчик смены языка"""
+        from qgis.PyQt.QtCore import Qt
         from ..translation_manager import translations
 
         language_data = self.dialog.header.language_combo.itemData(index)
         if language_data and translations.set_language(language_data):
             self.dialog.updateLanguage()
+
+            # Направление письма (арабский - справа налево)
+            direction = (Qt.RightToLeft if translations.is_rtl(language_data)
+                         else Qt.LeftToRight)
+            self.dialog.setLayoutDirection(direction)
+
+            self.settings_manager.set('language', language_data)
             self.dialog.log_message(f"🌐 Язык изменен на: {language_data}")
 
     def showDonation(self):
