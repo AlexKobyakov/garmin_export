@@ -38,6 +38,10 @@ class GarminExportDialog(QDialog):
         self.worker = None
         self.worker_thread = None
 
+        # Применяем сохранённый язык ДО построения интерфейса,
+        # чтобы комбобокс и все подписи сразу отобразились правильно
+        self._applySavedLanguage()
+
         self.setupWindow()
         self.setupUi()
 
@@ -53,6 +57,24 @@ class GarminExportDialog(QDialog):
         self.handlers.loadSettings()
 
         self.updateLanguage()
+        self._applyLayoutDirection()
+
+    def _applySavedLanguage(self):
+        """Применяет сохранённый язык интерфейса, если он выбирался ранее"""
+        from ..core.settings_manager import SettingsManager
+        from ..translation_manager import translations
+
+        saved = SettingsManager().get('language')
+        if saved:
+            translations.set_language(saved)
+
+    def _applyLayoutDirection(self):
+        """Направление письма по текущему языку (RTL для арабского)"""
+        from qgis.PyQt.QtCore import Qt
+        from ..translation_manager import translations
+
+        self.setLayoutDirection(
+            Qt.RightToLeft if translations.is_rtl() else Qt.LeftToRight)
 
     def setupWindow(self):
         """Настройка основных параметров окна"""

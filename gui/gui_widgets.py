@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import (
     QCheckBox, QSpinBox, QTextEdit, QListWidget, QListWidgetItem,
     QTableWidget, QTableWidgetItem, QHeaderView, QFrame
 )
-from qgis.PyQt.QtGui import QFont, QPalette, QColor
+from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label, ModernButton
 
@@ -95,20 +95,31 @@ class HeaderWidget(QFrame):
         """)
 
         self.language_combo = QComboBox()
-        self.language_combo.setFixedSize(140, 32)
-        self.language_combo.addItem("🇷🇺 Русский", "ru")
-        self.language_combo.addItem("🇺🇸 English", "en")
+        self.language_combo.setFixedSize(150, 32)
 
-        # Принудительная настройка палитры выпадающего списка
-        self.forceDropdownColors()
+        # Заполняем языки из менеджера переводов (единый источник)
+        from ..translation_manager import translations
+        for code, label in translations.get_language_labels():
+            self.language_combo.addItem(label, code)
 
+        # Устанавливаем текущий язык
+        current = translations.get_current_language()
+        index = self.language_combo.findData(current)
+        if index >= 0:
+            self.language_combo.setCurrentIndex(index)
+
+        # Стилизуем только сам комбобокс и выпадающий список через QSS.
+        # ВАЖНО: не вызываем setPalette() на самом комбо — на Windows/QGIS
+        # это приводило к белому тексту на белом фоне (пустое поле).
+        # Стиль выпадающего списка (QAbstractItemView) задаёт чёрный текст
+        # на белом фоне, чтобы пункты были читаемы в любой теме.
         self.language_combo.setStyleSheet("""
             QComboBox {
                 background: rgba(255, 255, 255, 0.2);
                 color: white;
                 border: 2px solid rgba(255, 255, 255, 0.3);
                 border-radius: 6px;
-                padding: 6px 12px;
+                padding: 4px 10px;
                 font-weight: bold;
                 font-size: 11px;
             }
@@ -122,68 +133,25 @@ class HeaderWidget(QFrame):
                 background: transparent;
             }
             QComboBox::down-arrow {
-                color: white;
-                width: 12px;
-                height: 12px;
+                width: 10px;
+                height: 10px;
+            }
+            QComboBox QAbstractItemView {
+                background-color: white;
+                color: #2c3e50;
+                border: 2px solid #bdc3c7;
+                border-radius: 4px;
+                outline: none;
+                font-size: 11px;
+                font-weight: bold;
+                selection-background-color: #3498db;
+                selection-color: white;
             }
         """)
 
         lang_layout.addWidget(lang_icon)
         lang_layout.addWidget(self.language_combo)
         layout.addWidget(lang_container)
-
-    def forceDropdownColors(self):
-        """Принудительная настройка цветов dropdown (из референсного плагина)"""
-        try:
-            view = self.language_combo.view()
-
-            palette = QPalette()
-            palette.setColor(QPalette.Base, QColor(255, 255, 255))
-            palette.setColor(QPalette.Text, QColor(0, 0, 0))
-            palette.setColor(QPalette.Window, QColor(255, 255, 255))
-            palette.setColor(QPalette.WindowText, QColor(0, 0, 0))
-            palette.setColor(QPalette.Button, QColor(255, 255, 255))
-            palette.setColor(QPalette.ButtonText, QColor(0, 0, 0))
-            palette.setColor(QPalette.Highlight, QColor(52, 152, 219))
-            palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
-            palette.setColor(QPalette.AlternateBase, QColor(248, 249, 250))
-
-            self.language_combo.setPalette(palette)
-            view.setPalette(palette)
-
-            view.setStyleSheet("""
-                QListView {
-                    background-color: white !important;
-                    color: black !important;
-                    border: 2px solid #bdc3c7;
-                    border-radius: 4px;
-                    outline: none;
-                    font-size: 11px;
-                    font-weight: bold;
-                    padding: 2px;
-                }
-                QListView::item {
-                    padding: 8px 12px;
-                    color: black !important;
-                    background-color: white !important;
-                    border: none;
-                    min-height: 24px;
-                }
-                QListView::item:selected {
-                    background-color: #3498db !important;
-                    color: white !important;
-                }
-                QListView::item:hover {
-                    background-color: #5dade2 !important;
-                    color: white !important;
-                }
-            """)
-
-            view.update()
-            self.language_combo.update()
-
-        except Exception as e:
-            print(f"Warning: Could not force dropdown colors: {e}")
 
     def createDonationButton(self, layout):
         """Создание кнопки поддержки"""

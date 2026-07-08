@@ -42,6 +42,7 @@ DEFAULTS = {
     'extra_args': '',
     'typ_mode': 'none',      # none | generate | file
     'typ_file_path': '',
+    'language': '',          # выбранный язык интерфейса (пусто = авто/локаль)
 }
 
 _BOOL_KEYS = {

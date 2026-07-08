@@ -8,55 +8,78 @@ Email: kobyakov@lesburo.ru
 Year: 2025
 """
 
-import os
-import sys
+import importlib
+
+# Языки с письмом справа налево (для setLayoutDirection)
+RTL_LANGUAGES = {'ar'}
+
+# Отображаемые названия языков (флаг + эндоним) в порядке для UI
+LANGUAGE_LABELS = [
+    ('ru', '🇷🇺 Русский'),
+    ('en', '🇺🇸 English'),
+    ('zh', '🇨🇳 中文'),
+    ('hi', '🇮🇳 हिन्दी'),
+    ('es', '🇪🇸 Español'),
+    ('ar', '🇸🇦 العربية'),
+    ('fr', '🇫🇷 Français'),
+    ('pt', '🇧🇷 Português'),
+    ('de', '🇩🇪 Deutsch'),
+]
+
 
 class TranslationManager:
     """Менеджер переводов с поддержкой модульной архитектуры"""
-    
+
     def __init__(self):
         self.current_language = 'ru'
         self.fallback_language = 'en'
         self.loaded_languages = {}
-        
-        # Список поддерживаемых языков
-        self.supported_languages = ['ru', 'en']
-        
+
+        # Список поддерживаемых языков (соответствует файлам в translations/)
+        self.supported_languages = [code for code, _ in LANGUAGE_LABELS]
+
         # Загружаем язык по умолчанию
         self._load_language(self.current_language)
         if self.current_language != self.fallback_language:
             self._load_language(self.fallback_language)
-    
+
     def _load_language(self, language_code):
-        """Загружает переводы для указанного языка"""
+        """Загружает переводы для указанного языка (динамический импорт)"""
         if language_code in self.loaded_languages:
             return True
-            
+
         if language_code not in self.supported_languages:
             return False
-            
+
         try:
-            # Динамически импортируем модуль языка из пакета translations
-            if language_code == 'ru':
-                from .translations import ru as module
-            elif language_code == 'en':
-                from .translations import en as module
-            else:
-                return False
-            
+            package = __package__ or __name__.rpartition('.')[0]
+            module = importlib.import_module(
+                '.translations.{0}'.format(language_code), package)
+
             if hasattr(module, 'translations'):
                 self.loaded_languages[language_code] = module.translations
                 return True
             else:
-                print(f"Warning: Module {language_code} does not have 'translations' dictionary")
+                print("Warning: Module {0} has no 'translations' dictionary"
+                      .format(language_code))
                 return False
-                
+
         except ImportError as e:
-            print(f"Warning: Could not load translations for {language_code}: {e}")
+            print("Warning: Could not load translations for {0}: {1}"
+                  .format(language_code, e))
             return False
         except Exception as e:
-            print(f"Error loading translations for {language_code}: {e}")
+            print("Error loading translations for {0}: {1}"
+                  .format(language_code, e))
             return False
+
+    def get_language_labels(self):
+        """Список (код, отображаемое_название) для заполнения UI"""
+        return list(LANGUAGE_LABELS)
+
+    def is_rtl(self, language_code=None):
+        """Является ли язык письмом справа налево"""
+        return (language_code or self.current_language) in RTL_LANGUAGES
     
     def set_language(self, language_code):
         """Устанавливает текущий язык"""
