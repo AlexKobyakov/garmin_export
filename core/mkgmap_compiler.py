@@ -31,17 +31,20 @@ def _subprocess_flags():
     return {}
 
 
-def validate_jar(jar_path, required_prefix):
+def validate_jar(jar_path, required_prefix, check_extension=True):
     """Проверка, что файл является jar-архивом с нужными классами.
 
     Args:
         jar_path: путь к jar файлу
         required_prefix: префикс пути внутри архива,
             например 'uk/me/parabola/mkgmap'
+        check_extension: требовать расширение .jar. Отключается при проверке
+            промежуточного файла загрузки (*.jar.part), который ещё не
+            переименован в итоговый .jar.
     """
     if not jar_path or not os.path.isfile(jar_path):
         return False
-    if not jar_path.lower().endswith('.jar'):
+    if check_extension and not jar_path.lower().endswith('.jar'):
         return False
     try:
         with zipfile.ZipFile(jar_path) as jar:

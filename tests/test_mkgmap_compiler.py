@@ -52,6 +52,22 @@ class ValidateJarTest(unittest.TestCase):
         finally:
             os.remove(path)
 
+    def test_part_file_valid_without_extension_check(self):
+        # Промежуточный файл загрузки *.jar.part должен проходить проверку
+        # содержимого при check_extension=False (регрессия: скачивание)
+        path = _make_jar(['uk/me/parabola/mkgmap/main/Main.class'])
+        part_path = path + '.part'
+        os.rename(path, part_path)
+        try:
+            self.assertFalse(
+                mkgmap_compiler.validate_jar(
+                    part_path, 'uk/me/parabola/mkgmap'))
+            self.assertTrue(
+                mkgmap_compiler.validate_jar(
+                    part_path, 'uk/me/parabola/mkgmap', check_extension=False))
+        finally:
+            os.remove(part_path)
+
     def test_missing_file(self):
         self.assertFalse(mkgmap_compiler.validate_mkgmap_jar('/no/such/file.jar'))
 
