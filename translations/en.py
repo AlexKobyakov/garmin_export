@@ -5,7 +5,7 @@ English translations for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 translations = {
@@ -160,4 +160,93 @@ translations = {
     'success_export_complete': 'Map compiled successfully! File saved:',
     'success_mapping_saved': 'Mapping saved successfully',
     'success_mapping_loaded': 'Mapping loaded successfully',
+
+    # Tools tab (labels, placeholders, info)
+    'mkgmap_path_label': 'Path to mkgmap.jar:',
+    'mkgmap_path_placeholder': 'Select or download mkgmap.jar',
+    'splitter_path_label': 'Path to splitter.jar (optional):',
+    'splitter_path_placeholder': 'splitter is needed to slice large maps (optional)',
+    'java_path_label': 'Path to Java:',
+    'java_path_placeholder': 'Empty = java from PATH; the button on the right detects it',
+    'tools_info': 'QGIS rules forbid bundling mkgmap.jar with the plugin. '
+                  'Click "Download mkgmap" and the plugin will fetch the latest '
+                  'version from mkgmap.org.uk (or from the Yandex.Disk backup), '
+                  'or point to your own file with "Add mkgmap".',
+    'support_tip': 'Support the plugin development!',
+    'author_tip': 'Plugin author information',
+
+    # Tuning tab - group titles
+    'map_params_group': 'Map parameters (mkgmap)',
+    'generalization_group': 'Generalization',
+    'performance_group': 'Performance (tuning)',
+    'logging_group': 'Logging and debugging',
+
+    # Tuning tab - options
+    'code_page_label': 'Label code page:',
+    'draw_priority_label': 'Draw priority (--draw-priority):',
+    'draw_priority_tip': '25 is standard. Higher = the map is drawn over others. '
+                         'For transparent overlay maps use more than 25.',
+    'opt_index': 'Address index for search (--index)',
+    'opt_add_pois': 'Create POIs from polygons (--add-pois-to-areas)',
+    'opt_lower_case': 'Allow lowercase in labels (--lower-case)',
+    'opt_order_area': 'Small polygons above large ones (--order-by-decreasing-area)',
+    'reduce_density_label': 'Line simplification, m (--reduce-point-density):',
+    'reduce_density_polygon_label': 'Polygon simplification, m (--reduce-point-density-polygon):',
+    'min_polygon_label': 'Min. polygon size (--min-size-polygon):',
+    'min_polygon_tip': 'Polygons smaller than this are removed. 8-15 recommended.',
+    'java_heap_label': 'Java memory, GB (-Xmx):',
+    'java_heap_tip': 'mkgmap needs ~500 MB per thread. For 8 cores set 4 GB.',
+    'max_jobs_label': 'Threads (--max-jobs):',
+    'max_jobs_tip': '0 = mkgmap decides based on cores and memory.',
+    'opt_mkgmap_log': 'Keep an mkgmap.log file in the output folder',
+    'opt_verbose': 'Verbose log (INFO level)',
+    'opt_keep_temp': 'Keep intermediate files (MP, TYP) in the output folder',
+    'extra_args_label': 'Extra mkgmap arguments:',
+    'extra_args_placeholder': 'e.g.: --precomp-sea=C:/sea.zip --generate-sea',
+    'value_auto': 'auto',
+    'value_auto_default': 'auto (2.6)',
+
+    # Code pages
+    'cp_1251': 'CP1251 (Cyrillic)',
+    'cp_1252': 'CP1252 (Latin-1, Western Europe)',
+    'cp_1250': 'CP1250 (Central Europe)',
+    'cp_1253': 'CP1253 (Greek)',
+    'cp_1254': 'CP1254 (Turkish)',
+    'cp_1257': 'CP1257 (Baltic)',
+    'cp_65001': 'Unicode (not all devices)',
+
+    # TYP tab
+    'typ_info': 'A TYP file defines how objects look on the Garmin device: '
+                'polygon colors, line widths, point icons. The plugin can generate '
+                'a TYP automatically from the current QGIS layer symbology - the map '
+                'on the navigator will look like in QGIS.',
+    'typ_none': 'Standard Garmin style (no TYP)',
+    'typ_generate': 'Generate TYP from QGIS styles (recommended)',
+    'typ_file': 'Use an existing TYP / typ.txt file:',
+    'typ_file_placeholder': 'Path to a .typ or .txt file',
+
+    # Layers tab
+    'layers_info': 'Select project layers to export to Garmin IMG format',
+
+    # Export tab (placeholders, tooltips)
+    'output_folder_placeholder': 'Select a folder to save the IMG file',
+    'map_description_placeholder': 'Map created with QGIS Garmin Export Plugin',
+    'family_id_tip': 'Map family identifier. Must be unique among maps on the device.',
+    'map_id_tip': '8-digit map tile number. Must be unique.',
+    'transparent_tip': 'A transparent map is drawn over other maps (e.g. over a base map).',
+    'routing_tip': 'Write NET/NOD data (--route). Works if the data contains a road network.',
+
+    # Styles tab
+    'mapping_info': 'Configure the correspondence between QGIS layers and Garmin object types',
+    'mapping_placeholder': 'JSON style mapping will be loaded automatically...',
+
+    # Levels tab
+    'levels_info': 'Levels define at which zoom the objects are visible on the device. '
+                   'Level 0 (resolution 24) is the most detailed, level 3 (resolution 18) '
+                   'is the overview. In the style mapping, the "level" parameter sets '
+                   'down to which level an object stays visible.',
+
+    # Log widget
+    'log_ready': 'Garmin Export Plugin loaded and ready',
+    'log_hint': 'Operation logs will appear here...',
 }

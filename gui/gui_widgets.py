@@ -5,7 +5,7 @@ GUI Widgets for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 import json
@@ -508,8 +508,11 @@ class LogTextWidget(QTextEdit):
             }
         """)
 
-        self.append("🎯 <span style='color: #3498db;'>Garmin Export Plugin загружен и готов к работе</span>")
-        self.append("📋 <span style='color: #95a5a6;'>Логи операций будут отображаться здесь...</span>")
+        from ..translation_manager import translations
+        self.append("🎯 <span style='color: #3498db;'>{0}</span>".format(
+            translations.get_text('log_ready')))
+        self.append("📋 <span style='color: #95a5a6;'>{0}</span>".format(
+            translations.get_text('log_hint')))
 
 
 class ResultsTableWidget(QTableWidget):

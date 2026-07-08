@@ -2,10 +2,73 @@
 
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.1.0  
+Версия: 1.1.1  
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
-Год: 2025
+Год: 2025-2026
+
+🌐 **Языки интерфейса / UI languages:** 🇷🇺 Русский · 🇺🇸 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇧🇷 Português · 🇨🇳 中文 · 🇮🇳 हिन्दी · 🇸🇦 العربية
+
+🇬🇧 [English description](#-english) · 🇷🇺 [Русское описание](#-описание)
+
+---
+
+## 🇬🇧 English
+
+**Garmin Export Plugin** is a professional QGIS tool for exporting vector layers
+to the Garmin IMG map format using the mkgmap compiler. It covers the whole
+workflow — from selecting layers in QGIS to producing a ready-to-use map for
+Garmin GPS devices.
+
+### Key features
+
+- 🗺️ **Exports every geometry type**: points (POI), lines (roads, rivers),
+  polygons (forests, water bodies), including multipart geometries.
+- 📥 **Built-in mkgmap/splitter download**: the "Download mkgmap" / "Download
+  splitter" buttons fetch the latest version from mkgmap.org.uk (variable link)
+  or from a permanent Yandex.Disk backup. You can also "Add" a local jar. QGIS
+  rules forbid bundling jars, so the file is fetched on demand.
+- 🖌️ **Automatic TYP styling**: the plugin generates a TYP file from the QGIS
+  layer symbology (polygon fills, line width/color, POI icons) so the map on the
+  device looks like it does in QGIS.
+- 🎨 **Flexible style mapping**: a JSON system for configuring Garmin object types.
+- 📊 **Multi-level maps**: 4 detail levels (Level0–Level3).
+- 🔧 **mkgmap fine-tuning**: Java heap (-Xmx), threads (--max-jobs),
+  generalization, draw priority, code page, address index — all following the
+  official mkgmap documentation.
+- ☕ **Java auto-detection**: the plugin finds Java on the system (PATH,
+  JAVA_HOME, common install directories).
+- 🔄 **Batch processing**: export all project layers at once.
+- 🌐 **Multilingual interface**: 9 languages (EN, RU, DE, ES, FR, PT, ZH, HI, AR),
+  including right-to-left layout for Arabic.
+- 📋 **mkgmap logging**: optional mkgmap.log file with a configurable verbosity.
+- 💾 **Persistent settings** between sessions.
+
+### Requirements
+
+- QGIS 3.22 or newer, Python 3.9+
+- Java Runtime Environment (JRE 8+) for mkgmap (the plugin can auto-detect it)
+
+### Quick start
+
+1. Open a QGIS project with vector layers and run the plugin from the
+   **Vector** menu → "🎯 Garmin IMG Export".
+2. On the **Tools** tab click **Download mkgmap** (or **Add mkgmap** for a local
+   jar); Java is detected automatically.
+3. Select the layers to export, set the output folder and map settings.
+4. Optionally choose a TYP styling mode and tune mkgmap options.
+5. Click **Compile Map** and get the ready `.img` file.
+
+### Tests
+
+Core logic (MP/TYP generation, mkgmap command building, download link parsing,
+jar validation, style mapping) is covered by offline tests that run without QGIS:
+
+```bash
+python tests/run_tests.py
+```
+
+---
 
 ## 📋 Описание
 
@@ -21,7 +84,7 @@ Garmin Export Plugin - это современный инструмент для
 - 🔧 **Тонкая настройка mkgmap**: память Java (-Xmx), число потоков (--max-jobs), генерализация, приоритет отрисовки, кодовая страница, адресный индекс — всё по официальной документации mkgmap
 - ☕ **Автопоиск Java**: плагин сам находит Java в системе (PATH, JAVA_HOME, типовые каталоги)
 - 🔄 **Пакетная обработка**: экспорт всех слоёв проекта одновременно
-- 🌐 **Многоязычный интерфейс**: поддержка русского и английского языков
+- 🌐 **Многоязычный интерфейс**: 9 языков (RU, EN, DE, ES, FR, PT, ZH, HI, AR), включая письмо справа налево для арабского
 - 📋 **Логирование mkgmap**: опциональный файл журнала mkgmap.log с настраиваемым уровнем детализации
 - 💾 **Сохранение настроек** между сеансами работы
 

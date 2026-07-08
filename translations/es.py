@@ -5,7 +5,7 @@ Traducciones al español para el complemento Garmin Export
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 translations = {
@@ -160,4 +160,93 @@ translations = {
     'success_export_complete': '¡Mapa compilado correctamente! Archivo guardado:',
     'success_mapping_saved': 'Asignación guardada correctamente',
     'success_mapping_loaded': 'Asignación cargada correctamente',
+
+    # Tools tab (labels, placeholders, info)
+    'mkgmap_path_label': 'Ruta a mkgmap.jar:',
+    'mkgmap_path_placeholder': 'Seleccione o descargue mkgmap.jar',
+    'splitter_path_label': 'Ruta a splitter.jar (opcional):',
+    'splitter_path_placeholder': 'splitter se necesita para dividir mapas grandes (opcional)',
+    'java_path_label': 'Ruta a Java:',
+    'java_path_placeholder': 'Vacío = java desde PATH; el botón de la derecha lo detecta',
+    'tools_info': 'Las reglas de QGIS prohíben incluir mkgmap.jar en el complemento. '
+                  'Haga clic en "Descargar mkgmap" y el complemento obtendrá la última '
+                  'versión de mkgmap.org.uk (o de la copia de seguridad en Yandex.Disk), '
+                  'o indique su propio archivo con "Añadir mkgmap".',
+    'support_tip': '¡Apoye el desarrollo del complemento!',
+    'author_tip': 'Información sobre el autor del complemento',
+
+    # Tuning tab - group titles
+    'map_params_group': 'Parámetros del mapa (mkgmap)',
+    'generalization_group': 'Generalización',
+    'performance_group': 'Rendimiento (ajuste)',
+    'logging_group': 'Registro y depuración',
+
+    # Tuning tab - options
+    'code_page_label': 'Página de códigos de las etiquetas:',
+    'draw_priority_label': 'Prioridad de dibujo (--draw-priority):',
+    'draw_priority_tip': '25 es el estándar. Mayor = el mapa se dibuja sobre los demás. '
+                         'Para mapas superpuestos transparentes use más de 25.',
+    'opt_index': 'Índice de direcciones para la búsqueda (--index)',
+    'opt_add_pois': 'Crear POI a partir de polígonos (--add-pois-to-areas)',
+    'opt_lower_case': 'Permitir minúsculas en las etiquetas (--lower-case)',
+    'opt_order_area': 'Polígonos pequeños sobre los grandes (--order-by-decreasing-area)',
+    'reduce_density_label': 'Simplificación de líneas, m (--reduce-point-density):',
+    'reduce_density_polygon_label': 'Simplificación de polígonos, m (--reduce-point-density-polygon):',
+    'min_polygon_label': 'Tamaño mín. de polígono (--min-size-polygon):',
+    'min_polygon_tip': 'Los polígonos más pequeños se eliminan. Se recomienda 8-15.',
+    'java_heap_label': 'Memoria de Java, GB (-Xmx):',
+    'java_heap_tip': 'mkgmap necesita ~500 MB por hilo. Para 8 núcleos, ponga 4 GB.',
+    'max_jobs_label': 'Hilos (--max-jobs):',
+    'max_jobs_tip': '0 = mkgmap decide según los núcleos y la memoria.',
+    'opt_mkgmap_log': 'Mantener un archivo mkgmap.log en la carpeta de salida',
+    'opt_verbose': 'Registro detallado (nivel INFO)',
+    'opt_keep_temp': 'Conservar archivos intermedios (MP, TYP) en la carpeta de salida',
+    'extra_args_label': 'Argumentos adicionales de mkgmap:',
+    'extra_args_placeholder': 'p. ej.: --precomp-sea=C:/sea.zip --generate-sea',
+    'value_auto': 'auto',
+    'value_auto_default': 'auto (2.6)',
+
+    # Code pages
+    'cp_1251': 'CP1251 (cirílico)',
+    'cp_1252': 'CP1252 (Latin-1, Europa Occidental)',
+    'cp_1250': 'CP1250 (Europa Central)',
+    'cp_1253': 'CP1253 (griego)',
+    'cp_1254': 'CP1254 (turco)',
+    'cp_1257': 'CP1257 (báltico)',
+    'cp_65001': 'Unicode (no en todos los dispositivos)',
+
+    # TYP tab
+    'typ_info': 'Un archivo TYP define el aspecto de los objetos en el dispositivo Garmin: '
+                'colores de polígonos, grosor de líneas, iconos de puntos. El complemento puede '
+                'generar un TYP automáticamente a partir de la simbología actual de las capas de '
+                'QGIS: el mapa en el navegador se verá como en QGIS.',
+    'typ_none': 'Estilo estándar de Garmin (sin TYP)',
+    'typ_generate': 'Generar TYP a partir de los estilos de QGIS (recomendado)',
+    'typ_file': 'Usar un archivo TYP / typ.txt existente:',
+    'typ_file_placeholder': 'Ruta a un archivo .typ o .txt',
+
+    # Layers tab
+    'layers_info': 'Seleccione las capas del proyecto para exportar al formato Garmin IMG',
+
+    # Export tab (placeholders, tooltips)
+    'output_folder_placeholder': 'Seleccione una carpeta para guardar el archivo IMG',
+    'map_description_placeholder': 'Mapa creado con el complemento QGIS Garmin Export',
+    'family_id_tip': 'Identificador de la familia de mapas. Debe ser único entre los mapas del dispositivo.',
+    'map_id_tip': 'Número de tesela del mapa de 8 dígitos. Debe ser único.',
+    'transparent_tip': 'Un mapa transparente se dibuja sobre otros mapas (p. ej., sobre un mapa base).',
+    'routing_tip': 'Escribir datos NET/NOD (--route). Funciona si los datos contienen una red viaria.',
+
+    # Styles tab
+    'mapping_info': 'Configure la correspondencia entre las capas de QGIS y los tipos de objeto de Garmin',
+    'mapping_placeholder': 'La asignación de estilos JSON se cargará automáticamente...',
+
+    # Levels tab
+    'levels_info': 'Los niveles definen en qué escalas son visibles los objetos en el dispositivo. '
+                   'El nivel 0 (resolución 24) es el más detallado, el nivel 3 (resolución 18) es la '
+                   'vista general. En la asignación de estilos, el parámetro "level" establece hasta '
+                   'qué nivel permanece visible un objeto.',
+
+    # Log widget
+    'log_ready': 'Garmin Export Plugin cargado y listo',
+    'log_hint': 'Los registros de operaciones aparecerán aquí...',
 }

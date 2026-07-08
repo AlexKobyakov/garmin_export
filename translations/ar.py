@@ -5,7 +5,7 @@ Arabic translations for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 translations = {
@@ -160,4 +160,91 @@ translations = {
     'success_export_complete': 'تمت ترجمة الخريطة بنجاح! تم حفظ الملف:',
     'success_mapping_saved': 'تم حفظ التعيين بنجاح',
     'success_mapping_loaded': 'تم تحميل التعيين بنجاح',
+
+    # Tools tab (labels, placeholders, info)
+    'mkgmap_path_label': 'مسار mkgmap.jar:',
+    'mkgmap_path_placeholder': 'اختر أو نزّل mkgmap.jar',
+    'splitter_path_label': 'مسار splitter.jar (اختياري):',
+    'splitter_path_placeholder': 'يلزم splitter لتقسيم الخرائط الكبيرة (اختياري)',
+    'java_path_label': 'مسار Java:',
+    'java_path_placeholder': 'فارغ = java من PATH؛ الزر على اليمين يكتشفه',
+    'tools_info': 'تمنع قواعد QGIS تضمين mkgmap.jar داخل الإضافة. '
+                  'انقر على "تنزيل mkgmap" لتحصل الإضافة على أحدث إصدار من '
+                  'mkgmap.org.uk (أو من نسخة Yandex.Disk الاحتياطية)، أو حدّد ملفك '
+                  'الخاص باستخدام "إضافة mkgmap".',
+    'support_tip': 'ادعم تطوير الإضافة!',
+    'author_tip': 'معلومات عن مؤلّف الإضافة',
+
+    # Tuning tab - group titles
+    'map_params_group': 'معاملات الخريطة (mkgmap)',
+    'generalization_group': 'التعميم',
+    'performance_group': 'الأداء (الضبط)',
+    'logging_group': 'التسجيل والتصحيح',
+
+    # Tuning tab - options
+    'code_page_label': 'صفحة ترميز التسميات:',
+    'draw_priority_label': 'أولوية الرسم (--draw-priority):',
+    'draw_priority_tip': '25 هو المعيار. أعلى = تُرسم الخريطة فوق غيرها. '
+                         'للخرائط الشفافة التراكبية استخدم أكثر من 25.',
+    'opt_index': 'فهرس العناوين للبحث (--index)',
+    'opt_add_pois': 'إنشاء نقاط اهتمام من المضلّعات (--add-pois-to-areas)',
+    'opt_lower_case': 'السماح بالأحرف الصغيرة في التسميات (--lower-case)',
+    'opt_order_area': 'المضلّعات الصغيرة فوق الكبيرة (--order-by-decreasing-area)',
+    'reduce_density_label': 'تبسيط الخطوط، م (--reduce-point-density):',
+    'reduce_density_polygon_label': 'تبسيط المضلّعات، م (--reduce-point-density-polygon):',
+    'min_polygon_label': 'أدنى حجم للمضلّع (--min-size-polygon):',
+    'min_polygon_tip': 'تُحذف المضلّعات الأصغر من ذلك. يُوصى بـ 8-15.',
+    'java_heap_label': 'ذاكرة Java، غيغابايت (-Xmx):',
+    'java_heap_tip': 'يحتاج mkgmap إلى ~500 ميغابايت لكل خيط. لـ 8 أنوية اضبط 4 غيغابايت.',
+    'max_jobs_label': 'الخيوط (--max-jobs):',
+    'max_jobs_tip': '0 = يقرّر mkgmap بناءً على الأنوية والذاكرة.',
+    'opt_mkgmap_log': 'الاحتفاظ بملف mkgmap.log في مجلد الإخراج',
+    'opt_verbose': 'سجل مفصّل (مستوى INFO)',
+    'opt_keep_temp': 'الاحتفاظ بالملفات الوسيطة (MP، TYP) في مجلد الإخراج',
+    'extra_args_label': 'وسائط mkgmap إضافية:',
+    'extra_args_placeholder': 'مثال: --precomp-sea=C:/sea.zip --generate-sea',
+    'value_auto': 'تلقائي',
+    'value_auto_default': 'تلقائي (2.6)',
+
+    # Code pages
+    'cp_1251': 'CP1251 (السيريلية)',
+    'cp_1252': 'CP1252 (Latin-1، أوروبا الغربية)',
+    'cp_1250': 'CP1250 (أوروبا الوسطى)',
+    'cp_1253': 'CP1253 (اليونانية)',
+    'cp_1254': 'CP1254 (التركية)',
+    'cp_1257': 'CP1257 (البلطيقية)',
+    'cp_65001': 'Unicode (ليست كل الأجهزة)',
+
+    # TYP tab
+    'typ_info': 'يحدّد ملف TYP مظهر العناصر على جهاز Garmin: '
+                'ألوان المضلّعات، وسمك الخطوط، ورموز النقاط. يمكن للإضافة إنشاء ملف TYP '
+                'تلقائيًا من رموز طبقات QGIS الحالية — ستبدو الخريطة على الملاح كما في QGIS.',
+    'typ_none': 'نمط Garmin القياسي (بدون TYP)',
+    'typ_generate': 'إنشاء TYP من أنماط QGIS (مُوصى به)',
+    'typ_file': 'استخدام ملف TYP / typ.txt موجود:',
+    'typ_file_placeholder': 'مسار ملف ‎.typ أو ‎.txt',
+
+    # Layers tab
+    'layers_info': 'اختر طبقات المشروع للتصدير إلى تنسيق Garmin IMG',
+
+    # Export tab (placeholders, tooltips)
+    'output_folder_placeholder': 'اختر مجلدًا لحفظ ملف IMG',
+    'map_description_placeholder': 'خريطة أُنشئت بإضافة QGIS Garmin Export',
+    'family_id_tip': 'معرّف عائلة الخريطة. يجب أن يكون فريدًا بين الخرائط على الجهاز.',
+    'map_id_tip': 'رقم بلاطة الخريطة المكوّن من 8 أرقام. يجب أن يكون فريدًا.',
+    'transparent_tip': 'تُرسم الخريطة الشفافة فوق الخرائط الأخرى (مثلًا فوق خريطة أساس).',
+    'routing_tip': 'كتابة بيانات NET/NOD (--route). تعمل إذا احتوت البيانات على شبكة طرق.',
+
+    # Styles tab
+    'mapping_info': 'اضبط المطابقة بين طبقات QGIS وأنواع كائنات Garmin',
+    'mapping_placeholder': 'سيتم تحميل تعيين الأنماط بصيغة JSON تلقائيًا...',
+
+    # Levels tab
+    'levels_info': 'تحدّد المستويات المقاييس التي تظهر عندها العناصر على الجهاز. '
+                   'المستوى 0 (الدقة 24) هو الأكثر تفصيلًا، والمستوى 3 (الدقة 18) هو العام. '
+                   'في تعيين الأنماط، يحدّد المعامل "level" إلى أي مستوى يبقى الكائن ظاهرًا.',
+
+    # Log widget
+    'log_ready': 'تم تحميل Garmin Export Plugin وهو جاهز',
+    'log_hint': 'ستظهر سجلات العمليات هنا...',
 }

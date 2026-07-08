@@ -6,7 +6,7 @@ Garmin Export Plugin for QGIS
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
 Organization: Lesburo
-Year: 2025
+Year: 2025-2026
 Version: 1.1.1
 
 Modular Architecture:

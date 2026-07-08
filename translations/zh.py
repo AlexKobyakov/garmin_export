@@ -5,7 +5,7 @@ Garmin Export 插件简体中文翻译
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 translations = {
@@ -160,4 +160,91 @@ translations = {
     'success_export_complete': '地图编译成功！文件已保存：',
     'success_mapping_saved': '映射保存成功',
     'success_mapping_loaded': '映射加载成功',
+
+    # Tools tab (labels, placeholders, info)
+    'mkgmap_path_label': 'mkgmap.jar 路径：',
+    'mkgmap_path_placeholder': '选择或下载 mkgmap.jar',
+    'splitter_path_label': 'splitter.jar 路径（可选）：',
+    'splitter_path_placeholder': 'splitter 用于切分大型地图（可选）',
+    'java_path_label': 'Java 路径：',
+    'java_path_placeholder': '留空 = 使用 PATH 中的 java；右侧按钮可自动检测',
+    'tools_info': 'QGIS 规则禁止在插件中捆绑 mkgmap.jar。'
+                  '点击“下载 mkgmap”，插件将从 mkgmap.org.uk 获取最新版本'
+                  '（或从 Yandex.Disk 备份获取），'
+                  '或使用“添加 mkgmap”指定您自己的文件。',
+    'support_tip': '支持插件开发！',
+    'author_tip': '插件作者信息',
+
+    # Tuning tab - group titles
+    'map_params_group': '地图参数（mkgmap）',
+    'generalization_group': '概化',
+    'performance_group': '性能（调优）',
+    'logging_group': '日志与调试',
+
+    # Tuning tab - options
+    'code_page_label': '标注代码页：',
+    'draw_priority_label': '绘制优先级（--draw-priority）：',
+    'draw_priority_tip': '25 为标准值。值越大，地图越绘制在其他地图之上。'
+                         '对于透明叠加地图请设置为大于 25。',
+    'opt_index': '用于搜索的地址索引（--index）',
+    'opt_add_pois': '从多边形创建 POI（--add-pois-to-areas）',
+    'opt_lower_case': '允许标注使用小写字母（--lower-case）',
+    'opt_order_area': '小多边形置于大多边形之上（--order-by-decreasing-area）',
+    'reduce_density_label': '线简化，米（--reduce-point-density）：',
+    'reduce_density_polygon_label': '多边形简化，米（--reduce-point-density-polygon）：',
+    'min_polygon_label': '最小多边形尺寸（--min-size-polygon）：',
+    'min_polygon_tip': '小于此尺寸的多边形将被删除。建议 8-15。',
+    'java_heap_label': 'Java 内存，GB（-Xmx）：',
+    'java_heap_tip': 'mkgmap 每个线程需要约 500 MB。8 核请设置 4 GB。',
+    'max_jobs_label': '线程数（--max-jobs）：',
+    'max_jobs_tip': '0 = mkgmap 根据核心数和内存自动决定。',
+    'opt_mkgmap_log': '在输出文件夹中保留 mkgmap.log 日志文件',
+    'opt_verbose': '详细日志（INFO 级别）',
+    'opt_keep_temp': '在输出文件夹中保留中间文件（MP、TYP）',
+    'extra_args_label': 'mkgmap 附加参数：',
+    'extra_args_placeholder': '例如：--precomp-sea=C:/sea.zip --generate-sea',
+    'value_auto': '自动',
+    'value_auto_default': '自动 (2.6)',
+
+    # Code pages
+    'cp_1251': 'CP1251（西里尔文）',
+    'cp_1252': 'CP1252（Latin-1，西欧）',
+    'cp_1250': 'CP1250（中欧）',
+    'cp_1253': 'CP1253（希腊文）',
+    'cp_1254': 'CP1254（土耳其文）',
+    'cp_1257': 'CP1257（波罗的海文）',
+    'cp_65001': 'Unicode（并非所有设备支持）',
+
+    # TYP tab
+    'typ_info': 'TYP 文件定义对象在 Garmin 设备上的外观：'
+                '多边形颜色、线宽、点图标。插件可以根据当前 QGIS 图层符号'
+                '自动生成 TYP —— 导航仪上的地图将与 QGIS 中一致。',
+    'typ_none': 'Garmin 标准样式（无 TYP）',
+    'typ_generate': '从 QGIS 样式生成 TYP（推荐）',
+    'typ_file': '使用现有的 TYP / typ.txt 文件：',
+    'typ_file_placeholder': '.typ 或 .txt 文件的路径',
+
+    # Layers tab
+    'layers_info': '选择要导出为 Garmin IMG 格式的项目图层',
+
+    # Export tab (placeholders, tooltips)
+    'output_folder_placeholder': '选择保存 IMG 文件的文件夹',
+    'map_description_placeholder': '由 QGIS Garmin Export 插件创建的地图',
+    'family_id_tip': '地图族标识符。在设备的各地图中必须唯一。',
+    'map_id_tip': '8 位地图分块编号。必须唯一。',
+    'transparent_tip': '透明地图绘制在其他地图之上（例如底图之上）。',
+    'routing_tip': '写入 NET/NOD 数据（--route）。当数据包含道路网络时有效。',
+
+    # Styles tab
+    'mapping_info': '配置 QGIS 图层与 Garmin 对象类型之间的对应关系',
+    'mapping_placeholder': 'JSON 样式映射将自动加载……',
+
+    # Levels tab
+    'levels_info': '级别决定对象在设备上以何种缩放显示。'
+                   '级别 0（分辨率 24）最详细，级别 3（分辨率 18）为概览。'
+                   '在样式映射中，“level”参数设置对象可见到哪个级别。',
+
+    # Log widget
+    'log_ready': 'Garmin Export Plugin 已加载并就绪',
+    'log_hint': '操作日志将显示在此处……',
 }

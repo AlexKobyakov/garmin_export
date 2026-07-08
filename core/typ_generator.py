@@ -15,7 +15,7 @@ TYP-файл определяет внешний вид объектов на у
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 
