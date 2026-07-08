@@ -5,7 +5,7 @@ GUI package for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 __all__ = [

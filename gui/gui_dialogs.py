@@ -8,7 +8,7 @@ MIF/TAB to SHP/GeoJSON Converter.
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 import json
@@ -59,7 +59,7 @@ class AuthorInfoDialog(QMessageBox):
             <i>(Alex Kobyakov)</i></p>
             <p><b>📧 {translations.get_text('contact')}:</b> <a href="mailto:{plugin_info['email']}">{plugin_info['email']}</a></p>
             <p><b>💬 Telegram:</b> <a href="https://t.me/AKobyakov" style="color: #0088cc; text-decoration: none;">@AKobyakov</a></p>
-            <p><b>📅 {translations.get_text('year')}:</b> 2025</p>
+            <p><b>📅 {translations.get_text('year')}:</b> 2025-2026</p>
             <p><b>🏢 {translations.get_text('organization')}:</b> Lesburo</p>
             <hr style="border: 1px solid #bdc3c7;">
             <p style="color: #7f8c8d; font-style: italic;">
@@ -239,10 +239,10 @@ class DownloadProgressDialog(QDialog):
         if total > 0:
             self.progress_bar.setRange(0, 100)
             self.progress_bar.setValue(int(received * 100 / total))
-            self.status_label.setText('{0:.1f} / {1:.1f} МБ'.format(
+            self.status_label.setText('{0:.1f} / {1:.1f} MB'.format(
                 received / 1048576.0, total / 1048576.0))
         else:
-            self.status_label.setText('{0:.1f} МБ'.format(received / 1048576.0))
+            self.status_label.setText('{0:.1f} MB'.format(received / 1048576.0))
 
     def set_status(self, text):
         """Установка строки статуса"""

@@ -8,7 +8,7 @@ Worker для экспорта данных в формат Garmin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 import json

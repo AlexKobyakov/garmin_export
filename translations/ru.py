@@ -5,7 +5,7 @@ Russian translations for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 translations = {
@@ -160,4 +160,96 @@ translations = {
     'success_export_complete': 'Карта успешно скомпилирована! Файл сохранён:',
     'success_mapping_saved': 'Сопоставление сохранено успешно',
     'success_mapping_loaded': 'Сопоставление загружено успешно',
+
+    # Tools tab (labels, placeholders, info)
+    'mkgmap_path_label': 'Путь к mkgmap.jar:',
+    'mkgmap_path_placeholder': 'Выберите или скачайте mkgmap.jar',
+    'splitter_path_label': 'Путь к splitter.jar (необязательно):',
+    'splitter_path_placeholder': 'splitter нужен для нарезки больших карт (необязательно)',
+    'java_path_label': 'Путь к Java:',
+    'java_path_placeholder': 'Пусто = java из PATH; кнопка справа найдёт автоматически',
+    'tools_info': 'Правила QGIS запрещают включать mkgmap.jar в состав плагина. '
+                  'Нажмите «Скачать mkgmap» — плагин получит последнюю версию с '
+                  'mkgmap.org.uk (или с резервного Яндекс.Диска), либо укажите '
+                  'свой файл кнопкой «Добавить mkgmap».',
+    'support_tip': 'Поддержите разработку плагина!',
+    'author_tip': 'Информация об авторе плагина',
+
+    # Tuning tab - group titles
+    'map_params_group': 'Параметры карты (mkgmap)',
+    'generalization_group': 'Генерализация',
+    'performance_group': 'Производительность (тюнинг)',
+    'logging_group': 'Логирование и отладка',
+
+    # Tuning tab - options
+    'code_page_label': 'Кодовая страница подписей:',
+    'draw_priority_label': 'Приоритет отрисовки (--draw-priority):',
+    'draw_priority_tip': '25 - стандарт. Больше = карта рисуется поверх других. '
+                         'Для прозрачных карт-надстроек ставьте больше 25.',
+    'opt_index': 'Адресный индекс для поиска (--index)',
+    'opt_add_pois': 'Создавать POI из полигонов (--add-pois-to-areas)',
+    'opt_lower_case': 'Разрешить строчные буквы в подписях (--lower-case)',
+    'opt_order_area': 'Мелкие полигоны поверх крупных (--order-by-decreasing-area)',
+    'reduce_density_label': 'Упрощение линий, м (--reduce-point-density):',
+    'reduce_density_polygon_label': 'Упрощение полигонов, м (--reduce-point-density-polygon):',
+    'min_polygon_label': 'Мин. размер полигона (--min-size-polygon):',
+    'min_polygon_tip': 'Полигоны меньше этого размера удаляются. 8-15 рекомендовано.',
+    'java_heap_label': 'Память Java, ГБ (-Xmx):',
+    'java_heap_tip': 'mkgmap требует ~500 МБ на поток. Для 8 ядер задайте 4 ГБ.',
+    'max_jobs_label': 'Потоки (--max-jobs):',
+    'max_jobs_tip': '0 = mkgmap определит по количеству ядер и памяти.',
+    'opt_mkgmap_log': 'Вести файл журнала mkgmap.log в выходной папке',
+    'opt_verbose': 'Подробный журнал (уровень INFO)',
+    'opt_keep_temp': 'Сохранять промежуточные файлы (MP, TYP) в выходной папке',
+    'extra_args_label': 'Доп. аргументы mkgmap:',
+    'extra_args_placeholder': 'например: --precomp-sea=C:/sea.zip --generate-sea',
+    'value_auto': 'авто',
+    'value_auto_default': 'авто (2.6)',
+
+    # Code pages
+    'cp_1251': 'CP1251 (кириллица)',
+    'cp_1252': 'CP1252 (Latin-1, Западная Европа)',
+    'cp_1250': 'CP1250 (Центральная Европа)',
+    'cp_1253': 'CP1253 (греческий)',
+    'cp_1254': 'CP1254 (турецкий)',
+    'cp_1257': 'CP1257 (балтийский)',
+    'cp_65001': 'Unicode (не все устройства)',
+
+    # TYP tab
+    'typ_info': 'TYP-файл задаёт внешний вид объектов на устройстве Garmin: '
+                'цвета полигонов, толщину линий, иконки точек. Плагин может '
+                'сгенерировать TYP автоматически из текущей символики слоёв QGIS '
+                '— карта на навигаторе будет выглядеть как в QGIS.',
+    'typ_none': 'Стандартный стиль Garmin (без TYP)',
+    'typ_generate': 'Сгенерировать TYP из стилей QGIS (рекомендуется)',
+    'typ_file': 'Использовать готовый файл TYP / typ.txt:',
+    'typ_file_placeholder': 'Путь к файлу .typ или .txt',
+
+    # Layers tab
+    'layers_info': 'Выберите слои проекта для экспорта в формат Garmin IMG',
+
+    # Export tab (placeholders, tooltips)
+    'output_folder_placeholder': 'Выберите папку для сохранения IMG файла',
+    'map_description_placeholder': 'Карта создана плагином QGIS Garmin Export',
+    'family_id_tip': 'Идентификатор семейства карт. Должен быть уникален среди '
+                     'карт на устройстве.',
+    'map_id_tip': '8-значный номер тайла карты. Должен быть уникален.',
+    'transparent_tip': 'Прозрачная карта отображается поверх других карт '
+                       '(например, поверх базовой карты).',
+    'routing_tip': 'Записать данные NET/NOD (--route). Работает, если данные '
+                   'содержат дорожную сеть.',
+
+    # Styles tab
+    'mapping_info': 'Настройте соответствие между слоями QGIS и типами объектов Garmin',
+    'mapping_placeholder': 'JSON-сопоставление стилей будет загружено автоматически...',
+
+    # Levels tab
+    'levels_info': 'Уровни определяют, при каких масштабах объекты видны на '
+                   'устройстве. Уровень 0 (разрешение 24) - самый детальный, '
+                   'уровень 3 (разрешение 18) - обзорный. В сопоставлении стилей '
+                   'параметр "level" задаёт, до какого уровня виден объект.',
+
+    # Log widget
+    'log_ready': 'Garmin Export Plugin загружен и готов к работе',
+    'log_hint': 'Логи операций будут отображаться здесь...',
 }

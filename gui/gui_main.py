@@ -5,7 +5,7 @@ Main GUI Dialog for Garmin Export Plugin
 
 Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
-Year: 2025
+Year: 2025-2026
 """
 
 from datetime import datetime
@@ -381,30 +381,40 @@ class GarminExportDialog(QDialog):
         self.settings_tabs.setTabText(5, f"📊 {t('tab_levels')}")
         self.settings_tabs.setTabText(6, f"🔧 {t('tab_tuning')}")
 
+        # Кнопки в заголовке (подсказки)
+        self.header.donation_button.setToolTip("❤️ " + t('support_tip'))
+        self.header.author_button.setToolTip("📝 " + t('author_tip'))
+
         # Выбор слоёв
         self.layer_selection.layers_group.setTitle(f"📁 {t('select_layers')}")
         self.layer_selection.select_all_button.setText(f"✅ {t('select_all_layers')}")
         self.layer_selection.deselect_all_button.setText(f"❌ {t('deselect_all_layers')}")
         self.layer_selection.refresh_button.setText(f"🔄 {t('refresh')}")
+        self.layer_selection.info_label.setText(t('layers_info'))
 
         # Настройки экспорта
         self.export_settings.output_group.setTitle(f"📤 {t('output_files')}")
         self.export_settings.output_folder_label.setText(t('output_folder'))
         self.export_settings.output_folder_button.setText(f"📂 {t('browse')}")
+        self.export_settings.output_folder_line.setPlaceholderText(t('output_folder_placeholder'))
         self.export_settings.output_filename_label.setText(t('output_file_name'))
         self.export_settings.map_group.setTitle(f"🗺️ {t('map_settings')}")
+        self.export_settings.family_id_label.setText(t('family_id'))
+        self.export_settings.family_id_spin.setToolTip(t('family_id_tip'))
+        self.export_settings.map_id_label.setText(t('map_id'))
+        self.export_settings.map_id_spin.setToolTip(t('map_id_tip'))
         self.export_settings.map_name_label.setText(t('map_name'))
         self.export_settings.map_description_label.setText(t('map_description'))
+        self.export_settings.map_description_line.setPlaceholderText(t('map_description_placeholder'))
         self.export_settings.transparent_cb.setText(t('transparent'))
+        self.export_settings.transparent_cb.setToolTip(t('transparent_tip'))
         self.export_settings.routing_cb.setText(t('routing'))
+        self.export_settings.routing_cb.setToolTip(t('routing_tip'))
 
-        # Инструменты
-        self.tools_widget.tools_group.setTitle(f"🧰 {t('tools_mkgmap')}")
-        self.tools_widget.mkgmap_browse_button.setText(f"📂 {t('add_mkgmap')}")
-        self.tools_widget.mkgmap_download_button.setText(f"📥 {t('download_mkgmap')}")
-        self.tools_widget.splitter_browse_button.setText(f"📂 {t('add_splitter')}")
-        self.tools_widget.splitter_download_button.setText(f"📥 {t('download_splitter')}")
-        self.tools_widget.java_detect_button.setText(f"🔍 {t('detect_java')}")
+        # Инструменты, Тюнинг, TYP — полностью через retranslateUi виджетов
+        self.tools_widget.retranslateUi()
+        self.advanced_options.retranslateUi()
+        self.typ_settings.retranslateUi()
 
         # Сопоставление стилей
         self.mapping_widget.mapping_group.setTitle(f"🎨 {t('style_mapping')}")
@@ -412,9 +422,8 @@ class GarminExportDialog(QDialog):
         self.mapping_widget.save_mapping_button.setText(f"💾 {t('save_mapping')}")
         self.mapping_widget.edit_mapping_button.setText(f"✏️ {t('edit_mapping')}")
         self.mapping_widget.reset_mapping_button.setText(f"🔄 {t('default_mapping')}")
-
-        # TYP
-        self.typ_settings.typ_group.setTitle(f"🖌️ {t('typ_styling')}")
+        self.mapping_widget.info_label.setText(t('mapping_info'))
+        self.mapping_widget.mapping_text.setPlaceholderText(t('mapping_placeholder'))
 
         # Уровни
         self.level_settings.levels_group.setTitle(f"📊 {t('export_levels')}")
@@ -422,6 +431,7 @@ class GarminExportDialog(QDialog):
         self.level_settings.level_1_cb.setText(t('level_1'))
         self.level_settings.level_2_cb.setText(t('level_2'))
         self.level_settings.level_3_cb.setText(t('level_3'))
+        self.level_settings.info_label.setText(t('levels_info'))
 
         # Прогресс и результаты
         self.progress_label.setText(f"📊 {t('progress')}")
