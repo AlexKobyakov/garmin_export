@@ -281,7 +281,7 @@ GNU General Public License v3.0
 
 ---
 
-© 2025 Alex Kobyakov. Все права защищены.
+© 2025 - 2026 Alex Kobyakov. Все права защищены.
 
 ## 🧪 Тесты
 
