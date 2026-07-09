@@ -222,5 +222,24 @@ class DownloadToolEndToEndTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.tmp, 'mkgmap-r4924.zip')))
 
 
+class OpenUrlSchemeTest(unittest.TestCase):
+    """Открытие допускается только по http/https (безопасность, CWE-22)."""
+
+    def test_rejects_file_scheme(self):
+        with self.assertRaises(ValueError):
+            downloader._open_url('file:///etc/passwd')
+
+    def test_rejects_ftp_scheme(self):
+        with self.assertRaises(ValueError):
+            downloader._open_url('ftp://example.com/x')
+
+    def test_rejects_empty_scheme(self):
+        with self.assertRaises(ValueError):
+            downloader._open_url('/local/path')
+
+    def test_allowed_schemes(self):
+        self.assertEqual(downloader.ALLOWED_SCHEMES, ('http', 'https'))
+
+
 if __name__ == '__main__':
     unittest.main()

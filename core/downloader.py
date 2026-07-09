@@ -64,10 +64,45 @@ YANDEX_API_TEMPLATE = (
 )
 
 
+# Разрешённые схемы URL. Открытие file:/ftp:/data: и прочих схем недопустимо
+# (безопасность: CWE-22). Скачиваются только ресурсы по http/https.
+ALLOWED_SCHEMES = ('http', 'https')
+
+
+def _build_web_opener():
+    """OpenerDirector только с обработчиками http/https.
+
+    Намеренно НЕ регистрируем FileHandler/FTPHandler/DataHandler, поэтому
+    схемы file:, ftp:, data: не могут быть открыты даже при редиректах.
+    Системный прокси сохраняется через ProxyHandler.
+    """
+    opener = urllib.request.OpenerDirector()
+    for handler in (
+        urllib.request.ProxyHandler(),
+        urllib.request.HTTPHandler(),
+        urllib.request.HTTPSHandler(),
+        urllib.request.HTTPDefaultErrorHandler(),
+        urllib.request.HTTPRedirectHandler(),
+        urllib.request.HTTPErrorProcessor(),
+    ):
+        opener.add_handler(handler)
+    return opener
+
+
+_WEB_OPENER = _build_web_opener()
+
+
 def _open_url(url, timeout=30):
-    """Открытие URL с корректным User-Agent (прокси берётся из системы)"""
+    """Открытие URL только по http/https (прокси берётся из системы).
+
+    Схема проверяется явно (защита от file:/ и нестандартных схем), а
+    используемый opener не содержит обработчиков не-web схем.
+    """
+    scheme = urllib.parse.urlparse(url).scheme.lower()
+    if scheme not in ALLOWED_SCHEMES:
+        raise ValueError('Недопустимая схема URL: {0}'.format(scheme or '(пусто)'))
     request = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
-    return urllib.request.urlopen(request, timeout=timeout)
+    return _WEB_OPENER.open(request, timeout=timeout)
 
 
 def parse_latest_version(html, tool):
