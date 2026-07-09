@@ -2,7 +2,7 @@
 
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.1.2  
+Версия: 1.1.3  
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026
@@ -25,9 +25,11 @@ Garmin GPS devices.
 - 🗺️ **Exports every geometry type**: points (POI), lines (roads, rivers),
   polygons (forests, water bodies), including multipart geometries.
 - 📥 **Built-in mkgmap/splitter download**: the "Download mkgmap" / "Download
-  splitter" buttons fetch the latest version from mkgmap.org.uk (variable link)
-  or from a permanent Yandex.Disk backup. You can also "Add" a local jar. QGIS
-  rules forbid bundling jars, so the file is fetched on demand.
+  splitter" buttons fetch the **full ZIP distribution** from mkgmap.org.uk
+  (variable link) or from a permanent Yandex.Disk backup and unpack it with all
+  dependency libraries (`lib/`: osmpbf, protobuf, fastutil…) so OSM/PBF reading
+  works. You can also "Add" a local jar. QGIS rules forbid bundling jars, so it
+  is fetched on demand.
 - 🖌️ **Automatic TYP styling**: the plugin generates a TYP file from the QGIS
   layer symbology (polygon fills, line width/color, POI icons) so the map on the
   device looks like it does in QGIS.
@@ -80,7 +82,7 @@ Garmin Export Plugin - это современный инструмент для
 ## ✨ Основные возможности
 
 - 🗺️ **Экспорт всех типов геометрии**: точки (POI), линии (дороги, реки), полигоны (леса, водоёмы), включая мультигеометрии
-- 📥 **Встроенное скачивание mkgmap/splitter**: кнопки «Скачать mkgmap» и «Скачать splitter» получают актуальную версию с mkgmap.org.uk (переменная ссылка) или с Яндекс.Диска (постоянная ссылка). Также можно «Добавить» локальный jar. QGIS запрещает включать jar в состав плагина, поэтому файл загружается по требованию
+- 📥 **Встроенное скачивание mkgmap/splitter**: кнопки «Скачать mkgmap» и «Скачать splitter» получают **полный ZIP-дистрибутив** с mkgmap.org.uk (переменная ссылка) или с Яндекс.Диска (постоянная ссылка) и распаковывают его со всеми зависимыми библиотеками (`lib/`: osmpbf, protobuf, fastutil…), чтобы работало чтение OSM/PBF. Также можно «Добавить» локальный jar. QGIS запрещает включать jar в состав плагина, поэтому файл загружается по требованию
 - 🖌️ **Автоматическая стилизация TYP**: плагин генерирует TYP-файл из символики слоёв QGIS (цвета полигонов, толщина и цвет линий, иконки точек) — карта на навигаторе выглядит как в QGIS
 - 🎨 **Гибкое сопоставление стилей**: JSON-система для настройки типов объектов Garmin
 - 📊 **Многоуровневые карты**: поддержка 4 уровней детализации (Level0-Level3)

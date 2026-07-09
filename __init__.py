@@ -7,7 +7,7 @@ Author: Кобяков Александр Викторович (Alex Kobyakov)
 Email: kobyakov@lesburo.ru
 Organization: Lesburo
 Year: 2025-2026
-Version: 1.1.2
+Version: 1.1.3
 
 Modular Architecture:
 - garmin_exporter.py: Main plugin class
