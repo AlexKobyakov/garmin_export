@@ -4,7 +4,6 @@
 import unittest
 
 from _bootstrap import PACKAGE  # noqa: F401
-from garmin_export.core import typ_generator
 from garmin_export.core.typ_generator import TypFileBuilder
 
 

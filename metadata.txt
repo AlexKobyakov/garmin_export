@@ -12,6 +12,8 @@ changelog=1.1.4 - Security scan fix (QGIS plugin repository)
     - Restrict downloads to http/https via a dedicated URL opener without
       file/ftp/data handlers, resolving the Bandit B310 critical finding (CWE-22)
     - Remove hardcoded /tmp paths from tests (Bandit B108) and add URL-scheme tests
+    - Code quality: clear all Flake8 findings reported by the scanner (unused
+      imports, blank-line whitespace, blank lines, binary-operator line breaks)
     1.1.3 - Full distribution download and language selector fix
     - Download now fetches the full mkgmap/splitter ZIP distributions and unpacks
       them with all dependency libraries (lib/), fixing NoClassDefFoundError

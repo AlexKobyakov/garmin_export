@@ -84,9 +84,11 @@ class GarminExportDialog(QDialog):
         self.setMinimumSize(1100, 820)
         self.resize(1300, 950)
 
-        self.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint |
-                            Qt.WindowCloseButtonHint |
-                            Qt.WindowMaximizeButtonHint)
+        flags = Qt.Dialog
+        flags |= Qt.WindowTitleHint
+        flags |= Qt.WindowCloseButtonHint
+        flags |= Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(flags)
 
     def setupUi(self):
         """Создание основного интерфейса"""

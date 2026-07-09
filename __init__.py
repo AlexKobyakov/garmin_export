@@ -18,13 +18,14 @@ Modular Architecture:
   downloader, settings, layer processing, code pages)
 """
 
+
 def classFactory(iface):
     """
     Точка входа для QGIS плагина
-    
+
     Args:
         iface: QGIS interface object
-        
+
     Returns:
         GarminExporter: Экземпляр основного класса плагина
     """

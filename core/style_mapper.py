@@ -13,72 +13,72 @@ import json
 
 class StyleMapper:
     """Класс для сопоставления стилей QGIS с типами Garmin"""
-    
+
     def __init__(self):
         self.mapping_data = {}
         self.default_mapping = self._get_default_mapping()
-    
+
     def load_mapping(self, mapping_data):
         """Загрузка данных сопоставления"""
         if isinstance(mapping_data, dict):
             self.mapping_data = mapping_data
         else:
             raise ValueError("Неверный формат данных сопоставления")
-    
+
     def get_layer_mapping(self, layer_name, geometry_type):
         """Получение сопоставления для слоя"""
         # Сначала ищем точное совпадение по имени
         layers_mapping = self.mapping_data.get('layers', {})
-        
+
         # Точное совпадение имени
         if layer_name in layers_mapping:
             mapping = layers_mapping[layer_name]
             if self._validate_mapping(mapping, geometry_type):
                 return mapping
-        
+
         # Поиск по частичному совпадению имени (нижний регистр)
         layer_name_lower = layer_name.lower()
         for key, mapping in layers_mapping.items():
             if key.lower() in layer_name_lower or layer_name_lower in key.lower():
                 if self._validate_mapping(mapping, geometry_type):
                     return mapping
-        
+
         # Поиск по типу геометрии
         geometry_mapping = self._find_by_geometry_type(geometry_type)
         if geometry_mapping:
             return geometry_mapping
-        
+
         # Возвращаем сопоставление по умолчанию
         return self._get_default_for_geometry(geometry_type)
-    
+
     def _validate_mapping(self, mapping, geometry_type):
         """Проверка корректности сопоставления"""
         if not isinstance(mapping, dict):
             return False
-        
+
         # Проверяем соответствие типа геометрии
         mapping_geometry = mapping.get('geometry', '')
-        
+
         geometry_aliases = {
             'Point': ['Point', 'POI', 'point'],
             'LineString': ['LineString', 'Line', 'Polyline', 'line'],
             'Polygon': ['Polygon', 'Area', 'polygon', 'area']
         }
-        
+
         valid_geometries = geometry_aliases.get(geometry_type, [])
-        
+
         return mapping_geometry in valid_geometries
-    
+
     def _find_by_geometry_type(self, geometry_type):
         """Поиск сопоставления по типу геометрии"""
         layers_mapping = self.mapping_data.get('layers', {})
-        
+
         for key, mapping in layers_mapping.items():
             if self._validate_mapping(mapping, geometry_type):
                 return mapping
-        
+
         return None
-    
+
     def _get_default_for_geometry(self, geometry_type):
         """Получение сопоставления по умолчанию для типа геометрии"""
         defaults = {
@@ -101,9 +101,9 @@ class StyleMapper:
                 'level': 2
             }
         }
-        
+
         return defaults.get(geometry_type, defaults['Point'])
-    
+
     def _get_default_mapping(self):
         """Получение сопоставления по умолчанию"""
         return {
@@ -198,7 +198,7 @@ class StyleMapper:
                 }
             }
         }
-    
+
     def get_garmin_types_by_category(self):
         """Получение типов Garmin по категориям"""
         return {
@@ -269,48 +269,48 @@ class StyleMapper:
                 "0x6000": "Развлечения"
             }
         }
-    
+
     def suggest_garmin_type(self, layer_name, geometry_type):
         """Предложение типа Garmin на основе имени слоя"""
         layer_name_lower = layer_name.lower()
-        
+
         # Словарь ключевых слов для автоматического определения
         keyword_mapping = {
             # Дороги
             'road': '0x06', 'дорога': '0x06', 'street': '0x06', 'улица': '0x06',
             'highway': '0x01', 'автомагистраль': '0x01', 'трасса': '0x01',
             'railway': '0x14', 'железная': '0x14', 'жд': '0x14',
-            
+
             # Водные объекты
             'river': '0x1F', 'река': '0x1F', 'stream': '0x1F', 'ручей': '0x1F',
             'lake': '0x3C', 'озеро': '0x3C', 'pond': '0x3C', 'пруд': '0x3C',
             'water': '0x3C', 'вода': '0x3C',
-            
+
             # Области
             'forest': '0x16', 'лес': '0x16', 'woods': '0x16',
             'building': '0x13', 'здание': '0x13', 'дом': '0x13',
             'park': '0x1A', 'парк': '0x1A',
-            
+
             # POI
             'city': '0x0100', 'город': '0x0100',
             'village': '0x0800', 'деревня': '0x0800', 'село': '0x0800',
             'poi': '0x2F00', 'point': '0x2F00'
         }
-        
+
         # Ищем ключевые слова в имени слоя
         for keyword, garmin_type in keyword_mapping.items():
             if keyword in layer_name_lower:
                 return garmin_type
-        
+
         # Возвращаем тип по умолчанию для геометрии
         default_types = {
             'Point': '0x2F00',
             'LineString': '0x06',
             'Polygon': '0x16'
         }
-        
+
         return default_types.get(geometry_type, '0x2F00')
-    
+
     def export_mapping_to_json(self, file_path):
         """Экспорт сопоставления в JSON файл"""
         try:
@@ -320,13 +320,13 @@ class StyleMapper:
             return True
         except Exception:
             return False
-    
+
     def import_mapping_from_json(self, file_path):
         """Импорт сопоставления из JSON файла"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            
+
             self.load_mapping(data)
             return True
         except Exception:

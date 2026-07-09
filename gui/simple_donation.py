@@ -10,7 +10,7 @@ Year: 2025-2026
 """
 
 from qgis.PyQt.QtCore import Qt, QUrl
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFrame
+from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QFrame
 from qgis.PyQt.QtGui import QDesktopServices
 from ..translation_manager import translations
 
