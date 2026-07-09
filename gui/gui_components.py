@@ -8,14 +8,13 @@ Email: kobyakov@lesburo.ru
 Year: 2025-2026
 """
 
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QGroupBox, QPushButton, QProgressBar, QLabel, QFrame
 
 
 class ModernGroupBox(QGroupBox):
     """Стилизованная группа с современным дизайном"""
-    
+
     def __init__(self, title="", parent=None):
         super().__init__(title, parent)
         self.setStyleSheet("""
@@ -41,14 +40,14 @@ class ModernGroupBox(QGroupBox):
 
 class ModernButton(QPushButton):
     """Стилизованная кнопка с современным дизайном"""
-    
+
     def __init__(self, text="", button_type="primary", parent=None):
         super().__init__(text, parent)
         self.button_type = button_type
         self.setMinimumHeight(40)
         self.setFont(QFont("Segoe UI", 10, QFont.Medium))
         self.apply_style()
-    
+
     def apply_style(self):
         """Применение стиля в зависимости от типа кнопки"""
         if self.button_type == "primary":
@@ -100,7 +99,7 @@ class ModernButton(QPushButton):
 
 class ModernProgressBar(QProgressBar):
     """Стилизованный прогресс-бар с современным дизайном"""
-    
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("""
@@ -241,7 +240,7 @@ def create_section_separator():
             margin: 10px 0;
         }
     """)
-    
+
     return separator
 
 
@@ -250,5 +249,5 @@ def create_info_label(text, label_class="description"):
     label = QLabel(text)
     label.setProperty("class", label_class)
     label.setWordWrap(True)
-    
+
     return label

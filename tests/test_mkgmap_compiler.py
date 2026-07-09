@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Тесты валидации jar-файлов и поиска Java."""
 
-import io
 import os
 import tempfile
 import unittest

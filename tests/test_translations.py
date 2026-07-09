@@ -6,7 +6,6 @@ import os
 import unittest
 
 from _bootstrap import PACKAGE  # noqa: F401
-from garmin_export import translation_manager as tmmod
 from garmin_export.translation_manager import TranslationManager
 
 # Ожидаемый набор языков (соответствует LANGUAGE_LABELS)

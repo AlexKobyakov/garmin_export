@@ -83,7 +83,7 @@ class TranslationManager:
     def is_rtl(self, language_code=None):
         """Является ли язык письмом справа налево"""
         return (language_code or self.current_language) in RTL_LANGUAGES
-    
+
     def set_language(self, language_code):
         """Устанавливает текущий язык"""
         if language_code in self.supported_languages:
@@ -91,39 +91,39 @@ class TranslationManager:
                 self.current_language = language_code
                 return True
         return False
-    
+
     def get_text(self, key, language=None):
         """Получает переведенный текст по ключу с fallback механизмом"""
         # Определяем язык для поиска
         lang = language or self.current_language
-        
+
         # Пытаемся найти в текущем языке
         if lang in self.loaded_languages:
             translations = self.loaded_languages[lang]
             if key in translations:
                 return translations[key]
-        
+
         # Пытаемся найти в резервном языке
         if self.fallback_language in self.loaded_languages and lang != self.fallback_language:
             translations = self.loaded_languages[self.fallback_language]
             if key in translations:
                 return translations[key]
-        
+
         # Возвращаем ключ, если перевод не найден
         return key
-    
+
     def get_current_language(self):
         """Возвращает код текущего языка"""
         return self.current_language
-    
+
     def get_supported_languages(self):
         """Возвращает список поддерживаемых языков"""
         return self.supported_languages.copy()
-    
+
     def is_language_loaded(self, language_code):
         """Проверяет, загружен ли язык"""
         return language_code in self.loaded_languages
-    
+
     def reload_language(self, language_code):
         """Перезагружает переводы для языка"""
         if language_code in self.loaded_languages:

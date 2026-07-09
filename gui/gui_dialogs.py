@@ -16,7 +16,7 @@ import json
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QMessageBox, QDialog, QVBoxLayout, QHBoxLayout,
-    QLabel, QTextEdit, QGroupBox, QPushButton
+    QLabel, QTextEdit, QGroupBox
 )
 from qgis.PyQt.QtGui import QFont
 

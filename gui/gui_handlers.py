@@ -14,7 +14,6 @@ import json
 from qgis.PyQt.QtCore import QThread
 from qgis.PyQt.QtWidgets import QFileDialog, QMessageBox
 
-from ..core.layer_manager import LayerManager
 from ..core.settings_manager import SettingsManager
 from ..core import mkgmap_compiler
 
@@ -73,8 +72,8 @@ class GuiEventHandlers:
         """Выбор выходной папки"""
         from ..translation_manager import translations
 
-        start_dir = (self.dialog.export_settings.output_folder_line.text().strip()
-                     or os.path.expanduser("~"))
+        line = self.dialog.export_settings.output_folder_line
+        start_dir = line.text().strip() or os.path.expanduser("~")
         folder = QFileDialog.getExistingDirectory(
             self.dialog,
             translations.get_text('select_output_folder'),
