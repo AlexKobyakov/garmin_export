@@ -2,13 +2,17 @@
 name=Garmin Export
 qgisMinimumVersion=3.22
 description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
-version=1.1.3
+version=1.1.4
 author=Alex Kobyakov
 email=kobyakov@lesburo.ru
 about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of the full mkgmap/splitter distributions (zip archives with all dependency libraries; QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, comprehensive label code-page support (UTF-8 plus Windows/DOS/CJK pages), batch processing of all project layers, and a 12-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI). Requires Java (JRE 8+) which the plugin can auto-detect.
 tracker=https://github.com/AlexKobyakov/garmin_export/issues
 repository=https://github.com/AlexKobyakov/garmin_export
-changelog=1.1.3 - Full distribution download and language selector fix
+changelog=1.1.4 - Security scan fix (QGIS plugin repository)
+    - Restrict downloads to http/https via a dedicated URL opener without
+      file/ftp/data handlers, resolving the Bandit B310 critical finding (CWE-22)
+    - Remove hardcoded /tmp paths from tests (Bandit B108) and add URL-scheme tests
+    1.1.3 - Full distribution download and language selector fix
     - Download now fetches the full mkgmap/splitter ZIP distributions and unpacks
       them with all dependency libraries (lib/), fixing NoClassDefFoundError
       (crosby.binary...) when reading OSM data

@@ -92,15 +92,15 @@ class LoggingConfigTest(unittest.TestCase):
         self.assertIn('java.util.logging.FileHandler.pattern=C:/out/mkgmap.log', cfg)
 
     def test_verbose_info_level(self):
-        cfg = mkgmap_command.build_logging_config('/tmp/m.log', verbose=True)
+        cfg = mkgmap_command.build_logging_config('C:/out/m.log', verbose=True)
         self.assertIn('uk.me.parabola.mkgmap.build.level=INFO', cfg)
 
     def test_non_verbose_warning_level(self):
-        cfg = mkgmap_command.build_logging_config('/tmp/m.log', verbose=False)
+        cfg = mkgmap_command.build_logging_config('C:/out/m.log', verbose=False)
         self.assertIn('uk.me.parabola.mkgmap.build.level=WARNING', cfg)
 
     def test_handlers_line(self):
-        cfg = mkgmap_command.build_logging_config('/tmp/m.log')
+        cfg = mkgmap_command.build_logging_config('C:/out/m.log')
         self.assertIn('handlers:', cfg)
         self.assertIn('FileHandler', cfg)
 
