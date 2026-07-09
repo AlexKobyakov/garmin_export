@@ -257,4 +257,5 @@ translations = {
     # Log widget
     'log_ready': 'تم تحميل Garmin Export Plugin وهو جاهز',
     'log_hint': 'ستظهر سجلات العمليات هنا...',
+    'extracting': 'جارٍ فك الضغط...',
 }

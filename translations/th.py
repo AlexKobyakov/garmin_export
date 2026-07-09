@@ -260,4 +260,5 @@ translations = {
     # Log widget
     'log_ready': 'Garmin Export Plugin โหลดแล้วและพร้อมใช้งาน',
     'log_hint': 'บันทึกการทำงานจะปรากฏที่นี่...',
+    'extracting': 'กำลังแตกไฟล์...',
 }

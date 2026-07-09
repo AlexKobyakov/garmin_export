@@ -94,13 +94,26 @@ class HeaderWidget(QFrame):
             }
         """)
 
-        self.language_combo = QComboBox()
-        self.language_combo.setFixedSize(150, 32)
-
-        # Заполняем языки из менеджера переводов (единый источник)
+        from qgis.PyQt.QtGui import QColor
         from ..translation_manager import translations
+
+        self.language_combo = QComboBox()
+        self.language_combo.setFixedSize(165, 32)
+
+        # Заполняем языки из менеджера переводов (единый источник).
+        # ВАЖНО: цвет текста и фона КАЖДОГО пункта задаётся на уровне модели
+        # (ForegroundRole/BackgroundRole). QSS-правило QComboBox QAbstractItemView
+        # на некоторых сборках Qt/Windows НЕ доходит до всплывающего списка, а
+        # цвет color:white из стиля комбо наследуется пунктами — получался
+        # белый текст на белом фоне (невидимые названия). Роли модели уважает
+        # делегат отрисовки на всех платформах.
+        dark = QColor('#2c3e50')
+        white = QColor('#ffffff')
         for code, label in translations.get_language_labels():
             self.language_combo.addItem(label, code)
+            i = self.language_combo.count() - 1
+            self.language_combo.setItemData(i, dark, Qt.ForegroundRole)
+            self.language_combo.setItemData(i, white, Qt.BackgroundRole)
 
         # Устанавливаем текущий язык
         current = translations.get_current_language()
@@ -108,44 +121,34 @@ class HeaderWidget(QFrame):
         if index >= 0:
             self.language_combo.setCurrentIndex(index)
 
-        # Стилизуем только сам комбобокс и выпадающий список через QSS.
-        # ВАЖНО: не вызываем setPalette() на самом комбо — на Windows/QGIS
-        # это приводило к белому тексту на белом фоне (пустое поле).
-        # Стиль выпадающего списка (QAbstractItemView) задаёт чёрный текст
-        # на белом фоне, чтобы пункты были читаемы в любой теме.
+        # Само поле комбобокса — тёмный текст на почти белом фоне (читается
+        # на градиентной шапке; исключает эффект «белое на белом»).
         self.language_combo.setStyleSheet("""
             QComboBox {
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-                border: 2px solid rgba(255, 255, 255, 0.3);
+                background: rgba(255, 255, 255, 0.95);
+                color: #2c3e50;
+                border: 2px solid rgba(255, 255, 255, 0.6);
                 border-radius: 6px;
                 padding: 4px 10px;
                 font-weight: bold;
                 font-size: 11px;
             }
             QComboBox:hover {
-                background: rgba(255, 255, 255, 0.3);
-                border-color: rgba(255, 255, 255, 0.5);
+                background: #ffffff;
+                border-color: #ffffff;
             }
             QComboBox::drop-down {
                 border: none;
                 width: 20px;
                 background: transparent;
             }
-            QComboBox::down-arrow {
-                width: 10px;
-                height: 10px;
-            }
             QComboBox QAbstractItemView {
-                background-color: white;
+                background-color: #ffffff;
                 color: #2c3e50;
                 border: 2px solid #bdc3c7;
-                border-radius: 4px;
                 outline: none;
-                font-size: 11px;
-                font-weight: bold;
                 selection-background-color: #3498db;
-                selection-color: white;
+                selection-color: #ffffff;
             }
         """)
 

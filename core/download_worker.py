@@ -58,7 +58,11 @@ class DownloadWorker(QObject):
 
     def _on_progress(self, received, total, status_text):
         if status_text:
-            self.status.emit(status_text)
+            if status_text == downloader.STATUS_EXTRACT:
+                from ..translation_manager import translations
+                self.status.emit(translations.get_text('extracting'))
+            else:
+                self.status.emit(status_text)
         self.progress.emit(received, total)
 
     def cancel(self):
