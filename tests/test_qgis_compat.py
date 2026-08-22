@@ -17,9 +17,9 @@ LEGACY_OVERSIZED = {
 
 
 def _python_files():
-    for folder, _dirs, names in os.walk(ROOT):
-        if os.path.basename(folder) in ('.git', '__pycache__'):
-            continue
+    for folder, dirs, names in os.walk(ROOT):
+        dirs[:] = [name for name in dirs
+                   if name not in ('.git', '__pycache__', 'build', 'dist')]
         for name in names:
             if name.endswith('.py') and not name.startswith('test_'):
                 yield os.path.relpath(os.path.join(folder, name), ROOT)
@@ -87,6 +87,20 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         actual = {_key(path) for path in _python_files()
                   if len(_source(path).splitlines()) > 500}
         self.assertEqual(actual, set(LEGACY_OVERSIZED))
+
+    def test_reference_author_and_support_dialog_contract(self):
+        author = _source('gui/gui_dialogs.py')
+        support = _source('gui/simple_donation.py')
+        self.assertIn('class AuthorInfoDialog(QDialog):', author)
+        self.assertIn('def retranslateUi(self):', author)
+        for name in ('title_label', 'subtitle_label', 'version_label',
+                     'about_label', 'contact_label', 'close_button'):
+            self.assertIn('self.{0}'.format(name), author)
+        self.assertIn('class SimpleDonationDialog(QDialog):', support)
+        self.assertIn('def retranslateUi(self):', support)
+        for name in ('title_label', 'description_label', 'kofi_button',
+                     'tbank_button', 'github_button'):
+            self.assertIn('self.{0}'.format(name), support)
 
 
 if __name__ == '__main__':

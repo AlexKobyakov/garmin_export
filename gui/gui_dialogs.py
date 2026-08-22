@@ -20,55 +20,108 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label
+from ..translation_manager import translations
 from ..qgis_compat import qt_enum
 
 
-class AuthorInfoDialog(QMessageBox):
-    """Диалог информации об авторе (идентичен референсному плагину)"""
+class AuthorInfoDialog(QDialog):
+    """Стильное окно «Об авторе» из зрелой реализации reference-плагина."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setupUi()
-
-    def setupUi(self):
-        """Настройка интерфейса"""
-        from ..translation_manager import translations
-
-        # Получаем информацию о плагине из metadata.txt
         try:
             from ..garmin_exporter import GarminExporter
-            plugin_info = GarminExporter.get_plugin_info()
+            self._info = GarminExporter.get_plugin_info()
         except Exception:
-            plugin_info = {
+            self._info = {
                 'name': 'Garmin Export',
                 'version': 'Unknown',
                 'author': 'Кобяков Александр Викторович',
-                'email': 'kobyakov@lesburo.ru'
+                'email': 'kobyakov@lesburo.ru',
             }
+        self.setMinimumSize(560, 640)
+        self.resize(560, 640)
+        self.setModal(True)
+        self.setWindowFlags(
+            qt_enum('WindowType', 'Dialog')
+            | qt_enum('WindowType', 'WindowTitleHint')
+            | qt_enum('WindowType', 'WindowCloseButtonHint'))
+        self.setupUi()
+        self.retranslateUi()
 
-        self.setWindowTitle(f'👤 {translations.get_text("header_about_author")}')
-        self.setTextFormat(qt_enum('TextFormat', 'RichText'))
-        self.setText(f"""
-        <div style="text-align: center; padding: 20px;">
-            <h2 style="color: #3498db;">🎯 {plugin_info['name']}</h2>
-            <p style="color: #7f8c8d; font-size: 14px; margin: 5px 0;">
-                <b>📜 {translations.get_text('version')}:</b> v{plugin_info['version']}
-            </p>
-            <hr style="border: 1px solid #bdc3c7;">
-            <p><b>👨‍💻 {translations.get_text('author')}:</b> {plugin_info['author']}<br>
-            <i>(Alex Kobyakov)</i></p>
-            <p><b>📧 {translations.get_text('contact')}:</b> <a href="mailto:{plugin_info['email']}">{plugin_info['email']}</a></p>
-            <p><b>💬 Telegram:</b> <a href="https://t.me/AKobyakov" style="color: #0088cc; text-decoration: none;">@AKobyakov</a></p>
-            <p><b>📅 {translations.get_text('year')}:</b> 2025-2026</p>
-            <p><b>🏢 {translations.get_text('organization')}:</b> Lesburo</p>
-            <hr style="border: 1px solid #bdc3c7;">
-            <p style="color: #7f8c8d; font-style: italic;">
-            {translations.get_text('plugin_description')}<br>
-            {translations.get_text('multilingual_support')}
-            </p>
-        </div>
-        """)
-        self.setStandardButtons(QMessageBox.Ok)
+    def setupUi(self):
+        t = translations.get_text
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(25, 25, 25, 25)
+        layout.setSpacing(14)
+
+        self.title_label = QLabel()
+        self.title_label.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.title_label.setStyleSheet(
+            'color: #2c3e50; font-size: 20px; font-weight: bold;')
+
+        self.subtitle_label = QLabel()
+        self.subtitle_label.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.subtitle_label.setWordWrap(True)
+        self.subtitle_label.setStyleSheet('color: #7f8c8d; font-size: 12px;')
+
+        self.version_label = QLabel()
+        self.version_label.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.version_label.setStyleSheet('color: #95a5a6; font-size: 11px;')
+
+        self.about_label = QLabel()
+        self.about_label.setWordWrap(True)
+        self.about_label.setTextFormat(qt_enum('TextFormat', 'RichText'))
+        self.about_label.setStyleSheet(self._card('#eaf4fb', '#bfe0f5'))
+
+        self.contact_label = QLabel()
+        self.contact_label.setWordWrap(True)
+        self.contact_label.setTextFormat(qt_enum('TextFormat', 'RichText'))
+        self.contact_label.setOpenExternalLinks(True)
+        self.contact_label.setStyleSheet(self._card('#f8f9fa', '#dee2e6'))
+
+        self.close_button = create_styled_button(t('close'), 'secondary', '✖️')
+        self.close_button.clicked.connect(self.accept)
+
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.subtitle_label)
+        layout.addWidget(self.version_label)
+        layout.addWidget(self.about_label)
+        layout.addWidget(self.contact_label)
+        layout.addStretch()
+        layout.addWidget(
+            self.close_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.setStyleSheet(
+            'QDialog { background-color: white; border-radius: 10px; }')
+
+    def retranslateUi(self):
+        t = translations.get_text
+        info = self._info
+        self.setWindowTitle('👤 ' + t('header_about_author'))
+        self.title_label.setText('🗺️ ' + info['name'])
+        self.subtitle_label.setText(t('plugin_description'))
+        self.version_label.setText(
+            '📜 {0}: v{1}'.format(t('version'), info['version']))
+        self.about_label.setText(
+            '<b style="color:#2980b9;">🧭 Garmin IMG / mkgmap</b><br>{0}'.format(
+                t('multilingual_support')))
+        self.contact_label.setText(
+            '<b>👨‍💻 {author_l}:</b> {author} <i>(Alex Kobyakov)</i><br>'
+            '<b>📧 {contact_l}:</b> <a href="mailto:{email}">{email}</a><br>'
+            '<b>💬 Telegram:</b> <a href="https://t.me/AKobyakov">@AKobyakov</a><br>'
+            '<b>🏢 {org_l}:</b> Lesburo &nbsp;·&nbsp; <b>📅 {year_l}:</b> 2025–2026<br>'
+            '<span style="color:#7f8c8d;">{multi}</span>'.format(
+                author_l=t('author'), author=info['author'],
+                contact_l=t('contact'), email=info['email'],
+                org_l=t('organization'), year_l=t('year'),
+                multi=t('multilingual_support')))
+        self.close_button.setText('✖️ ' + t('close'))
+
+    @staticmethod
+    def _card(bg, border):
+        return ('QLabel {{ background-color: {0}; border: 1px solid {1}; '
+                'border-radius: 8px; padding: 15px; color: #2c3e50; }}'
+                .format(bg, border))
 
 
 # Совместимость со старым именем

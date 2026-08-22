@@ -1,41 +1,35 @@
 # -*- coding: utf-8 -*-
-"""
-Simple Donation Dialog
-Простой диалог поддержки без веб-компонентов
-(идентичен референсному плагину MIF/TAB to SHP/GeoJSON Converter)
+"""Support / donation dialog for Garmin Export.
 
-Author: Кобяков Александр Викторович (Alex Kobyakov)
-Email: kobyakov@lesburo.ru
-Year: 2025-2026
+The layout and live-retranslation contract are shared with GPS Road Builder.
 """
 
 from qgis.PyQt.QtCore import QUrl
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QFrame
 from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QFrame
 
-from ..qgis_compat import qt_enum
 from ..translation_manager import translations
+from ..qgis_compat import qt_enum
 
 
 class SimpleDonationDialog(QDialog):
-    """Простой диалог поддержки разработки"""
+    """Стильное окно поддержки из зрелой реализации reference-плагина."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(translations.get_text('donation_title'))
-        self.setFixedSize(500, 400)
+        self.setMinimumSize(500, 400)
+        self.resize(500, 400)
         self.setModal(True)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
-        """Настройка интерфейса"""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(25, 25, 25, 25)
         layout.setSpacing(20)
 
-        # Заголовок
-        title = QLabel(translations.get_text('donation_window_title'))
-        title.setStyleSheet("""
+        self.title_label = QLabel()
+        self.title_label.setStyleSheet("""
             QLabel {
                 color: #2c3e50;
                 font-size: 18px;
@@ -44,12 +38,12 @@ class SimpleDonationDialog(QDialog):
                 padding: 10px;
             }
         """)
-        title.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.title_label.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
 
-        # Описание
-        description = QLabel(translations.get_text('donation_description'))
-        description.setTextFormat(qt_enum('TextFormat', 'RichText'))
-        description.setStyleSheet("""
+        self.description_label = QLabel()
+        self.description_label.setWordWrap(True)
+        self.description_label.setTextFormat(qt_enum('TextFormat', 'RichText'))
+        self.description_label.setStyleSheet("""
             QLabel {
                 background-color: #f8f9fa;
                 border: 1px solid #dee2e6;
@@ -59,126 +53,76 @@ class SimpleDonationDialog(QDialog):
             }
         """)
 
-        # Кнопки поддержки
         buttons_frame = QFrame()
         buttons_layout = QVBoxLayout(buttons_frame)
         buttons_layout.setSpacing(10)
 
-        # Ko-fi кнопка
-        kofi_button = QPushButton(translations.get_text('donation_kofi'))
-        kofi_button.setStyleSheet("""
-            QPushButton {
-                background-color: #f45d22;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 15px 20px;
-                font-weight: bold;
-                font-size: 14px;
-                min-height: 20px;
-            }
-            QPushButton:hover {
-                background-color: #e55a1f;
-            }
-        """)
-        kofi_button.clicked.connect(self.openKofi)
+        self.kofi_button = QPushButton()
+        self.kofi_button.setStyleSheet(
+            self._button_style('#f45d22', '#e55a1f', 'white'))
+        self.kofi_button.clicked.connect(self.openKofi)
 
-        # Т Банк кнопка
-        tbank_button = QPushButton(translations.get_text('donation_tbank'))
-        tbank_button.setStyleSheet("""
-            QPushButton {
-                background-color: #ffdd2d;
-                color: #333;
-                border: none;
-                border-radius: 8px;
-                padding: 15px 20px;
-                font-weight: bold;
-                font-size: 14px;
-                min-height: 20px;
-            }
-            QPushButton:hover {
-                background-color: #f5d000;
-            }
-        """)
-        tbank_button.clicked.connect(self.openTBank)
+        self.tbank_button = QPushButton()
+        self.tbank_button.setStyleSheet(
+            self._button_style('#ffdd2d', '#f5d000', '#333'))
+        self.tbank_button.clicked.connect(self.openTBank)
 
-        # GitHub Sponsors кнопка
-        github_button = QPushButton(translations.get_text('donation_github'))
-        github_button.setStyleSheet("""
-            QPushButton {
-                background-color: #24292e;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 15px 20px;
-                font-weight: bold;
-                font-size: 14px;
-                min-height: 20px;
-            }
-            QPushButton:hover {
-                background-color: #1b1f23;
-            }
-        """)
-        github_button.clicked.connect(self.openGitHub)
+        self.github_button = QPushButton()
+        self.github_button.setStyleSheet(
+            self._button_style('#24292e', '#1b1f23', 'white'))
+        self.github_button.clicked.connect(self.openGitHub)
 
-        buttons_layout.addWidget(kofi_button)
-        buttons_layout.addWidget(tbank_button)
-        buttons_layout.addWidget(github_button)
+        buttons_layout.addWidget(self.kofi_button)
+        buttons_layout.addWidget(self.tbank_button)
+        buttons_layout.addWidget(self.github_button)
 
-        # Кнопка закрытия
-        close_button = QPushButton(translations.get_text('donation_maybe_later'))
-        close_button.setStyleSheet("""
-            QPushButton {
-                background-color: #6c757d;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 8px 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #5a6268;
-            }
-        """)
-        close_button.clicked.connect(self.accept)
-
-        # Добавление в макет
-        layout.addWidget(title)
-        layout.addWidget(description)
+        # Пользователь закрывает окно крестиком; отдельная кнопка «позже» не нужна.
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.description_label)
         layout.addWidget(buttons_frame)
         layout.addStretch()
-        layout.addWidget(
-            close_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
+        self.setStyleSheet(
+            "QDialog { background-color: white; border-radius: 10px; }")
 
-        # Стилизация диалога
-        self.setStyleSheet("""
-            QDialog {
-                background-color: white;
-                border-radius: 10px;
-            }
-        """)
+    def retranslateUi(self):
+        t = translations.get_text
+        self.setWindowTitle(t('donation_title'))
+        self.title_label.setText(t('donation_window_title'))
+        self.description_label.setText(t('donation_description'))
+        self.kofi_button.setText(t('donation_kofi'))
+        self.tbank_button.setText(t('donation_tbank'))
+        self.github_button.setText(t('donation_github'))
+
+    @staticmethod
+    def _button_style(bg, hover, fg):
+        return """
+            QPushButton {{
+                background-color: {0};
+                color: {2};
+                border: none;
+                border-radius: 8px;
+                padding: 15px 20px;
+                font-weight: bold;
+                font-size: 14px;
+                min-height: 20px;
+            }}
+            QPushButton:hover {{ background-color: {1}; }}
+        """.format(bg, hover, fg)
 
     def openKofi(self):
-        """Открыть Ko-fi страницу"""
-        url = "https://ko-fi.com/kobyakov"
-        QDesktopServices.openUrl(QUrl(url))
+        QDesktopServices.openUrl(QUrl("https://ko-fi.com/kobyakov"))
         self.accept()
 
     def openTBank(self):
-        """Открыть страницу доната Т Банка"""
-        url = "https://www.tinkoff.ru/rm/r_nCoENhHIfi.KBsuiKmOgJ/ggPSE72306"
-        QDesktopServices.openUrl(QUrl(url))
+        QDesktopServices.openUrl(
+            QUrl("https://www.tinkoff.ru/rm/r_nCoENhHIfi.KBsuiKmOgJ/ggPSE72306"))
         self.accept()
 
     def openGitHub(self):
-        """Открыть GitHub Sponsors"""
-        url = "https://github.com/sponsors/AlexKobyakov"
-        QDesktopServices.openUrl(QUrl(url))
+        QDesktopServices.openUrl(QUrl("https://github.com/sponsors/AlexKobyakov"))
         self.accept()
 
 
-# Совместимость со старым именем
+# Совместимость имён
 DonationDialog = SimpleDonationDialog
-
-# Экспорт
 __all__ = ['SimpleDonationDialog', 'DonationDialog']
