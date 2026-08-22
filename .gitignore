@@ -9,6 +9,9 @@ __pycache__/
 *.jar
 
 # Build / temp output
+build/
+dist/
+*.zip
 *.img
 *.mp
 mkgmap.log
