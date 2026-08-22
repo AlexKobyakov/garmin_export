@@ -11,11 +11,7 @@ from _bootstrap import PACKAGE  # noqa: F401
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LEGACY_OVERSIZED = {
-    # These files predate G1 and are bounded G2 decomposition debt.
-    'gui/gui_handlers.py': 717,
-    'gui/gui_widgets.py': 633,
-}
+LEGACY_OVERSIZED = {}
 
 
 def _python_files():
@@ -112,10 +108,27 @@ class CompatibilityBoundaryTest(unittest.TestCase):
             block = source.split('class {0}'.format(class_name), 1)[1]
             self.assertIn('def retranslateUi(self):', block, class_name)
 
+    def test_legacy_gui_facades_keep_public_exports(self):
+        widgets = _source('gui/gui_widgets.py')
+        handlers = _source('gui/gui_handlers.py')
+        for name in ('HeaderWidget', 'LayerSelectionWidget',
+                     'ExportSettingsWidget', 'StyleMappingWidget',
+                     'ControlButtonsWidget', 'LogTextWidget',
+                     'ResultsTableWidget', 'LevelSettingsWidget'):
+            self.assertIn(name, widgets)
+        self.assertIn('class GuiEventHandlers(', handlers)
+        for name in ('UiHandlers', 'DownloadHandlers', 'MappingHandlers',
+                     'CompilationHandlers', 'SettingsHandlers'):
+            self.assertIn(name, handlers)
+
     def test_scoped_gui_has_no_untranslated_cyrillic_literals(self):
         paths = ('gui/gui_handlers.py', 'gui/gui_main.py',
                  'gui/gui_widgets.py', 'gui/gui_mkgmap_widgets.py',
-                 'gui/simple_donation.py', 'gui/widget_i18n.py')
+                 'gui/simple_donation.py', 'gui/widget_i18n.py',
+                 'gui/widget_header.py', 'gui/widget_selection.py',
+                 'gui/widget_results.py', 'gui/handler_ui.py',
+                 'gui/handler_download.py', 'gui/handler_mapping.py',
+                 'gui/handler_compile.py', 'gui/handler_settings.py')
         for path in paths:
             tokens = tokenize.generate_tokens(
                 io.StringIO(_source(path)).readline)
