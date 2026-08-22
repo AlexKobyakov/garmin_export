@@ -54,9 +54,11 @@ class HeaderWidget(QFrame):
             'color: white; font-size: 16px; background: transparent;')
         self.language_combo = QComboBox()
         self.language_combo.setFixedSize(165, 32)
+        self._language_codes = []
         foreground = QColor('#2c3e50')
         background = QColor('#ffffff')
         for code, label in translations.get_language_labels():
+            self._language_codes.append(code)
             self.language_combo.addItem(label, code)
             index = self.language_combo.count() - 1
             self.language_combo.setItemData(
@@ -81,6 +83,16 @@ class HeaderWidget(QFrame):
         row.addWidget(icon)
         row.addWidget(self.language_combo)
         layout.addWidget(container)
+
+    def language_code_at(self, index):
+        """Return a canonical language code for a Qt5/Qt6 signal value."""
+        try:
+            index = int(index)
+        except (TypeError, ValueError):
+            index = self.language_combo.currentIndex()
+        if 0 <= index < len(self._language_codes):
+            return self._language_codes[index]
+        return None
 
     def createDonationButton(self, layout):
         self.donation_button = ModernButton()

@@ -285,8 +285,12 @@ class GarminExportDialog(QDialog):
     def connectSignals(self):
         """Подключение сигналов к обработчикам"""
         # Заголовок
-        self.header.language_combo.currentIndexChanged.connect(
-            self.handlers.onLanguageChanged)
+        language_signal = self.header.language_combo.currentIndexChanged
+        try:
+            language_signal = language_signal[int]
+        except (IndexError, KeyError, TypeError):
+            pass
+        language_signal.connect(self.handlers.onLanguageChanged)
         self.header.donation_button.clicked.connect(self.handlers.showDonation)
         self.header.author_button.clicked.connect(self.handlers.showAuthorInfo)
 

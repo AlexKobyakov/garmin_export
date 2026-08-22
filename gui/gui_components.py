@@ -8,6 +8,8 @@ Email: kobyakov@lesburo.ru
 Year: 2025-2026
 """
 
+import os
+
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QGroupBox, QPushButton, QProgressBar, QLabel, QFrame
 
@@ -124,6 +126,9 @@ class ModernProgressBar(QProgressBar):
 
 def apply_global_styles():
     """Применение глобальных стилей"""
+    checkmark = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'resources', 'checkmark.svg').replace('\\', '/')
     return """
         QDialog {
             background-color: #f8f9fa;
@@ -188,6 +193,7 @@ def apply_global_styles():
         QCheckBox::indicator:checked {
             background-color: #3498db;
             border-color: #3498db;
+            image: url(""" + checkmark + """);
         }
         QRadioButton {
             spacing: 8px;

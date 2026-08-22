@@ -122,6 +122,22 @@ class CompatibilityBoundaryTest(unittest.TestCase):
                      'CompilationHandlers', 'SettingsHandlers'):
             self.assertIn(name, handlers)
 
+    def test_qt5_language_signal_uses_canonical_codes(self):
+        header = _source('gui/widget_header.py')
+        main = _source('gui/gui_main.py')
+        handler = _source('gui/handler_ui.py')
+        self.assertIn('self._language_codes', header)
+        self.assertIn('def language_code_at', header)
+        self.assertIn('language_signal[int]', main)
+        self.assertIn('language_code_at(index)', handler)
+        self.assertIn('QSignalBlocker', _source('gui/gui_mkgmap_widgets.py'))
+
+    def test_qt6_checkbox_has_explicit_checkmark_asset(self):
+        styles = _source('gui/gui_components.py')
+        self.assertIn('checkmark.svg', styles)
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
+                                                     'checkmark.svg')))
+
     def test_scoped_gui_has_no_untranslated_cyrillic_literals(self):
         paths = ('gui/gui_handlers.py', 'gui/gui_main.py',
                  'gui/gui_widgets.py', 'gui/gui_mkgmap_widgets.py',

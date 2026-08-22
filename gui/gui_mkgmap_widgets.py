@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import (
     QLabel, QLineEdit, QCheckBox, QSpinBox, QComboBox, QRadioButton,
     QButtonGroup, QDoubleSpinBox
 )
+from qgis.PyQt.QtCore import QSignalBlocker
 
 from .gui_components import create_styled_button, create_info_label
 from ..core.codepages import CODE_PAGES
@@ -254,7 +255,7 @@ class AdvancedOptionsWidget(QWidget):
 
         # Кодовые страницы (сохраняем текущий выбор)
         current = self.code_page_combo.currentData()
-        self.code_page_combo.blockSignals(True)
+        blocker = QSignalBlocker(self.code_page_combo)
         try:
             for i, (code, key) in enumerate(CODE_PAGES):
                 self.code_page_combo.setItemText(i, _t(key))
@@ -263,7 +264,7 @@ class AdvancedOptionsWidget(QWidget):
                 if idx >= 0:
                     self.code_page_combo.setCurrentIndex(idx)
         finally:
-            self.code_page_combo.blockSignals(False)
+            del blocker
 
         # Основные опции
         self.code_page_label.setText(_t('code_page_label'))

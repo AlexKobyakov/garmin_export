@@ -12,7 +12,7 @@ from ..qgis_compat import qt_enum
 class UiHandlers:
     def onLanguageChanged(self, index):
         from ..translation_manager import translations
-        code = self.dialog.header.language_combo.itemData(index)
+        code = self.dialog.header.language_code_at(index)
         if code and translations.set_language(code):
             self.dialog.updateLanguage()
             self.dialog.updatePluginAction()
