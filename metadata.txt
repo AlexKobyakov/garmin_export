@@ -1,6 +1,7 @@
 [general]
 name=Garmin Export
 qgisMinimumVersion=3.22
+qgisMaximumVersion=4.99
 description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
 version=1.1.4
 author=Alex Kobyakov

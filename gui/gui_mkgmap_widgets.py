@@ -254,12 +254,16 @@ class AdvancedOptionsWidget(QWidget):
 
         # Кодовые страницы (сохраняем текущий выбор)
         current = self.code_page_combo.currentData()
-        for i, (code, key) in enumerate(CODE_PAGES):
-            self.code_page_combo.setItemText(i, _t(key))
-        if current:
-            idx = self.code_page_combo.findData(current)
-            if idx >= 0:
-                self.code_page_combo.setCurrentIndex(idx)
+        self.code_page_combo.blockSignals(True)
+        try:
+            for i, (code, key) in enumerate(CODE_PAGES):
+                self.code_page_combo.setItemText(i, _t(key))
+            if current:
+                idx = self.code_page_combo.findData(current)
+                if idx >= 0:
+                    self.code_page_combo.setCurrentIndex(idx)
+        finally:
+            self.code_page_combo.blockSignals(False)
 
         # Основные опции
         self.code_page_label.setText(_t('code_page_label'))

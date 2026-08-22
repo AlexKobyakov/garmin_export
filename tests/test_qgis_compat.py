@@ -3,6 +3,8 @@
 
 import os
 import re
+import io
+import tokenize
 import unittest
 
 from _bootstrap import PACKAGE  # noqa: F401
@@ -81,7 +83,8 @@ class CompatibilityBoundaryTest(unittest.TestCase):
                     '{0} grew beyond its G1 baseline'.format(path))
             else:
                 self.assertLessEqual(
-                    lines, 500, '{0} exceeds the 500-line module limit'.format(path))
+                    lines, 500,
+                    '{0} exceeds the 500-line module limit'.format(path))
 
     def test_legacy_oversized_files_are_explicit_decomposition_debt(self):
         actual = {_key(path) for path in _python_files()
@@ -101,6 +104,31 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         for name in ('title_label', 'description_label', 'kofi_button',
                      'tbank_button', 'github_button'):
             self.assertIn('self.{0}'.format(name), support)
+
+    def test_dialogs_expose_retranslate_contract(self):
+        source = _source('gui/gui_dialogs.py')
+        for class_name in ('MappingEditorDialog', 'DownloadProgressDialog',
+                           'ErrorDialog'):
+            block = source.split('class {0}'.format(class_name), 1)[1]
+            self.assertIn('def retranslateUi(self):', block, class_name)
+
+    def test_scoped_gui_has_no_untranslated_cyrillic_literals(self):
+        paths = ('gui/gui_handlers.py', 'gui/gui_main.py',
+                 'gui/gui_widgets.py', 'gui/gui_mkgmap_widgets.py',
+                 'gui/simple_donation.py', 'gui/widget_i18n.py')
+        for path in paths:
+            tokens = tokenize.generate_tokens(
+                io.StringIO(_source(path)).readline)
+            for token in tokens:
+                if token.type != tokenize.STRING:
+                    continue
+                if token.string.startswith(('"""', "'''")):
+                    continue
+                alphabet = ('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+                            'абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
+                if any(char in token.string for char in alphabet):
+                    self.fail('{0}:{1} has an untranslated string'.format(
+                        path, token.start[0]))
 
 
 if __name__ == '__main__':

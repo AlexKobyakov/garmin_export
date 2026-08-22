@@ -135,12 +135,10 @@ class MappingEditorDialog(QDialog):
         super().__init__(parent)
         self.mapping_json = mapping_json
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса редактора сопоставления"""
-        from ..translation_manager import translations
-
-        self.setWindowTitle(translations.get_text('mapping_title'))
         self.setMinimumSize(600, 500)
         self.setModal(True)
 
@@ -154,15 +152,15 @@ class MappingEditorDialog(QDialog):
         icon_label = QLabel("🎨")
         icon_label.setStyleSheet("font-size: 24px;")
 
-        title_label = QLabel(translations.get_text('mapping_title'))
-        title_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #2c3e50;")
+        self.title_label = QLabel()
+        self.title_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #2c3e50;")
 
         header_layout.addWidget(icon_label)
-        header_layout.addWidget(title_label)
+        header_layout.addWidget(self.title_label)
         header_layout.addStretch()
 
         # Описание
-        description_label = create_info_label(translations.get_text('mapping_description'))
+        self.description_label = create_info_label('')
 
         # Редактор JSON
         self.json_editor = QTextEdit()
@@ -183,33 +181,41 @@ class MappingEditorDialog(QDialog):
         # Кнопки управления
         buttons_layout = QHBoxLayout()
 
-        validate_button = create_styled_button(
-            translations.get_text('validate_json'), "warning-button", "✅")
-        validate_button.clicked.connect(self.validate_json)
+        self.validate_button = create_styled_button('', "warning-button", "✅")
+        self.validate_button.clicked.connect(self.validate_json)
 
-        reset_button = create_styled_button(
-            translations.get_text('default_mapping'), "danger-button", "🔄")
-        reset_button.clicked.connect(self.reset_to_default)
+        self.reset_button = create_styled_button('', "danger-button", "🔄")
+        self.reset_button.clicked.connect(self.reset_to_default)
 
-        save_button = create_styled_button(
-            translations.get_text('save'), "success-button", "💾")
-        save_button.clicked.connect(self.accept)
+        self.save_button = create_styled_button('', "success-button", "💾")
+        self.save_button.clicked.connect(self.accept)
 
-        cancel_button = create_styled_button(
-            translations.get_text('cancel'), icon_text="❌")
-        cancel_button.clicked.connect(self.reject)
+        self.cancel_button = create_styled_button('', icon_text="❌")
+        self.cancel_button.clicked.connect(self.reject)
 
-        buttons_layout.addWidget(validate_button)
-        buttons_layout.addWidget(reset_button)
+        buttons_layout.addWidget(self.validate_button)
+        buttons_layout.addWidget(self.reset_button)
         buttons_layout.addStretch()
-        buttons_layout.addWidget(save_button)
-        buttons_layout.addWidget(cancel_button)
+        buttons_layout.addWidget(self.save_button)
+        buttons_layout.addWidget(self.cancel_button)
 
         # Сборка макета
         main_layout.addLayout(header_layout)
-        main_layout.addWidget(description_label)
+        main_layout.addWidget(self.description_label)
         main_layout.addWidget(self.json_editor)
         main_layout.addLayout(buttons_layout)
+
+    def retranslateUi(self):
+        """Refresh presentation text without changing the JSON value."""
+        t = translations.get_text
+        title = t('mapping_title')
+        self.setWindowTitle(title)
+        self.title_label.setText(title)
+        self.description_label.setText(t('mapping_description'))
+        self.validate_button.setText('✅ ' + t('validate_json'))
+        self.reset_button.setText('🔄 ' + t('default_mapping'))
+        self.save_button.setText('💾 ' + t('save'))
+        self.cancel_button.setText('❌ ' + t('cancel'))
 
     def validate_json(self):
         """Проверяет корректность JSON"""
@@ -239,20 +245,22 @@ class MappingEditorDialog(QDialog):
 class DownloadProgressDialog(QDialog):
     """Диалог прогресса скачивания mkgmap/splitter"""
 
-    def __init__(self, title, parent=None):
+    def __init__(self, title, parent=None, title_key=None):
         super().__init__(parent)
         self.is_cancelled = False
-        self.setWindowTitle(title)
+        self._title = title
+        self._title_key = title_key
+        self._has_runtime_status = False
         self.setFixedSize(480, 190)
         self.setModal(True)
         self.setWindowFlags(
             qt_enum('WindowType', 'Dialog') |
             qt_enum('WindowType', 'WindowTitleHint'))
-        self.setupUi(title)
+        self.setupUi()
+        self.retranslateUi()
 
-    def setupUi(self, title):
+    def setupUi(self):
         """Настройка интерфейса"""
-        from ..translation_manager import translations
         from .gui_components import ModernProgressBar
 
         layout = QVBoxLayout(self)
@@ -262,21 +270,20 @@ class DownloadProgressDialog(QDialog):
         header_layout = QHBoxLayout()
         icon_label = QLabel("📥")
         icon_label.setStyleSheet("font-size: 28px;")
-        title_label = QLabel(title)
-        title_label.setStyleSheet(
+        self.title_label = QLabel()
+        self.title_label.setStyleSheet(
             "font-size: 14px; font-weight: bold; color: #2c3e50;")
         header_layout.addWidget(icon_label)
-        header_layout.addWidget(title_label)
+        header_layout.addWidget(self.title_label)
         header_layout.addStretch()
 
-        self.status_label = QLabel(translations.get_text('downloading'))
+        self.status_label = QLabel()
         self.status_label.setStyleSheet("font-size: 11px; color: #7f8c8d;")
 
         self.progress_bar = ModernProgressBar()
         self.progress_bar.setRange(0, 0)  # неопределённый до первого прогресса
 
-        self.cancel_button = create_styled_button(
-            translations.get_text('cancel'), "danger-button", "❌")
+        self.cancel_button = create_styled_button('', "danger-button", "❌")
         self.cancel_button.clicked.connect(self.on_cancel)
 
         layout.addLayout(header_layout)
@@ -285,6 +292,15 @@ class DownloadProgressDialog(QDialog):
         layout.addWidget(
             self.cancel_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
 
+    def retranslateUi(self):
+        t = translations.get_text
+        title = t(self._title_key) if self._title_key else self._title
+        self.setWindowTitle(title)
+        self.title_label.setText(title)
+        if not self._has_runtime_status:
+            self.status_label.setText(t('downloading'))
+        self.cancel_button.setText('❌ ' + t('cancel'))
+
     def on_cancel(self):
         """Отмена скачивания"""
         self.is_cancelled = True
@@ -292,6 +308,7 @@ class DownloadProgressDialog(QDialog):
 
     def update_progress(self, received, total):
         """Обновление прогресса (байты)"""
+        self._has_runtime_status = True
         if total > 0:
             self.progress_bar.setRange(0, 100)
             self.progress_bar.setValue(int(received * 100 / total))
@@ -302,24 +319,29 @@ class DownloadProgressDialog(QDialog):
 
     def set_status(self, text):
         """Установка строки статуса"""
+        self._has_runtime_status = True
         self.status_label.setText(text)
 
 
 class ErrorDialog(QDialog):
     """Диалоговое окно отображения ошибок"""
 
-    def __init__(self, title, message, details="", parent=None):
+    def __init__(self, title, message, details="", parent=None,
+                 title_key=None, message_key=None):
         super().__init__(parent)
+        self._title = title
+        self._message = message
+        self._details = details
         self.title = title
         self.message = message
         self.details = details
+        self._title_key = title_key
+        self._message_key = message_key
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса диалога ошибок"""
-        from ..translation_manager import translations
-
-        self.setWindowTitle(self.title)
         self.setMinimumSize(450, 300)
         self.setModal(True)
 
@@ -333,17 +355,17 @@ class ErrorDialog(QDialog):
         icon_label = QLabel("❌")
         icon_label.setStyleSheet("font-size: 32px;")
 
-        title_label = QLabel(self.title)
-        title_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #e74c3c;")
+        self.title_label = QLabel()
+        self.title_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #e74c3c;")
 
         header_layout.addWidget(icon_label)
-        header_layout.addWidget(title_label)
+        header_layout.addWidget(self.title_label)
         header_layout.addStretch()
 
         # Сообщение об ошибке
-        message_label = QLabel(self.message)
-        message_label.setWordWrap(True)
-        message_label.setStyleSheet("""
+        self.message_label = QLabel()
+        self.message_label.setWordWrap(True)
+        self.message_label.setStyleSheet("""
             QLabel {
                 background-color: #fdeded;
                 border: 2px solid #f5c6cb;
@@ -354,13 +376,13 @@ class ErrorDialog(QDialog):
         """)
 
         # Детали ошибки (если есть)
-        details_group = None
-        if self.details:
-            details_group = QGroupBox('📋 ' + translations.get_text('details'))
-            details_layout = QVBoxLayout(details_group)
+        self.details_group = None
+        if self._details:
+            self.details_group = QGroupBox()
+            details_layout = QVBoxLayout(self.details_group)
 
             self.details_text = QTextEdit()
-            self.details_text.setPlainText(self.details)
+            self.details_text.setPlainText(self._details)
             self.details_text.setReadOnly(True)
             self.details_text.setMaximumHeight(150)
             self.details_text.setFont(QFont("Consolas", 9))
@@ -368,13 +390,24 @@ class ErrorDialog(QDialog):
             details_layout.addWidget(self.details_text)
 
         # Кнопка закрытия
-        close_button = create_styled_button(
-            translations.get_text('close'), "danger-button", "❌")
-        close_button.clicked.connect(self.accept)
+        self.close_button = create_styled_button('', "danger-button", "❌")
+        self.close_button.clicked.connect(self.accept)
 
         # Сборка макета
         main_layout.addLayout(header_layout)
-        main_layout.addWidget(message_label)
-        if details_group is not None:
-            main_layout.addWidget(details_group)
-        main_layout.addWidget(close_button)
+        main_layout.addWidget(self.message_label)
+        if self.details_group is not None:
+            main_layout.addWidget(self.details_group)
+        main_layout.addWidget(self.close_button)
+
+    def retranslateUi(self):
+        t = translations.get_text
+        title = t(self._title_key) if self._title_key else self._title
+        message = (t(self._message_key).format(error='')
+                   if self._message_key else self._message)
+        self.setWindowTitle(title)
+        self.title_label.setText(title)
+        self.message_label.setText(message)
+        if self.details_group is not None:
+            self.details_group.setTitle('📋 ' + t('details'))
+        self.close_button.setText('❌ ' + t('close'))

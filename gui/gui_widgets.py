@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-GUI Widgets for Garmin Export Plugin
-Виджеты графического интерфейса для плагина экспорта в Garmin
-
-Author: Кобяков Александр Викторович (Alex Kobyakov)
-Email: kobyakov@lesburo.ru
-Year: 2025-2026
-"""
+"""Composite widgets for the Garmin export dialog."""
 
 import json
 
@@ -19,7 +12,14 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label, ModernButton
+from ..translation_manager import translations
 from ..qgis_compat import qt_class_enum, qt_enum
+from .widget_i18n import (
+    retranslate_header, retranslate_layer_selection,
+    retranslate_export_settings, retranslate_style_mapping,
+    retranslate_control_buttons, retranslate_log, retranslate_results,
+    retranslate_levels,
+)
 
 
 def get_default_mapping_json():
@@ -44,6 +44,7 @@ class HeaderWidget(QFrame):
             }
         """)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса заголовка"""
@@ -51,8 +52,7 @@ class HeaderWidget(QFrame):
         main_layout.setContentsMargins(20, 15, 20, 15)
         main_layout.setSpacing(20)
 
-        # Заголовок
-        self.title_label = QLabel("🎯 Garmin Export Plugin")
+        self.title_label = QLabel()
         self.title_label.setStyleSheet("""
             QLabel {
                 color: white;
@@ -62,7 +62,6 @@ class HeaderWidget(QFrame):
             }
         """)
 
-        # Правая панель с элементами управления
         self.controls_widget = QWidget()
         controls_layout = QHBoxLayout(self.controls_widget)
         controls_layout.setContentsMargins(0, 0, 0, 0)
@@ -95,18 +94,9 @@ class HeaderWidget(QFrame):
         """)
 
         from qgis.PyQt.QtGui import QColor
-        from ..translation_manager import translations
-
         self.language_combo = QComboBox()
         self.language_combo.setFixedSize(165, 32)
 
-        # Заполняем языки из менеджера переводов (единый источник).
-        # ВАЖНО: цвет текста и фона КАЖДОГО пункта задаётся на уровне модели
-        # (ForegroundRole/BackgroundRole). QSS-правило QComboBox QAbstractItemView
-        # на некоторых сборках Qt/Windows НЕ доходит до всплывающего списка, а
-        # цвет color:white из стиля комбо наследуется пунктами — получался
-        # белый текст на белом фоне (невидимые названия). Роли модели уважает
-        # делегат отрисовки на всех платформах.
         dark = QColor('#2c3e50')
         white = QColor('#ffffff')
         for code, label in translations.get_language_labels():
@@ -117,14 +107,11 @@ class HeaderWidget(QFrame):
             self.language_combo.setItemData(
                 i, white, qt_enum('ItemDataRole', 'BackgroundRole'))
 
-        # Устанавливаем текущий язык
         current = translations.get_current_language()
         index = self.language_combo.findData(current)
         if index >= 0:
             self.language_combo.setCurrentIndex(index)
 
-        # Само поле комбобокса — тёмный текст на почти белом фоне (читается
-        # на градиентной шапке; исключает эффект «белое на белом»).
         self.language_combo.setStyleSheet("""
             QComboBox {
                 background: rgba(255, 255, 255, 0.95);
@@ -160,11 +147,9 @@ class HeaderWidget(QFrame):
 
     def createDonationButton(self, layout):
         """Создание кнопки поддержки"""
-        from ..translation_manager import translations
-
-        self.donation_button = ModernButton(f"☕ {translations.get_text('header_support')}")
+        self.donation_button = ModernButton()
         self.donation_button.setFixedSize(120, 32)
-        self.donation_button.setToolTip("❤️ Поддержите разработку плагина!")
+        self.donation_button.setToolTip("")
         self.donation_button.setStyleSheet("""
             QPushButton {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -188,11 +173,9 @@ class HeaderWidget(QFrame):
 
     def createAuthorButton(self, layout):
         """Создание кнопки автора"""
-        from ..translation_manager import translations
-
-        self.author_button = ModernButton(f"👤 {translations.get_text('header_about_author')}")
+        self.author_button = ModernButton()
         self.author_button.setFixedSize(100, 32)
-        self.author_button.setToolTip("📝 Информация об авторе плагина")
+        self.author_button.setToolTip("")
         self.author_button.setStyleSheet("""
             QPushButton {
                 background: rgba(255, 255, 255, 0.2);
@@ -210,6 +193,8 @@ class HeaderWidget(QFrame):
         """)
         layout.addWidget(self.author_button)
 
+    retranslateUi = retranslate_header
+
 
 class LayerSelectionWidget(QWidget):
     """Виджет выбора слоёв для экспорта"""
@@ -217,6 +202,7 @@ class LayerSelectionWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса выбора слоёв"""
@@ -224,15 +210,15 @@ class LayerSelectionWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(10)
 
-        self.layers_group = QGroupBox("📁 Выбор слоёв для экспорта")
+        self.layers_group = QGroupBox()
         group_layout = QVBoxLayout(self.layers_group)
         group_layout.setSpacing(10)
 
         buttons_layout = QHBoxLayout()
 
-        self.select_all_button = create_styled_button("Выбрать все", "success-button", "✅")
-        self.deselect_all_button = create_styled_button("Снять выделение", "warning-button", "❌")
-        self.refresh_button = create_styled_button("Обновить", icon_text="🔄")
+        self.select_all_button = create_styled_button("", "success-button", "✅")
+        self.deselect_all_button = create_styled_button("", "warning-button", "❌")
+        self.refresh_button = create_styled_button("", icon_text="🔄")
 
         buttons_layout.addWidget(self.select_all_button)
         buttons_layout.addWidget(self.deselect_all_button)
@@ -251,14 +237,15 @@ class LayerSelectionWidget(QWidget):
             }
         """)
 
-        self.info_label = create_info_label(
-            "Выберите слои проекта для экспорта в формат Garmin IMG")
+        self.info_label = create_info_label("")
 
         group_layout.addWidget(self.info_label)
         group_layout.addLayout(buttons_layout)
         group_layout.addWidget(self.layers_list)
 
         layout.addWidget(self.layers_group)
+
+    retranslateUi = retranslate_layer_selection
 
     def add_layer_item(self, layer_id, layer_name, layer_type, is_checked=False):
         """Добавляет элемент слоя в список (идентификация по layer_id)"""
@@ -312,6 +299,7 @@ class ExportSettingsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса настроек экспорта"""
@@ -328,23 +316,23 @@ class ExportSettingsWidget(QWidget):
 
     def createOutputSection(self):
         """Создание секции выходных файлов"""
-        self.output_group = QGroupBox("📤 Выходные файлы")
+        self.output_group = QGroupBox()
         layout = QGridLayout(self.output_group)
         layout.setSpacing(10)
 
-        self.output_folder_label = QLabel("Выходная папка:")
+        self.output_folder_label = QLabel()
         layout.addWidget(self.output_folder_label, 0, 0)
 
         folder_layout = QHBoxLayout()
         self.output_folder_line = QLineEdit()
-        self.output_folder_line.setPlaceholderText("Выберите папку для сохранения IMG файла")
-        self.output_folder_button = create_styled_button("Обзор...", icon_text="📂")
+        self.output_folder_line.setPlaceholderText("")
+        self.output_folder_button = create_styled_button("", icon_text="📂")
 
         folder_layout.addWidget(self.output_folder_line)
         folder_layout.addWidget(self.output_folder_button)
         layout.addLayout(folder_layout, 0, 1)
 
-        self.output_filename_label = QLabel("Имя файла карты:")
+        self.output_filename_label = QLabel()
         layout.addWidget(self.output_filename_label, 1, 0)
         self.output_filename_line = QLineEdit()
         self.output_filename_line.setPlaceholderText("map")
@@ -353,57 +341,52 @@ class ExportSettingsWidget(QWidget):
 
     def createMapSettingsSection(self):
         """Создание секции настроек карты"""
-        self.map_group = QGroupBox("🗺️ Настройки карты")
+        self.map_group = QGroupBox()
         layout = QGridLayout(self.map_group)
         layout.setSpacing(10)
 
-        self.family_id_label = QLabel("Family ID:")
+        self.family_id_label = QLabel()
         layout.addWidget(self.family_id_label, 0, 0)
         self.family_id_spin = QSpinBox()
         self.family_id_spin.setRange(1, 65535)
         self.family_id_spin.setValue(1234)
-        self.family_id_spin.setToolTip(
-            "Идентификатор семейства карт. Должен быть уникален среди "
-            "карт на устройстве.")
+        self.family_id_spin.setToolTip("")
         layout.addWidget(self.family_id_spin, 0, 1)
 
-        self.map_id_label = QLabel("Map ID:")
+        self.map_id_label = QLabel()
         layout.addWidget(self.map_id_label, 0, 2)
         self.map_id_spin = QSpinBox()
         self.map_id_spin.setRange(1, 99999999)
         self.map_id_spin.setValue(12340001)
-        self.map_id_spin.setToolTip(
-            "8-значный номер тайла карты. Должен быть уникален.")
+        self.map_id_spin.setToolTip("")
         layout.addWidget(self.map_id_spin, 0, 3)
 
-        self.map_name_label = QLabel("Название карты:")
+        self.map_name_label = QLabel()
         layout.addWidget(self.map_name_label, 1, 0)
         self.map_name_line = QLineEdit()
-        self.map_name_line.setPlaceholderText("QGIS Map")
-        self.map_name_line.setText("QGIS Map")
+        self.map_name_line.setPlaceholderText("")
+        self.map_name_line.setText("")
         layout.addWidget(self.map_name_line, 1, 1, 1, 3)
 
-        self.map_description_label = QLabel("Описание:")
+        self.map_description_label = QLabel()
         layout.addWidget(self.map_description_label, 2, 0)
         self.map_description_line = QLineEdit()
-        self.map_description_line.setPlaceholderText("Map created with QGIS Garmin Export Plugin")
+        self.map_description_line.setPlaceholderText("")
         layout.addWidget(self.map_description_line, 2, 1, 1, 3)
 
         checkbox_layout = QHBoxLayout()
-        self.transparent_cb = QCheckBox("Прозрачная карта")
-        self.transparent_cb.setToolTip(
-            "Прозрачная карта отображается поверх других карт "
-            "(например, поверх базовой карты).")
-        self.routing_cb = QCheckBox("Поддержка маршрутизации")
-        self.routing_cb.setToolTip(
-            "Записать данные NET/NOD (--route). Работает, если данные "
-            "содержат дорожную сеть.")
+        self.transparent_cb = QCheckBox()
+        self.transparent_cb.setToolTip("")
+        self.routing_cb = QCheckBox()
+        self.routing_cb.setToolTip("")
 
         checkbox_layout.addWidget(self.transparent_cb)
         checkbox_layout.addWidget(self.routing_cb)
         checkbox_layout.addStretch()
 
         layout.addLayout(checkbox_layout, 3, 0, 1, 4)
+
+    retranslateUi = retranslate_export_settings
 
 
 class StyleMappingWidget(QWidget):
@@ -412,6 +395,7 @@ class StyleMappingWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса сопоставления стилей"""
@@ -419,16 +403,16 @@ class StyleMappingWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(10)
 
-        self.mapping_group = QGroupBox("🎨 JSON-сопоставление стилей")
+        self.mapping_group = QGroupBox()
         group_layout = QVBoxLayout(self.mapping_group)
         group_layout.setSpacing(10)
 
         buttons_layout = QHBoxLayout()
 
-        self.load_mapping_button = create_styled_button("Загрузить", "success-button", "📂")
-        self.save_mapping_button = create_styled_button("Сохранить", "warning-button", "💾")
-        self.edit_mapping_button = create_styled_button("Редактировать", icon_text="✏️")
-        self.reset_mapping_button = create_styled_button("По умолчанию", "danger-button", "🔄")
+        self.load_mapping_button = create_styled_button("", "success-button", "📂")
+        self.save_mapping_button = create_styled_button("", "warning-button", "💾")
+        self.edit_mapping_button = create_styled_button("", icon_text="✏️")
+        self.reset_mapping_button = create_styled_button("", "danger-button", "🔄")
 
         buttons_layout.addWidget(self.load_mapping_button)
         buttons_layout.addWidget(self.save_mapping_button)
@@ -439,16 +423,17 @@ class StyleMappingWidget(QWidget):
         self.mapping_text = QTextEdit()
         self.mapping_text.setMinimumHeight(200)
         self.mapping_text.setFont(QFont("Consolas", 10))
-        self.mapping_text.setPlaceholderText("JSON-сопоставление стилей будет загружено автоматически...")
+        self.mapping_text.setPlaceholderText("")
 
-        self.info_label = create_info_label(
-            "Настройте соответствие между слоями QGIS и типами объектов Garmin")
+        self.info_label = create_info_label("")
 
         group_layout.addWidget(self.info_label)
         group_layout.addLayout(buttons_layout)
         group_layout.addWidget(self.mapping_text)
 
         layout.addWidget(self.mapping_group)
+
+    retranslateUi = retranslate_style_mapping
 
     def get_mapping_json(self):
         """Возвращает JSON сопоставления"""
@@ -469,6 +454,7 @@ class ControlButtonsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса кнопок управления"""
@@ -476,7 +462,7 @@ class ControlButtonsWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(15)
 
-        self.compile_button = create_styled_button("Скомпилировать карту", "success-button", "🚀")
+        self.compile_button = create_styled_button("", "success-button", "🚀")
         self.compile_button.setMinimumHeight(40)
         self.compile_button.setStyleSheet(self.compile_button.styleSheet() + """
             QPushButton {
@@ -486,15 +472,17 @@ class ControlButtonsWidget(QWidget):
             }
         """)
 
-        self.cancel_button = create_styled_button("Отмена", "danger-button", "❌")
+        self.cancel_button = create_styled_button("", "danger-button", "❌")
         self.cancel_button.setEnabled(False)
 
-        self.clear_log_button = create_styled_button("Очистить логи", "warning-button", "🧹")
+        self.clear_log_button = create_styled_button("", "warning-button", "🧹")
 
         layout.addWidget(self.compile_button)
         layout.addWidget(self.cancel_button)
         layout.addStretch()
         layout.addWidget(self.clear_log_button)
+
+    retranslateUi = retranslate_control_buttons
 
 
 class LogTextWidget(QTextEdit):
@@ -503,6 +491,7 @@ class LogTextWidget(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка виджета логов"""
@@ -519,11 +508,9 @@ class LogTextWidget(QTextEdit):
             }
         """)
 
-        from ..translation_manager import translations
-        self.append("🎯 <span style='color: #3498db;'>{0}</span>".format(
-            translations.get_text('log_ready')))
-        self.append("📋 <span style='color: #95a5a6;'>{0}</span>".format(
-            translations.get_text('log_hint')))
+        self._initial_messages = True
+
+    retranslateUi = retranslate_log
 
 
 class ResultsTableWidget(QTableWidget):
@@ -532,11 +519,12 @@ class ResultsTableWidget(QTableWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка таблицы результатов"""
         self.setColumnCount(3)
-        self.setHorizontalHeaderLabels(["📄 Слой", "📊 Статус", "💬 Сообщение"])
+        self.setHorizontalHeaderLabels(['', '', ''])
 
         header = self.horizontalHeader()
         header.setStretchLastSection(True)
@@ -554,6 +542,8 @@ class ResultsTableWidget(QTableWidget):
 
         self.verticalHeader().setVisible(False)
 
+    retranslateUi = retranslate_results
+
     def add_result(self, layer_name, status, message):
         """Добавляет результат в таблицу"""
         row = self.rowCount()
@@ -569,7 +559,10 @@ class ResultsTableWidget(QTableWidget):
         icon = status_icons.get(status, '❓')
 
         self.setItem(row, 0, QTableWidgetItem(layer_name))
-        self.setItem(row, 1, QTableWidgetItem(f"{icon} {status.title()}"))
+        status_item = QTableWidgetItem(
+            f"{icon} {translations.get_text(status)}")
+        status_item.setData(qt_enum('ItemDataRole', 'UserRole'), status)
+        self.setItem(row, 1, status_item)
         self.setItem(row, 2, QTableWidgetItem(message))
 
     def clear_results(self):
@@ -583,6 +576,7 @@ class LevelSettingsWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi()
+        self.retranslateUi()
 
     def setupUi(self):
         """Настройка интерфейса уровней"""
@@ -590,14 +584,14 @@ class LevelSettingsWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(10)
 
-        self.levels_group = QGroupBox("📊 Уровни отображения карты")
+        self.levels_group = QGroupBox()
         group_layout = QGridLayout(self.levels_group)
         group_layout.setSpacing(10)
 
-        self.level_0_cb = QCheckBox("Уровень 0 (детальный)")
-        self.level_1_cb = QCheckBox("Уровень 1 (основной)")
-        self.level_2_cb = QCheckBox("Уровень 2 (средний)")
-        self.level_3_cb = QCheckBox("Уровень 3 (обзорный)")
+        self.level_0_cb = QCheckBox()
+        self.level_1_cb = QCheckBox()
+        self.level_2_cb = QCheckBox()
+        self.level_3_cb = QCheckBox()
 
         self.level_0_cb.setChecked(True)
         self.level_1_cb.setChecked(True)
@@ -612,14 +606,12 @@ class LevelSettingsWidget(QWidget):
         group_layout.addWidget(self.level_2_cb, 1, 0)
         group_layout.addWidget(self.level_3_cb, 1, 1)
 
-        self.info_label = create_info_label(
-            "Уровни определяют, при каких масштабах объекты видны на "
-            "устройстве. Уровень 0 (разрешение 24) - самый детальный, "
-            "уровень 3 (разрешение 18) - обзорный. В сопоставлении стилей "
-            "параметр \"level\" задаёт, до какого уровня виден объект.")
+        self.info_label = create_info_label("")
         group_layout.addWidget(self.info_label, 2, 0, 1, 2)
 
         layout.addWidget(self.levels_group)
+
+    retranslateUi = retranslate_levels
 
     def get_enabled_levels(self):
         """Возвращает список включенных уровней"""

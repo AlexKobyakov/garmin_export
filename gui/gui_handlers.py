@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-GUI Event Handlers for Garmin Export Plugin
-Обработчики событий GUI для плагина экспорта в Garmin
-
-Author: Кобяков Александр Викторович (Alex Kobyakov)
-Email: kobyakov@lesburo.ru
-Year: 2025-2026
-"""
+"""Event handlers for the Garmin export dialog."""
 
 import os
 import json
@@ -29,7 +22,6 @@ class GuiEventHandlers:
         self.download_thread = None
         self.download_worker = None
         self.settings_manager = SettingsManager()
-
     # ------------------------------------------------------------------
     # Заголовок: язык, поддержка, автор
     # ------------------------------------------------------------------
@@ -37,10 +29,10 @@ class GuiEventHandlers:
     def onLanguageChanged(self, index):
         """Обработчик смены языка"""
         from ..translation_manager import translations
-
         language_data = self.dialog.header.language_combo.itemData(index)
         if language_data and translations.set_language(language_data):
             self.dialog.updateLanguage()
+            self.dialog.updatePluginAction()
 
             # Направление письма (арабский - справа налево)
             direction = (
@@ -50,7 +42,7 @@ class GuiEventHandlers:
             self.dialog.setLayoutDirection(direction)
 
             self.settings_manager.set('language', language_data)
-            self.dialog.log_message(f"🌐 Язык изменен на: {language_data}")
+            self.dialog.log_message(f"🌐 {language_data}")
 
     def showDonation(self):
         """Показывает диалог пожертвований"""
@@ -85,7 +77,7 @@ class GuiEventHandlers:
         if folder:
             self.dialog.export_settings.output_folder_line.setText(folder)
             self.settings_manager.set('output_folder', folder)
-            self.dialog.log_message(f"📂 Выбрана выходная папка: {folder}")
+            self.dialog.log_message(f"📂 {folder}")
 
     def selectMkgmapPath(self):
         """Выбор пути к mkgmap.jar (кнопка 'Добавить mkgmap')"""
@@ -95,13 +87,13 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('select_mkgmap'),
             os.path.expanduser("~"),
-            "JAR файлы (*.jar);;Все файлы (*)"
+            "JAR files (*.jar);;All files (*)"
         )
 
         if file_path:
             self.dialog.tools_widget.mkgmap_path_line.setText(file_path)
             self.onMkgmapPathChanged()
-            self.dialog.log_message(f"⚙️ Выбран mkgmap: {file_path}")
+            self.dialog.log_message(f"⚙️ {file_path}")
 
     def selectSplitterPath(self):
         """Выбор пути к splitter.jar (кнопка 'Добавить splitter')"""
@@ -111,13 +103,13 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('select_splitter'),
             os.path.expanduser("~"),
-            "JAR файлы (*.jar);;Все файлы (*)"
+            "JAR files (*.jar);;All files (*)"
         )
 
         if file_path:
             self.dialog.tools_widget.splitter_path_line.setText(file_path)
             self.settings_manager.set('splitter_path', file_path)
-            self.dialog.log_message(f"⚙️ Выбран splitter: {file_path}")
+            self.dialog.log_message(f"⚙️ {file_path}")
 
     def selectJavaPath(self):
         """Выбор пути к java"""
@@ -127,7 +119,7 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('select_java'),
             os.path.expanduser("~"),
-            "java (java.exe java);;Все файлы (*)"
+            "Java executable (java.exe);;All files (*)"
         )
 
         if file_path:
@@ -142,7 +134,7 @@ class GuiEventHandlers:
         if java_path:
             self.dialog.tools_widget.java_path_line.setText(java_path)
             self.onJavaPathChanged()
-            self.dialog.log_message(f"☕ Java найдена: {java_path}")
+            self.dialog.log_message(f"☕ {java_path}")
         else:
             self.dialog.tools_widget.java_status_label.setText(
                 '❌ ' + translations.get_text('java_not_found'))
@@ -157,13 +149,13 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('select_typ_file'),
             os.path.expanduser("~"),
-            "TYP файлы (*.typ *.txt);;Все файлы (*)"
+            "TYP files (*.typ *.txt);;All files (*)"
         )
 
         if file_path:
             self.dialog.typ_settings.set_typ_file_path(file_path)
             self.settings_manager.set('typ_file_path', file_path)
-            self.dialog.log_message(f"🖌️ Выбран TYP файл: {file_path}")
+            self.dialog.log_message(f"🖌️ {file_path}")
 
     # ------------------------------------------------------------------
     # Статусы инструментов
@@ -228,10 +220,12 @@ class GuiEventHandlers:
                 translations.get_text('download_in_progress'))
             return
 
-        title = (translations.get_text('download_mkgmap') if tool == 'mkgmap'
-                 else translations.get_text('download_splitter'))
+        title_key = ('download_mkgmap' if tool == 'mkgmap'
+                     else 'download_splitter')
+        title = translations.get_text(title_key)
 
-        progress_dialog = DownloadProgressDialog(title, self.dialog)
+        progress_dialog = DownloadProgressDialog(
+            title, self.dialog, title_key=title_key)
 
         self.download_thread = QThread(self.dialog)
         self.download_worker = DownloadWorker(tool)
@@ -304,7 +298,7 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('select_mapping_file'),
             os.path.expanduser("~"),
-            "JSON файлы (*.json);;Все файлы (*)"
+            "JSON files (*.json);;All files (*)"
         )
 
         if file_path:
@@ -315,10 +309,10 @@ class GuiEventHandlers:
                 json.loads(mapping_json)
 
                 self.dialog.mapping_widget.set_mapping_json(mapping_json)
-                self.dialog.log_message(f"📂 Сопоставление загружено: {file_path}")
+                self.dialog.log_message(f"📂 {file_path}")
 
             except Exception as e:
-                self.dialog.log_message(f"❌ Ошибка загрузки сопоставления: {str(e)}")
+                self.dialog.log_message(f"❌ {str(e)}")
                 QMessageBox.warning(
                     self.dialog, translations.get_text('error'),
                     f"{translations.get_text('error_invalid_json')}:\n{str(e)}")
@@ -331,7 +325,7 @@ class GuiEventHandlers:
             self.dialog,
             translations.get_text('save_mapping_file'),
             os.path.expanduser("~/garmin_mapping.json"),
-            "JSON файлы (*.json);;Все файлы (*)"
+            "JSON files (*.json);;All files (*)"
         )
 
         if file_path:
@@ -342,10 +336,10 @@ class GuiEventHandlers:
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(mapping_json)
 
-                self.dialog.log_message(f"💾 Сопоставление сохранено: {file_path}")
+                self.dialog.log_message(f"💾 {file_path}")
 
             except Exception as e:
-                self.dialog.log_message(f"❌ Ошибка сохранения сопоставления: {str(e)}")
+                self.dialog.log_message(f"❌ {str(e)}")
                 QMessageBox.warning(
                     self.dialog, translations.get_text('error'),
                     f"{translations.get_text('error_invalid_json')}:\n{str(e)}")
@@ -353,6 +347,7 @@ class GuiEventHandlers:
     def editMapping(self):
         """Редактирование JSON-сопоставления"""
         from .gui_dialogs import MappingEditorDialog
+        from ..translation_manager import translations
 
         current_mapping = self.dialog.mapping_widget.get_mapping_json()
         editor_dialog = MappingEditorDialog(current_mapping, self.dialog)
@@ -360,13 +355,15 @@ class GuiEventHandlers:
         if editor_dialog.exec() == MappingEditorDialog.Accepted:
             new_mapping = editor_dialog.get_mapping_json()
             self.dialog.mapping_widget.set_mapping_json(new_mapping)
-            self.dialog.log_message("✏️ JSON-сопоставление отредактировано")
+            self.dialog.log_message("✏️ " + translations.get_text('edit_mapping'))
 
     def resetMapping(self):
         """Сброс сопоставления к значениям по умолчанию"""
         default_mapping = self.dialog.mapping_widget.get_default_mapping()
         self.dialog.mapping_widget.set_mapping_json(default_mapping)
-        self.dialog.log_message("🔄 Сопоставление сброшено к значениям по умолчанию")
+        from ..translation_manager import translations
+        self.dialog.log_message(
+            "🔄 " + translations.get_text('default_mapping'))
 
     # ------------------------------------------------------------------
     # Слои
@@ -408,7 +405,7 @@ class GuiEventHandlers:
         self.createWorker(selected_layers, settings)
         self.setCompilationMode(True)
 
-        self.dialog.log_message("🚀 Начало компиляции карты...")
+        self.dialog.log_message("🚀 " + translations.get_text('compile_map'))
 
     def cancelCompilation(self):
         """Отмена компиляции"""
@@ -418,7 +415,8 @@ class GuiEventHandlers:
             self.worker_thread.wait(5000)
 
             self.setCompilationMode(False)
-            self.dialog.log_message("❌ Компиляция отменена пользователем")
+            from ..translation_manager import translations
+            self.dialog.log_message("❌ " + translations.get_text('cancel'))
 
     def clearLogs(self):
         """Очистка логов"""
@@ -460,7 +458,7 @@ class GuiEventHandlers:
             detected = mkgmap_compiler.find_java()
             if detected:
                 self.dialog.tools_widget.java_path_line.setText(detected)
-                self.dialog.log_message(f"☕ Java найдена автоматически: {detected}")
+                self.dialog.log_message(f"☕ {detected}")
             else:
                 QMessageBox.warning(
                     self.dialog, translations.get_text('error'),
@@ -561,7 +559,7 @@ class GuiEventHandlers:
 
         if success:
             self.dialog.log_message(
-                f"🎉 Компиляция завершена успешно! Файл: {output_file}")
+                f"🎉 {translations.get_text('success_export_complete')} {output_file}")
             QMessageBox.information(
                 self.dialog,
                 translations.get_text('success'),
@@ -582,7 +580,9 @@ class GuiEventHandlers:
             translations.get_text('critical_error'),
             translations.get_text('error_mkgmap_execution').format(error=''),
             error_message,
-            self.dialog
+            self.dialog,
+            title_key='critical_error',
+            message_key='error_mkgmap_execution',
         )
         error_dialog.exec()
 
