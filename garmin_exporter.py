@@ -15,7 +15,7 @@ from qgis.PyQt.QtGui import QAction, QIcon
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsApplication
 
-from .translation_manager import translations
+from .translation_manager import PLUGIN_NAME, translations
 
 
 class GarminExporter:
@@ -40,7 +40,7 @@ class GarminExporter:
             translations.set_language('en')
 
         self.actions = []
-        self.menu = 'Garmin Export'
+        self.menu = PLUGIN_NAME
         self.dialog = None
         self.main_action = None
         self.first_start = True
@@ -68,7 +68,7 @@ class GarminExporter:
     def get_plugin_info():
         """Полная информация о плагине из metadata.txt"""
         default = {
-            'name': 'Garmin Export',
+            'name': PLUGIN_NAME,
             'version': 'Unknown',
             'author': 'Кобяков Александр Викторович',
             'email': 'kobyakov@lesburo.ru',
@@ -127,7 +127,7 @@ class GarminExporter:
 
         self.main_action = self.add_action(
             icon_path,
-            text=f"🎯 {translations.get_text('window_title')}",
+            text='🎯 ' + PLUGIN_NAME,
             callback=self.run,
             parent=self.iface.mainWindow(),
             status_tip=translations.get_text('plugin_description'),
@@ -140,7 +140,7 @@ class GarminExporter:
         """Обновляет текст QAction после live-переключения языка."""
         if self.main_action is None:
             return
-        title = translations.get_text('window_title')
+        title = PLUGIN_NAME
         description = translations.get_text('plugin_description')
         self.main_action.setText('🎯 ' + title)
         self.main_action.setStatusTip(description)

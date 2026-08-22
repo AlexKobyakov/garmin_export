@@ -12,6 +12,7 @@ import importlib
 
 # Языки с письмом справа налево (для setLayoutDirection)
 RTL_LANGUAGES = {'ar'}
+PLUGIN_NAME = 'Garmin Export'
 
 # Отображаемые названия языков (флаг + эндоним) в порядке для UI
 LANGUAGE_LABELS = [

@@ -14,9 +14,12 @@ from qgis.PyQt.QtWidgets import (
     QButtonGroup, QDoubleSpinBox
 )
 from qgis.PyQt.QtCore import QSignalBlocker
+from qgis.PyQt.QtGui import QColor
 
-from .gui_components import create_styled_button, create_info_label
+from .gui_components import (
+    apply_combo_popup_style, create_styled_button, create_info_label)
 from ..core.codepages import CODE_PAGES
+from ..qgis_compat import qt_enum
 
 
 def _t(key):
@@ -149,8 +152,12 @@ class AdvancedOptionsWidget(QWidget):
         self.code_page_label = QLabel()
         grid.addWidget(self.code_page_label, 0, 0)
         self.code_page_combo = QComboBox()
+        apply_combo_popup_style(self.code_page_combo)
         for code, key in CODE_PAGES:
             self.code_page_combo.addItem("", code)
+            self.code_page_combo.setItemData(
+                self.code_page_combo.count() - 1, QColor('#2c3e50'),
+                qt_enum('ItemDataRole', 'ForegroundRole'))
         grid.addWidget(self.code_page_combo, 0, 1)
 
         self.draw_priority_label = QLabel()

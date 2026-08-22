@@ -28,6 +28,7 @@ from .gui_mkgmap_widgets import (
 from .gui_handlers import GuiEventHandlers
 from ..core.layer_manager import LayerManager
 from ..qgis_compat import qt_class_enum, qt_enum
+from ..translation_manager import PLUGIN_NAME, translations
 
 
 class GarminExportDialog(QDialog):
@@ -81,9 +82,7 @@ class GarminExportDialog(QDialog):
 
     def setupWindow(self):
         """Настройка основных параметров окна"""
-        from ..translation_manager import translations
-
-        self.setWindowTitle(f"🎯 {translations.get_text('window_title')}")
+        self.setWindowTitle('🎯 ' + PLUGIN_NAME)
         self.setMinimumSize(1100, 820)
         self.resize(1300, 950)
 
@@ -362,7 +361,8 @@ class GarminExportDialog(QDialog):
                 is_checked=True
             )
 
-        self.log_message(f"📁 Загружено слоёв проекта: {len(layers)}")
+        self.log_message('📁 {0}: {1}'.format(
+            translations.get_text('tab_layers'), len(layers)))
 
     def loadDefaultSettings(self):
         """Загрузка настроек по умолчанию"""
@@ -374,7 +374,7 @@ class GarminExportDialog(QDialog):
         from ..translation_manager import translations
         t = translations.get_text
 
-        self.setWindowTitle('🎯 ' + t('window_title'))
+        self.setWindowTitle('🎯 ' + PLUGIN_NAME)
         self.header.retranslateUi()
         for index, (icon, key, _widget) in enumerate(self._settings_tab_keys):
             self.settings_tabs.setTabText(index, icon + ' ' + t(key))

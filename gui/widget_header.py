@@ -4,7 +4,7 @@
 from qgis.PyQt.QtWidgets import QFrame, QHBoxLayout, QLabel, QComboBox, QWidget
 from qgis.PyQt.QtGui import QColor
 
-from .gui_components import ModernButton
+from .gui_components import ModernButton, apply_combo_popup_style
 from .widget_i18n import retranslate_header
 from ..translation_manager import translations
 from ..qgis_compat import qt_enum
@@ -54,6 +54,7 @@ class HeaderWidget(QFrame):
             'color: white; font-size: 16px; background: transparent;')
         self.language_combo = QComboBox()
         self.language_combo.setFixedSize(165, 32)
+        apply_combo_popup_style(self.language_combo)
         self._language_codes = []
         foreground = QColor('#2c3e50')
         background = QColor('#ffffff')
@@ -79,7 +80,12 @@ class HeaderWidget(QFrame):
             ' QComboBox QAbstractItemView { background-color: #ffffff;'
             ' color: #2c3e50; border: 2px solid #bdc3c7; outline: none;'
             ' selection-background-color: #3498db;'
-            ' selection-color: #ffffff; }')
+            ' selection-color: #ffffff; }'
+            ' QComboBox QAbstractItemView::item { color: #2c3e50;'
+            ' background-color: #ffffff; }'
+            ' QComboBox QAbstractItemView::item:hover,'
+            ' QComboBox QAbstractItemView::item:selected {'
+            ' color: #ffffff; background-color: #3498db; }')
         row.addWidget(icon)
         row.addWidget(self.language_combo)
         layout.addWidget(container)
@@ -96,7 +102,7 @@ class HeaderWidget(QFrame):
 
     def createDonationButton(self, layout):
         self.donation_button = ModernButton()
-        self.donation_button.setFixedSize(120, 32)
+        self.donation_button.setMinimumSize(165, 32)
         self.donation_button.setToolTip('')
         self.donation_button.setStyleSheet(
             'QPushButton { background: rgba(244,93,34,0.9); color: white;'
@@ -107,7 +113,7 @@ class HeaderWidget(QFrame):
 
     def createAuthorButton(self, layout):
         self.author_button = ModernButton()
-        self.author_button.setFixedSize(100, 32)
+        self.author_button.setMinimumSize(190, 32)
         self.author_button.setToolTip('')
         self.author_button.setStyleSheet(
             'QPushButton { background: rgba(255,255,255,0.2); color: white;'

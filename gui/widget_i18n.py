@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """Presentation-only translation handlers for Garmin export widgets."""
 
-from ..translation_manager import translations
+from ..translation_manager import PLUGIN_NAME, translations
 from ..qgis_compat import qt_enum
 
 
 def retranslate_header(widget):
     t = translations.get_text
-    widget.title_label.setText('🎯 ' + t('window_title'))
+    widget.title_label.setText('🎯 ' + PLUGIN_NAME)
     widget.donation_button.setText('☕ ' + t('header_support'))
     widget.donation_button.setToolTip('❤️ ' + t('support_tip'))
     widget.author_button.setText('👤 ' + t('header_about_author'))

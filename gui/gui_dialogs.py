@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label
-from ..translation_manager import translations
+from ..translation_manager import PLUGIN_NAME, translations
 from ..qgis_compat import qt_enum
 
 
@@ -34,7 +34,7 @@ class AuthorInfoDialog(QDialog):
             self._info = GarminExporter.get_plugin_info()
         except Exception:
             self._info = {
-                'name': 'Garmin Export',
+                'name': PLUGIN_NAME,
                 'version': 'Unknown',
                 'author': 'Кобяков Александр Викторович',
                 'email': 'kobyakov@lesburo.ru',
@@ -97,14 +97,15 @@ class AuthorInfoDialog(QDialog):
     def retranslateUi(self):
         t = translations.get_text
         info = self._info
-        self.setWindowTitle('👤 ' + t('header_about_author'))
-        self.title_label.setText('🗺️ ' + info['name'])
+        self.setWindowTitle(
+            '{0} — {1}'.format(PLUGIN_NAME, t('header_about_author')))
+        self.title_label.setText('🗺️ ' + PLUGIN_NAME)
         self.subtitle_label.setText(t('plugin_description'))
         self.version_label.setText(
             '📜 {0}: v{1}'.format(t('version'), info['version']))
         self.about_label.setText(
-            '<b style="color:#2980b9;">🧭 Garmin IMG / mkgmap</b><br>{0}'.format(
-                t('multilingual_support')))
+            '<b style="color:#2980b9;">🎯 {0}</b><br>{1}'.format(
+                PLUGIN_NAME, t('multilingual_support')))
         self.contact_label.setText(
             '<b>👨‍💻 {author_l}:</b> {author} <i>(Alex Kobyakov)</i><br>'
             '<b>📧 {contact_l}:</b> <a href="mailto:{email}">{email}</a><br>'

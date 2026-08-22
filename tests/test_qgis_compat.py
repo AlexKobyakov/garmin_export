@@ -135,8 +135,33 @@ class CompatibilityBoundaryTest(unittest.TestCase):
     def test_qt6_checkbox_has_explicit_checkmark_asset(self):
         styles = _source('gui/gui_components.py')
         self.assertIn('checkmark.svg', styles)
+        self.assertIn('radio_dot.svg', styles)
+        self.assertIn('QComboBox QAbstractItemView::item:hover', styles)
+        self.assertIn('QSpinBox::up-button', styles)
+        self.assertIn('QDoubleSpinBox::down-arrow', styles)
+        self.assertIn('spin_up.svg', styles)
+        self.assertIn('spin_down.svg', styles)
+        self.assertIn('HighlightedText', styles)
+        self.assertIn('url("__CHECKMARK__")', styles)
+        self.assertIn('url("__RADIO_DOT__")', styles)
         self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
                                                      'checkmark.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
+                                                     'radio_dot.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
+                                                     'spin_up.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
+                                                     'spin_down.svg')))
+
+    def test_support_title_is_wrap_safe(self):
+        source = _source('gui/simple_donation.py')
+        self.assertIn('self.title_label.setWordWrap(True)', source)
+        self.assertIn('self.setMinimumSize(560, 420)', source)
+
+    def test_code_page_popup_forces_item_foreground(self):
+        source = _source('gui/gui_mkgmap_widgets.py')
+        self.assertIn('ForegroundRole', source)
+        self.assertIn('apply_combo_popup_style(self.code_page_combo)', source)
 
     def test_scoped_gui_has_no_untranslated_cyrillic_literals(self):
         paths = ('gui/gui_handlers.py', 'gui/gui_main.py',
@@ -145,7 +170,8 @@ class CompatibilityBoundaryTest(unittest.TestCase):
                  'gui/widget_header.py', 'gui/widget_selection.py',
                  'gui/widget_results.py', 'gui/handler_ui.py',
                  'gui/handler_download.py', 'gui/handler_mapping.py',
-                 'gui/handler_compile.py', 'gui/handler_settings.py')
+                 'gui/handler_compile.py', 'gui/handler_settings.py',
+                 'core/export_worker.py')
         for path in paths:
             tokens = tokenize.generate_tokens(
                 io.StringIO(_source(path)).readline)

@@ -8,7 +8,7 @@ from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QFrame
 
-from ..translation_manager import translations
+from ..translation_manager import PLUGIN_NAME, translations
 from ..qgis_compat import qt_enum
 
 
@@ -17,8 +17,8 @@ class SimpleDonationDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(500, 400)
-        self.resize(500, 400)
+        self.setMinimumSize(560, 420)
+        self.resize(560, 420)
         self.setModal(True)
         self.setupUi()
         self.retranslateUi()
@@ -38,6 +38,8 @@ class SimpleDonationDialog(QDialog):
                 padding: 10px;
             }
         """)
+        self.title_label.setWordWrap(True)
+        self.title_label.setMinimumHeight(52)
         self.title_label.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
 
         self.description_label = QLabel()
@@ -86,8 +88,9 @@ class SimpleDonationDialog(QDialog):
 
     def retranslateUi(self):
         t = translations.get_text
-        self.setWindowTitle(t('donation_title'))
-        self.title_label.setText(t('donation_window_title'))
+        self.setWindowTitle('{0} — {1}'.format(PLUGIN_NAME, t('donation_title')))
+        self.title_label.setText(
+            '{0} — {1}'.format(PLUGIN_NAME, t('donation_window_title')))
         self.description_label.setText(t('donation_description'))
         self.kofi_button.setText(t('donation_kofi'))
         self.tbank_button.setText(t('donation_tbank'))
