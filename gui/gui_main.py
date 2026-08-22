@@ -14,6 +14,7 @@ from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QSplitter,
     QScrollArea, QWidget, QTabWidget, QFrame, QLabel
 )
+from qgis.PyQt.QtGui import QTextCursor
 
 from .gui_components import ModernProgressBar, apply_global_styles
 from .gui_widgets import (
@@ -26,7 +27,7 @@ from .gui_mkgmap_widgets import (
 )
 from .gui_handlers import GuiEventHandlers
 from ..core.layer_manager import LayerManager
-from ..qgis_compat import qt_enum
+from ..qgis_compat import qt_class_enum, qt_enum
 
 
 class GarminExportDialog(QDialog):
@@ -416,7 +417,8 @@ class GarminExportDialog(QDialog):
         self.log_text.append(formatted_message)
 
         cursor = self.log_text.textCursor()
-        cursor.movePosition(cursor.End)
+        cursor.movePosition(
+            qt_class_enum(QTextCursor, 'MoveOperation', 'End'))
         self.log_text.setTextCursor(cursor)
 
     def closeEvent(self, event):
