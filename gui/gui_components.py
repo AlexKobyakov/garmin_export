@@ -11,6 +11,8 @@ Year: 2025-2026
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QGroupBox, QPushButton, QProgressBar, QLabel, QFrame
 
+from ..qgis_compat import qfont_weight, qt_class_enum
+
 
 class ModernGroupBox(QGroupBox):
     """Стилизованная группа с современным дизайном"""
@@ -45,7 +47,7 @@ class ModernButton(QPushButton):
         super().__init__(text, parent)
         self.button_type = button_type
         self.setMinimumHeight(40)
-        self.setFont(QFont("Segoe UI", 10, QFont.Medium))
+        self.setFont(QFont("Segoe UI", 10, qfont_weight('Medium')))
         self.apply_style()
 
     def apply_style(self):
@@ -230,8 +232,8 @@ def create_styled_button(text, button_class="primary", icon_text=""):
 def create_section_separator():
     """Создает разделитель секций"""
     separator = QFrame()
-    separator.setFrameShape(QFrame.HLine)
-    separator.setFrameShadow(QFrame.Sunken)
+    separator.setFrameShape(qt_class_enum(QFrame, 'Shape', 'HLine'))
+    separator.setFrameShadow(qt_class_enum(QFrame, 'Shadow', 'Sunken'))
     separator.setStyleSheet("""
         QFrame {
             color: #bdc3c7;

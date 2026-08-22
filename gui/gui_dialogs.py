@@ -13,7 +13,6 @@ Year: 2025-2026
 
 import json
 
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QMessageBox, QDialog, QVBoxLayout, QHBoxLayout,
     QLabel, QTextEdit, QGroupBox
@@ -21,6 +20,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label
+from ..qgis_compat import qt_enum
 
 
 class AuthorInfoDialog(QMessageBox):
@@ -47,7 +47,7 @@ class AuthorInfoDialog(QMessageBox):
             }
 
         self.setWindowTitle(f'👤 {translations.get_text("header_about_author")}')
-        self.setTextFormat(Qt.RichText)
+        self.setTextFormat(qt_enum('TextFormat', 'RichText'))
         self.setText(f"""
         <div style="text-align: center; padding: 20px;">
             <h2 style="color: #3498db;">🎯 {plugin_info['name']}</h2>
@@ -192,7 +192,9 @@ class DownloadProgressDialog(QDialog):
         self.setWindowTitle(title)
         self.setFixedSize(480, 190)
         self.setModal(True)
-        self.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint)
+        self.setWindowFlags(
+            qt_enum('WindowType', 'Dialog') |
+            qt_enum('WindowType', 'WindowTitleHint'))
         self.setupUi(title)
 
     def setupUi(self, title):
@@ -227,7 +229,8 @@ class DownloadProgressDialog(QDialog):
         layout.addLayout(header_layout)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
-        layout.addWidget(self.cancel_button, 0, Qt.AlignCenter)
+        layout.addWidget(
+            self.cancel_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
 
     def on_cancel(self):
         """Отмена скачивания"""

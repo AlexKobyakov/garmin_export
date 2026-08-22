@@ -10,7 +10,6 @@ Year: 2025-2026
 
 from datetime import datetime
 
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QSplitter,
     QScrollArea, QWidget, QTabWidget, QFrame, QLabel
@@ -27,6 +26,7 @@ from .gui_mkgmap_widgets import (
 )
 from .gui_handlers import GuiEventHandlers
 from ..core.layer_manager import LayerManager
+from ..qgis_compat import qt_enum
 
 
 class GarminExportDialog(QDialog):
@@ -70,11 +70,12 @@ class GarminExportDialog(QDialog):
 
     def _applyLayoutDirection(self):
         """Направление письма по текущему языку (RTL для арабского)"""
-        from qgis.PyQt.QtCore import Qt
         from ..translation_manager import translations
 
         self.setLayoutDirection(
-            Qt.RightToLeft if translations.is_rtl() else Qt.LeftToRight)
+            qt_enum('LayoutDirection', 'RightToLeft')
+            if translations.is_rtl()
+            else qt_enum('LayoutDirection', 'LeftToRight'))
 
     def setupWindow(self):
         """Настройка основных параметров окна"""
@@ -84,10 +85,10 @@ class GarminExportDialog(QDialog):
         self.setMinimumSize(1100, 820)
         self.resize(1300, 950)
 
-        flags = Qt.Dialog
-        flags |= Qt.WindowTitleHint
-        flags |= Qt.WindowCloseButtonHint
-        flags |= Qt.WindowMaximizeButtonHint
+        flags = qt_enum('WindowType', 'Dialog')
+        flags |= qt_enum('WindowType', 'WindowTitleHint')
+        flags |= qt_enum('WindowType', 'WindowCloseButtonHint')
+        flags |= qt_enum('WindowType', 'WindowMaximizeButtonHint')
         self.setWindowFlags(flags)
 
     def setupUi(self):
@@ -108,7 +109,7 @@ class GarminExportDialog(QDialog):
 
     def createMainContent(self):
         """Создание основного содержимого"""
-        self.main_splitter = QSplitter(Qt.Vertical)
+        self.main_splitter = QSplitter(qt_enum('Orientation', 'Vertical'))
         self.main_splitter.setChildrenCollapsible(False)
 
         self.createSettingsArea()
@@ -124,8 +125,10 @@ class GarminExportDialog(QDialog):
         """Создание области настроек"""
         self.settings_scroll = QScrollArea()
         self.settings_scroll.setWidgetResizable(True)
-        self.settings_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.settings_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.settings_scroll.setVerticalScrollBarPolicy(
+            qt_enum('ScrollBarPolicy', 'ScrollBarAsNeeded'))
+        self.settings_scroll.setHorizontalScrollBarPolicy(
+            qt_enum('ScrollBarPolicy', 'ScrollBarAlwaysOff'))
 
         settings_container = QWidget()
         settings_layout = QVBoxLayout(settings_container)

@@ -11,8 +11,8 @@ Year: 2025-2026
 import os
 import configparser
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsApplication
 
 from .translation_manager import translations

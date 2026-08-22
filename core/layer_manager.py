@@ -13,6 +13,8 @@ Year: 2025-2026
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 
+from ..qgis_compat import qgis_geometry_type
+
 
 class LayerManager:
     """Менеджер векторных слоёв проекта"""
@@ -49,11 +51,11 @@ class LayerManager:
         """Определяет тип геометрии слоя"""
         geom_type = layer.geometryType()
 
-        if geom_type == QgsWkbTypes.PointGeometry:
+        if geom_type == qgis_geometry_type('Point', QgsWkbTypes):
             return 'Point'
-        elif geom_type == QgsWkbTypes.LineGeometry:
+        elif geom_type == qgis_geometry_type('Line', QgsWkbTypes):
             return 'LineString'
-        elif geom_type == QgsWkbTypes.PolygonGeometry:
+        elif geom_type == qgis_geometry_type('Polygon', QgsWkbTypes):
             return 'Polygon'
         return 'Unknown'
 

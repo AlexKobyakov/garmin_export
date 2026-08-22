@@ -346,6 +346,7 @@ def extract_layer_style(layer):
         или None, если стиль извлечь не удалось.
     """
     from qgis.core import QgsWkbTypes
+    from ..qgis_compat import qgis_geometry_type
 
     symbol = _first_symbol(layer)
     if symbol is None:
@@ -353,12 +354,12 @@ def extract_layer_style(layer):
 
     geom_type = layer.geometryType()
 
-    if geom_type == QgsWkbTypes.PolygonGeometry:
+    if geom_type == qgis_geometry_type('Polygon', QgsWkbTypes):
         color = _qcolor_to_hex(symbol.color())
         return {'kind': 'polygon', 'color': color,
                 'width_px': 0, 'border_color': None, 'pixels': None}
 
-    if geom_type == QgsWkbTypes.LineGeometry:
+    if geom_type == qgis_geometry_type('Line', QgsWkbTypes):
         color = _qcolor_to_hex(symbol.color())
         width_px = 2
         try:
@@ -368,7 +369,7 @@ def extract_layer_style(layer):
         return {'kind': 'line', 'color': color,
                 'width_px': width_px, 'border_color': None, 'pixels': None}
 
-    if geom_type == QgsWkbTypes.PointGeometry:
+    if geom_type == qgis_geometry_type('Point', QgsWkbTypes):
         color = _qcolor_to_hex(symbol.color())
         pixels = _marker_symbol_pixels(symbol)
         return {'kind': 'point', 'color': color,

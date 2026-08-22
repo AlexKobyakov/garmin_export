@@ -16,6 +16,7 @@ from qgis.PyQt.QtWidgets import QFileDialog, QMessageBox
 
 from ..core.settings_manager import SettingsManager
 from ..core import mkgmap_compiler
+from ..qgis_compat import qt_enum
 
 
 class GuiEventHandlers:
@@ -35,7 +36,6 @@ class GuiEventHandlers:
 
     def onLanguageChanged(self, index):
         """Обработчик смены языка"""
-        from qgis.PyQt.QtCore import Qt
         from ..translation_manager import translations
 
         language_data = self.dialog.header.language_combo.itemData(index)
@@ -43,8 +43,10 @@ class GuiEventHandlers:
             self.dialog.updateLanguage()
 
             # Направление письма (арабский - справа налево)
-            direction = (Qt.RightToLeft if translations.is_rtl(language_data)
-                         else Qt.LeftToRight)
+            direction = (
+                qt_enum('LayoutDirection', 'RightToLeft')
+                if translations.is_rtl(language_data)
+                else qt_enum('LayoutDirection', 'LeftToRight'))
             self.dialog.setLayoutDirection(direction)
 
             self.settings_manager.set('language', language_data)
@@ -55,14 +57,14 @@ class GuiEventHandlers:
         from .simple_donation import SimpleDonationDialog
 
         dialog = SimpleDonationDialog(self.dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def showAuthorInfo(self):
         """Показывает информацию об авторе"""
         from .gui_dialogs import AuthorInfoDialog
 
         dialog = AuthorInfoDialog(self.dialog)
-        dialog.exec_()
+        dialog.exec()
 
     # ------------------------------------------------------------------
     # Выбор путей
@@ -252,7 +254,7 @@ class GuiEventHandlers:
         self.download_thread.start()
         self.dialog.log_message(f"📥 {title}...")
 
-        progress_dialog.exec_()
+        progress_dialog.exec()
 
         # Если диалог закрыт до завершения - отменяем
         if 'success' not in result:
@@ -355,7 +357,7 @@ class GuiEventHandlers:
         current_mapping = self.dialog.mapping_widget.get_mapping_json()
         editor_dialog = MappingEditorDialog(current_mapping, self.dialog)
 
-        if editor_dialog.exec_() == MappingEditorDialog.Accepted:
+        if editor_dialog.exec() == MappingEditorDialog.Accepted:
             new_mapping = editor_dialog.get_mapping_json()
             self.dialog.mapping_widget.set_mapping_json(new_mapping)
             self.dialog.log_message("✏️ JSON-сопоставление отредактировано")
@@ -582,7 +584,7 @@ class GuiEventHandlers:
             error_message,
             self.dialog
         )
-        error_dialog.exec_()
+        error_dialog.exec()
 
     def onProgressUpdate(self, value, message=""):
         """Обработчик обновления прогресса"""

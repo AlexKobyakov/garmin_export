@@ -10,16 +10,16 @@ Year: 2025-2026
 
 import json
 
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QGroupBox, QLabel, QLineEdit, QComboBox,
     QCheckBox, QSpinBox, QTextEdit, QListWidget, QListWidgetItem,
-    QTableWidget, QTableWidgetItem, QHeaderView, QFrame
+    QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QFrame
 )
 from qgis.PyQt.QtGui import QFont
 
 from .gui_components import create_styled_button, create_info_label, ModernButton
+from ..qgis_compat import qt_class_enum, qt_enum
 
 
 def get_default_mapping_json():
@@ -112,8 +112,10 @@ class HeaderWidget(QFrame):
         for code, label in translations.get_language_labels():
             self.language_combo.addItem(label, code)
             i = self.language_combo.count() - 1
-            self.language_combo.setItemData(i, dark, Qt.ForegroundRole)
-            self.language_combo.setItemData(i, white, Qt.BackgroundRole)
+            self.language_combo.setItemData(
+                i, dark, qt_enum('ItemDataRole', 'ForegroundRole'))
+            self.language_combo.setItemData(
+                i, white, qt_enum('ItemDataRole', 'BackgroundRole'))
 
         # Устанавливаем текущий язык
         current = translations.get_current_language()
@@ -271,10 +273,14 @@ class LayerSelectionWidget(QWidget):
         icon = icon_map.get(layer_type, '❓')
 
         item.setText(f"{icon} {layer_name} ({layer_type})")
-        item.setData(Qt.UserRole, {
+        item.setData(qt_enum('ItemDataRole', 'UserRole'), {
             'id': layer_id, 'name': layer_name, 'type': layer_type})
-        item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-        item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
+        item.setFlags(
+            qt_enum('ItemFlag', 'ItemIsUserCheckable') |
+            qt_enum('ItemFlag', 'ItemIsEnabled'))
+        item.setCheckState(
+            qt_enum('CheckState', 'Checked')
+            if is_checked else qt_enum('CheckState', 'Unchecked'))
 
         self.layers_list.addItem(item)
 
@@ -283,19 +289,21 @@ class LayerSelectionWidget(QWidget):
         selected = []
         for i in range(self.layers_list.count()):
             item = self.layers_list.item(i)
-            if item.checkState() == Qt.Checked:
-                selected.append(item.data(Qt.UserRole))
+            if item.checkState() == qt_enum('CheckState', 'Checked'):
+                selected.append(item.data(qt_enum('ItemDataRole', 'UserRole')))
         return selected
 
     def select_all_layers(self):
         """Выбирает все слои"""
         for i in range(self.layers_list.count()):
-            self.layers_list.item(i).setCheckState(Qt.Checked)
+            self.layers_list.item(i).setCheckState(
+                qt_enum('CheckState', 'Checked'))
 
     def deselect_all_layers(self):
         """Снимает выделение со всех слоёв"""
         for i in range(self.layers_list.count()):
-            self.layers_list.item(i).setCheckState(Qt.Unchecked)
+            self.layers_list.item(i).setCheckState(
+                qt_enum('CheckState', 'Unchecked'))
 
 
 class ExportSettingsWidget(QWidget):
@@ -532,12 +540,16 @@ class ResultsTableWidget(QTableWidget):
 
         header = self.horizontalHeader()
         header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.Stretch)
+        header.setSectionResizeMode(
+            0, qt_class_enum(QHeaderView, 'ResizeMode', 'ResizeToContents'))
+        header.setSectionResizeMode(
+            1, qt_class_enum(QHeaderView, 'ResizeMode', 'ResizeToContents'))
+        header.setSectionResizeMode(
+            2, qt_class_enum(QHeaderView, 'ResizeMode', 'Stretch'))
 
         self.setAlternatingRowColors(True)
-        self.setSelectionBehavior(QTableWidget.SelectRows)
+        self.setSelectionBehavior(qt_class_enum(
+            QAbstractItemView, 'SelectionBehavior', 'SelectRows'))
         self.setMinimumHeight(150)
 
         self.verticalHeader().setVisible(False)

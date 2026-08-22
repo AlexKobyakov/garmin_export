@@ -9,9 +9,11 @@ Email: kobyakov@lesburo.ru
 Year: 2025-2026
 """
 
-from qgis.PyQt.QtCore import Qt, QUrl
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QFrame
 from qgis.PyQt.QtGui import QDesktopServices
+
+from ..qgis_compat import qt_enum
 from ..translation_manager import translations
 
 
@@ -42,11 +44,11 @@ class SimpleDonationDialog(QDialog):
                 padding: 10px;
             }
         """)
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(qt_enum('AlignmentFlag', 'AlignCenter'))
 
         # Описание
         description = QLabel(translations.get_text('donation_description'))
-        description.setTextFormat(Qt.RichText)
+        description.setTextFormat(qt_enum('TextFormat', 'RichText'))
         description.setStyleSheet("""
             QLabel {
                 background-color: #f8f9fa;
@@ -145,7 +147,8 @@ class SimpleDonationDialog(QDialog):
         layout.addWidget(description)
         layout.addWidget(buttons_frame)
         layout.addStretch()
-        layout.addWidget(close_button, 0, Qt.AlignCenter)
+        layout.addWidget(
+            close_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
 
         # Стилизация диалога
         self.setStyleSheet("""
