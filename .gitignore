@@ -20,3 +20,6 @@ temp/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local planning and audit workspace (never publish to GitHub)
+plan/
