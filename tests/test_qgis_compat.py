@@ -132,6 +132,15 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         self.assertIn('language_code_at(index)', handler)
         self.assertIn('QSignalBlocker', _source('gui/gui_mkgmap_widgets.py'))
 
+    def test_language_selector_uses_packaged_svg_flags(self):
+        manager = _source('translation_manager.py')
+        header = _source('gui/widget_header.py')
+        self.assertIn('LANGUAGE_FLAG_FILES', manager)
+        self.assertIn('get_language_flag_path', manager)
+        self.assertIn('QIcon(flag)', header)
+        self.assertIn('refreshLanguageSelector', header)
+        self.assertNotIn('🇷🇺', manager)
+
     def test_qt6_checkbox_has_explicit_checkmark_asset(self):
         styles = _source('gui/gui_components.py')
         self.assertIn('checkmark.svg', styles)

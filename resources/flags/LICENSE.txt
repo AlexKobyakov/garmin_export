@@ -1,0 +1,3 @@
+These twelve small flag SVGs were drawn for Garmin Export and are distributed
+as project artwork under the repository's AGPL-3.0-or-later license. They do not
+contain copied third-party artwork or external font/emoji dependencies.

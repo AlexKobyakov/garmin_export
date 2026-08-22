@@ -2,7 +2,8 @@
 """Header and language selector widget."""
 
 from qgis.PyQt.QtWidgets import QFrame, QHBoxLayout, QLabel, QComboBox, QWidget
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtCore import QSignalBlocker
+from qgis.PyQt.QtGui import QColor, QIcon
 
 from .gui_components import ModernButton, apply_combo_popup_style
 from .widget_i18n import retranslate_header
@@ -60,7 +61,9 @@ class HeaderWidget(QFrame):
         background = QColor('#ffffff')
         for code, label in translations.get_language_labels():
             self._language_codes.append(code)
-            self.language_combo.addItem(label, code)
+            flag = translations.get_language_flag_path(code)
+            self.language_combo.addItem(QIcon(flag) if flag else QIcon(),
+                                        label, code)
             index = self.language_combo.count() - 1
             self.language_combo.setItemData(
                 index, foreground, qt_enum('ItemDataRole', 'ForegroundRole'))
@@ -89,6 +92,24 @@ class HeaderWidget(QFrame):
         row.addWidget(icon)
         row.addWidget(self.language_combo)
         layout.addWidget(container)
+
+    def refreshLanguageSelector(self):
+        """Refresh labels/icons without emitting a transient language change."""
+        current = self.language_code_at(self.language_combo.currentIndex())
+        blocker = QSignalBlocker(self.language_combo)
+        try:
+            for index, (code, label) in enumerate(
+                    translations.get_language_labels()):
+                self.language_combo.setItemText(index, label)
+                flag = translations.get_language_flag_path(code)
+                self.language_combo.setItemIcon(
+                    index, QIcon(flag) if flag else QIcon())
+            if current:
+                index = self.language_combo.findData(current)
+                if index >= 0:
+                    self.language_combo.setCurrentIndex(index)
+        finally:
+            del blocker
 
     def language_code_at(self, index):
         """Return a canonical language code for a Qt5/Qt6 signal value."""

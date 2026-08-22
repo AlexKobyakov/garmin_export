@@ -7,6 +7,7 @@ from ..qgis_compat import qt_enum
 
 def retranslate_header(widget):
     t = translations.get_text
+    widget.refreshLanguageSelector()
     widget.title_label.setText('🎯 ' + PLUGIN_NAME)
     widget.donation_button.setText('☕ ' + t('header_support'))
     widget.donation_button.setToolTip('❤️ ' + t('support_tip'))

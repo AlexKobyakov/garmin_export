@@ -9,26 +9,33 @@ Year: 2025-2026
 """
 
 import importlib
+import os
 
 # Языки с письмом справа налево (для setLayoutDirection)
 RTL_LANGUAGES = {'ar'}
 PLUGIN_NAME = 'Garmin Export'
 
-# Отображаемые названия языков (флаг + эндоним) в порядке для UI
+# Отображаемые названия языков (эндоним) в порядке для UI. Флаги — отдельные
+# SVG-ресурсы, чтобы Qt5/Qt6 не зависели от шрифтов с emoji-глифами.
 LANGUAGE_LABELS = [
-    ('ru', '🇷🇺 Русский'),
-    ('en', '🇺🇸 English'),
-    ('zh', '🇨🇳 中文'),
-    ('hi', '🇮🇳 हिन्दी'),
-    ('es', '🇪🇸 Español'),
-    ('ar', '🇸🇦 العربية'),
-    ('fr', '🇫🇷 Français'),
-    ('pt', '🇧🇷 Português'),
-    ('de', '🇩🇪 Deutsch'),
-    ('id', '🇮🇩 Bahasa Indonesia'),
-    ('th', '🇹🇭 ไทย'),
-    ('vi', '🇻🇳 Tiếng Việt'),
+    ('ru', 'Русский'),
+    ('en', 'English'),
+    ('zh', '中文'),
+    ('hi', 'हिन्दी'),
+    ('es', 'Español'),
+    ('ar', 'العربية'),
+    ('fr', 'Français'),
+    ('pt', 'Português'),
+    ('de', 'Deutsch'),
+    ('id', 'Bahasa Indonesia'),
+    ('th', 'ไทย'),
+    ('vi', 'Tiếng Việt'),
 ]
+
+LANGUAGE_FLAG_FILES = {
+    code: os.path.join('flags', '{0}.svg'.format(code))
+    for code, _label in LANGUAGE_LABELS
+}
 
 
 class TranslationManager:
@@ -80,6 +87,13 @@ class TranslationManager:
     def get_language_labels(self):
         """Список (код, отображаемое_название) для заполнения UI"""
         return list(LANGUAGE_LABELS)
+
+    def get_language_flag_path(self, language_code):
+        """Return the packaged SVG flag path, or an empty path if unavailable."""
+        relative = LANGUAGE_FLAG_FILES.get(language_code)
+        if not relative:
+            return ''
+        return os.path.join(os.path.dirname(__file__), 'resources', relative)
 
     def is_rtl(self, language_code=None):
         """Является ли язык письмом справа налево"""
