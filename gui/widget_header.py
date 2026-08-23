@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Header and language selector widget."""
 
-from qgis.PyQt.QtWidgets import QFrame, QHBoxLayout, QLabel, QComboBox, QWidget
+from qgis.PyQt.QtWidgets import QFrame, QHBoxLayout, QLabel, QWidget
 from qgis.PyQt.QtCore import QSignalBlocker
 from qgis.PyQt.QtGui import QColor, QIcon
 
-from .gui_components import ModernButton, apply_combo_popup_style
+from .gui_components import ModernButton, StyledComboBox
 from .widget_i18n import retranslate_header
 from ..translation_manager import translations
 from ..qgis_compat import qt_enum
@@ -53,9 +53,9 @@ class HeaderWidget(QFrame):
         icon = QLabel('🌐')
         icon.setStyleSheet(
             'color: white; font-size: 16px; background: transparent;')
-        self.language_combo = QComboBox()
-        self.language_combo.setFixedSize(165, 32)
-        apply_combo_popup_style(self.language_combo)
+        self.language_combo = StyledComboBox()
+        self.language_combo.setMinimumWidth(150)
+        self.language_combo.setMinimumHeight(32)
         self._language_codes = []
         foreground = QColor('#2c3e50')
         background = QColor('#ffffff')

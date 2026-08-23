@@ -10,14 +10,14 @@ Year: 2025-2026
 
 from qgis.PyQt.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox,
-    QLabel, QLineEdit, QCheckBox, QSpinBox, QComboBox, QRadioButton,
+    QLabel, QLineEdit, QCheckBox, QSpinBox, QRadioButton,
     QButtonGroup, QDoubleSpinBox
 )
 from qgis.PyQt.QtCore import QSignalBlocker
 from qgis.PyQt.QtGui import QColor
 
 from .gui_components import (
-    apply_combo_popup_style, create_styled_button, create_info_label)
+    StyledComboBox, create_styled_button, create_info_label)
 from ..core.codepages import CODE_PAGES
 from ..qgis_compat import qt_enum
 
@@ -151,8 +151,7 @@ class AdvancedOptionsWidget(QWidget):
 
         self.code_page_label = QLabel()
         grid.addWidget(self.code_page_label, 0, 0)
-        self.code_page_combo = QComboBox()
-        apply_combo_popup_style(self.code_page_combo)
+        self.code_page_combo = StyledComboBox()
         for code, key in CODE_PAGES:
             self.code_page_combo.addItem("", code)
             self.code_page_combo.setItemData(

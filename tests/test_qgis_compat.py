@@ -156,8 +156,9 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         self.assertIn('checkmark.svg', styles)
         self.assertIn('radio_dot.svg', styles)
         self.assertIn('QComboBox QAbstractItemView::item:hover', styles)
-        self.assertIn('class ReadableComboDelegate', styles)
-        self.assertIn('setItemDelegate(ReadableComboDelegate(view))', styles)
+        self.assertIn('class ComboPopupDelegate', styles)
+        self.assertIn('class StyledComboBox', styles)
+        self.assertIn('def showPopup(self)', styles)
         self.assertIn('QSpinBox::up-button', styles)
         self.assertIn('QDoubleSpinBox::down-arrow', styles)
         self.assertIn('spin_up.svg', styles)
@@ -182,7 +183,7 @@ class CompatibilityBoundaryTest(unittest.TestCase):
     def test_code_page_popup_forces_item_foreground(self):
         source = _source('gui/gui_mkgmap_widgets.py')
         self.assertIn('ForegroundRole', source)
-        self.assertIn('apply_combo_popup_style(self.code_page_combo)', source)
+        self.assertIn('self.code_page_combo = StyledComboBox()', source)
 
     def test_scoped_gui_has_no_untranslated_cyrillic_literals(self):
         paths = ('gui/gui_handlers.py', 'gui/gui_main.py',

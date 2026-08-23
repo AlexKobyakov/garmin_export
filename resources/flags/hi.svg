@@ -1,1 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20"><path fill="#ff9933" d="M0 0h30v6.67H0z"/><path fill="#fff" d="M0 6.67h30v6.66H0z"/><path fill="#138808" d="M0 13.33h30V20H0z"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".7"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" aria-label="Indian">
+  <rect width="60" height="13.333" fill="#ff9933"/><rect y="13.333" width="60" height="13.334" fill="#fff"/>
+  <rect y="26.667" width="60" height="13.333" fill="#138808"/><circle cx="30" cy="20" r="5" fill="none" stroke="#000080" stroke-width="1.5"/>
+</svg>
