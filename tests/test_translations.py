@@ -42,6 +42,8 @@ class LanguageRegistryTest(unittest.TestCase):
         # У каждого языка непустое отображаемое имя
         for code, label in labels:
             self.assertTrue(label.strip(), 'empty label for {0}'.format(code))
+            self.assertFalse(any(ord(char) > 0x1F000 for char in label),
+                             'emoji flag leaked into {0}'.format(code))
 
     def test_every_language_has_a_file(self):
         for lang in EXPECTED_LANGUAGES:

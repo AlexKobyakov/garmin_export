@@ -141,11 +141,23 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         self.assertIn('refreshLanguageSelector', header)
         self.assertNotIn('🇷🇺', manager)
 
+    def test_g3_rtl_and_language_persistence_contract(self):
+        main = _source('gui/gui_main.py')
+        handler = _source('gui/handler_ui.py')
+        settings = _source('core/settings_manager.py')
+        self.assertIn('_applySavedLanguage', main)
+        self.assertIn('_applyLayoutDirection', main)
+        self.assertIn("self.settings_manager.set('language', code)", handler)
+        self.assertIn("'language': ''", settings)
+        self.assertIn("translations.is_rtl()", main)
+
     def test_qt6_checkbox_has_explicit_checkmark_asset(self):
         styles = _source('gui/gui_components.py')
         self.assertIn('checkmark.svg', styles)
         self.assertIn('radio_dot.svg', styles)
         self.assertIn('QComboBox QAbstractItemView::item:hover', styles)
+        self.assertIn('class ReadableComboDelegate', styles)
+        self.assertIn('setItemDelegate(ReadableComboDelegate(view))', styles)
         self.assertIn('QSpinBox::up-button', styles)
         self.assertIn('QDoubleSpinBox::down-arrow', styles)
         self.assertIn('spin_up.svg', styles)

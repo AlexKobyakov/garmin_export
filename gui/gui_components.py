@@ -10,10 +10,14 @@ Year: 2025-2026
 
 import os
 
+from qgis.PyQt.QtCore import QRect, QSize
 from qgis.PyQt.QtGui import QColor, QFont, QPalette
-from qgis.PyQt.QtWidgets import QGroupBox, QPushButton, QProgressBar, QLabel, QFrame
+from qgis.PyQt.QtGui import QPainter
+from qgis.PyQt.QtWidgets import (
+    QGroupBox, QPushButton, QProgressBar, QLabel, QFrame,
+    QStyledItemDelegate, QStyle)
 
-from ..qgis_compat import qfont_weight, qt_class_enum
+from ..qgis_compat import qfont_weight, qt_class_enum, qt_enum
 
 
 class ModernGroupBox(QGroupBox):
@@ -291,9 +295,41 @@ def create_styled_button(text, button_class="primary", icon_text=""):
     return button
 
 
+class ReadableComboDelegate(QStyledItemDelegate):
+    """Paint combo rows explicitly, bypassing the native Qt6 delegate."""
+
+    def paint(self, painter, option, index):
+        painter.save()
+        selected_flag = qt_class_enum(
+            QStyle, 'StateFlag', 'State_Selected')
+        hover_flag = qt_class_enum(QStyle, 'StateFlag', 'State_MouseOver')
+        active = bool(option.state & (selected_flag | hover_flag))
+        painter.fillRect(option.rect, QColor('#3498db' if active else '#ffffff'))
+
+        rect = option.rect.adjusted(8, 0, -8, 0)
+        icon = index.data(qt_enum('ItemDataRole', 'DecorationRole'))
+        if icon and hasattr(icon, 'paint'):
+            icon_rect = QRect(rect.left(), rect.top(), 22, rect.height())
+            icon.paint(painter, icon_rect)
+            rect.setLeft(rect.left() + 28)
+
+        painter.setPen(QColor('#ffffff' if active else '#2c3e50'))
+        painter.drawText(
+            rect,
+            qt_enum('AlignmentFlag', 'AlignLeft')
+            | qt_enum('AlignmentFlag', 'AlignVCenter'),
+            str(index.data(qt_enum('ItemDataRole', 'DisplayRole')) or ''))
+        painter.restore()
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        return QSize(size.width(), max(size.height(), 28))
+
+
 def apply_combo_popup_style(combo):
     """Make Qt5/Qt6 combo popup rows readable on Windows delegates."""
     view = combo.view()
+    view.setItemDelegate(ReadableComboDelegate(view))
     view.setStyleSheet("""
         QListView {
             background-color: #ffffff;
