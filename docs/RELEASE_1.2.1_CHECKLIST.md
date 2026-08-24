@@ -2,6 +2,21 @@
 
 ## Scope
 
+The 1.2.1 release includes the previously planned 1.2.0 modernization scope.
+There is no separate 1.2.0 tag or archive: the Qt5/Qt6 boundary, UI contract,
+bounded GUI refactor and 12-language/i18n work were completed and released
+together with the G4/G5 reliability work as 1.2.1.
+
+The carried scope includes:
+
+- shared QGIS 3/Qt5 and QGIS 4/Qt6 compatibility helpers and checker guards;
+- retranslate-safe composite widgets/dialogs, retained layout references,
+  translated tooltips/placeholders/actions and readable combo/check controls;
+- 12-language registry, SVG flags, Arabic RTL, live/restart persistence and
+  translation parity tests;
+- production Python modules bounded to 500 lines or less.
+
+
 Release 1.2.1 closes the bounded G0-G5 track. It contains the Qt5/Qt6 boundary,
 UI and translation contract, 12-language flags/RTL support, dependency
 reliability and the cancellation-safe export lifecycle. Processing Provider and

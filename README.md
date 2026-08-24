@@ -1,11 +1,19 @@
 # Garmin Export Plugin для QGIS
 
+[![CI](https://github.com/AlexKobyakov/garmin_export/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexKobyakov/garmin_export/actions/workflows/ci.yml)
+[![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
+![QGIS 3.22+ / 4.x](https://img.shields.io/badge/QGIS-3.22%2B%20%2F%204.x-589632.svg)
+![Qt5 + Qt6](https://img.shields.io/badge/Qt5%20%2B%20Qt6-compatible-informational.svg)
+![Version](https://img.shields.io/badge/version-1.2.1-informational.svg)
+![Tests](https://img.shields.io/badge/tests-162%20offline-success.svg)
+
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
 Версия: 1.2.1
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026
+Совместимость: QGIS 3.44/Qt5 и QGIS 4.2/Qt6
 
 🌐 **Языки интерфейса / UI languages:** 🇷🇺 Русский · 🇺🇸 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇧🇷 Português · 🇨🇳 中文 · 🇮🇳 हिन्दी · 🇸🇦 العربية · 🇮🇩 Bahasa Indonesia · 🇹🇭 ไทย · 🇻🇳 Tiếng Việt
 
@@ -48,10 +56,13 @@ Garmin GPS devices.
 - 📋 **mkgmap logging**: optional mkgmap.log file with a configurable verbosity.
 - 💾 **Persistent settings** between sessions.
 - 🧾 **Reliable lifecycle**: cancellation-safe export runs, stale-worker isolation and an anonymized .garmin_export/run_manifest.json on every completed run.
+- 🖥️ **Qt5/Qt6 dual support**: one compatibility boundary for QGIS 3.44/Qt5 and QGIS 4.2/Qt6, with scoped enum fallbacks and no direct PyQt5/PyQt6 imports.
+- 🎛️ **Polished UI contract**: live/restart-safe language switching, SVG flags, readable combo/check controls, retranslate-safe dialogs, translated tooltips, placeholders and actions.
 
 ### Requirements
 
-- QGIS 3.22 or newer, Python 3.9+
+- QGIS 3.22 or newer (Qt5 on QGIS 3.x; Qt6 on QGIS 4.x), Python 3.9+
+- Manually verified in QGIS 3.44/Qt5 and QGIS 4.2/Qt6.
 - Java Runtime Environment (JRE 8+) for mkgmap (the plugin can auto-detect it)
 
 ### Quick start

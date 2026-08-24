@@ -42,7 +42,7 @@ def _tool_version(path, tool):
 class ExportService:
     """Owns one run's state; it never imports QGIS or emits GUI signals."""
 
-    def __init__(self, selected_layers, settings, plugin_version='1.1.4'):
+    def __init__(self, selected_layers, settings, plugin_version='1.2.1'):
         self.selected_layers = [
             {'id': str(item.get('id') or ''),
              'name': str(item.get('name') or '')}

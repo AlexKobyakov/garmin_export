@@ -2,11 +2,12 @@
 name=Garmin Export
 qgisMinimumVersion=3.22
 qgisMaximumVersion=4.99
-description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
+hasProcessingProvider=yes
+description=Professional Garmin IMG export for QGIS 3.22+ with Qt5/Qt6 dual support, modern localized UI, 12 languages and reliable mkgmap workflows
 version=1.2.1
 author=Alex Kobyakov
 email=kobyakov@lesburo.ru
-about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of the full mkgmap/splitter distributions (zip archives with all dependency libraries; QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, comprehensive label code-page support (UTF-8 plus Windows/DOS/CJK pages), batch processing of all project layers, and a 12-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI). Requires Java (JRE 8+) which the plugin can auto-detect.
+about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Supports QGIS 3.44/Qt5 and QGIS 4.2/Qt6 through a shared compatibility boundary. The UI provides live/restart-safe translation, SVG language flags, RTL Arabic, readable combo/check controls, retranslate-safe dialogs, tooltips and actions. Features: one-click download of the full mkgmap/splitter distributions (zip archives with all dependency libraries; QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, comprehensive label code-page support (UTF-8 plus Windows/DOS/CJK pages), batch processing of all project layers, and a 12-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI). Requires Java (JRE 8+) which the plugin can auto-detect.
 tracker=https://github.com/AlexKobyakov/garmin_export/issues
 repository=https://github.com/AlexKobyakov/garmin_export
 changelog=1.2.1 - G4/G5 reliability release
@@ -22,6 +23,16 @@ changelog=1.2.1 - G4/G5 reliability release
       correctness in the export worker
     - Added offline G0-G5 regression coverage; release archive excludes plan,
       tests and wheels while retaining wheels in the public source repository
+    1.2.0 (scope delivered in 1.2.1) - Qt5/Qt6, UI and localization modernization
+    - Added the shared QGIS 3/4 and Qt5/Qt6 compatibility boundary with scoped
+      enum fallbacks and static/official checker guards.
+    - Reworked the UI contract: composite retranslateUi passes, retained form/table
+      references, translated tooltips/placeholders/actions, stable combo data and
+      readable Qt5/Qt6 popup/check controls.
+    - Completed bounded GUI decomposition under the <=500-line production-file rule.
+    - Added the 12-language registry, SVG flags, Arabic RTL, live switching,
+      restart persistence and translation key/placeholder parity guards.
+
     1.1.4 - Security scan fix (QGIS plugin repository)
     - Restrict downloads to http/https via a dedicated URL opener without
       file/ftp/data handlers, resolving the Bandit B310 critical finding (CWE-22)
@@ -55,7 +66,7 @@ changelog=1.2.1 - G4/G5 reliability release
     - Author/Support dialogs identical to reference plugin
     - Offline unit tests for core logic
     1.0.0 - Initial release
-tags=garmin, export, img, mkgmap, gps, vector, typ, batch, multilingual, navigation, custom-maps
+tags=garmin, export, img, mkgmap, gps, qgis, vector, typ, batch, multilingual, navigation, custom-maps, qt5, qt6, processing, openstreetmap
 homepage=https://github.com/AlexKobyakov/garmin_export
 category=Vector
 icon=icon.png

@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: "Garmin Export"
+message: "If you use Garmin Export, please cite it using this file."
+type: software
+authors:
+  - family-names: Kobyakov
+    given-names: Alexander
+    email: kobyakov@lesburo.ru
+    affiliation: Lesburo
+version: 1.2.1
+date-released: 2026-08-24
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/AlexKobyakov/garmin_export"
+url: "https://github.com/AlexKobyakov/garmin_export"
+abstract: >-
+  A QGIS plugin for exporting vector layers to Garmin IMG maps through the
+  mkgmap compiler. The project supports QGIS 3.22+ with a shared Qt5/Qt6
+  compatibility boundary, a localized 12-language UI, TYP styling and
+  cancellation-safe dependency and export workflows.
+keywords:
+  - GIS
+  - QGIS
+  - Garmin IMG
+  - mkgmap
+  - vector data
+  - TYP styling
+  - Qt5
+  - Qt6
+  - PyQGIS
+  - map export
