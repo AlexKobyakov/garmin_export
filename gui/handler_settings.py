@@ -47,6 +47,8 @@ class SettingsHandlers:
         dialog.typ_settings.set_typ_file_path(sm.get('typ_file_path'))
         if sm.get('mkgmap_path'):
             self.onMkgmapPathChanged()
+        if sm.get('splitter_path'):
+            self.onSplitterPathChanged()
 
     def saveSettings(self):
         dialog = self.dialog

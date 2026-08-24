@@ -55,6 +55,7 @@ translations = {
     'select_java': '选择 java 可执行文件',
     'jar_valid': '文件有效',
     'jar_invalid': '文件不是有效的 mkgmap.jar',
+    'tool_invalid': '发行包不完整或无效（需要 JAR + lib/）',
     'java_not_found': '未找到 Java。请安装 Java（JRE 8+）。',
     'downloading': '正在下载...',
     'download_in_progress': '已有下载正在进行中。',

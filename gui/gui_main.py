@@ -320,6 +320,8 @@ class GarminExportDialog(QDialog):
             self.handlers.detectJava)
         self.tools_widget.mkgmap_path_line.editingFinished.connect(
             self.handlers.onMkgmapPathChanged)
+        self.tools_widget.splitter_path_line.editingFinished.connect(
+            self.handlers.onSplitterPathChanged)
 
         # Сопоставление стилей
         self.mapping_widget.load_mapping_button.clicked.connect(

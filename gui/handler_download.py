@@ -49,6 +49,7 @@ class DownloadHandlers:
             self.download_worker.cancel()
         self.download_thread.quit()
         self.download_thread.wait(15000)
+        error_code = getattr(self.download_worker, 'error_code', 'download_failed')
         self.download_thread = None
         self.download_worker = None
         success = result.get('success', False)
@@ -56,11 +57,11 @@ class DownloadHandlers:
         if success:
             self._apply_downloaded_tool(tool, payload)
         elif payload:
-            self.dialog.log_message(
-                '❌ {0}: {1}'.format(
-                    translations.get_text('download_failed'), payload))
-            QMessageBox.warning(
-                self.dialog, translations.get_text('download_failed'), payload)
+            category_key = {'archive': 'tool_invalid', 'dependencies': 'tool_invalid', 'cancelled': 'cancel', 'network': 'download_failed', 'permission': 'download_failed'}.get(error_code, 'download_failed')
+            category = translations.get_text(category_key)
+            message = '[{0}] {1}'.format(category, payload)
+            self.dialog.log_message('❌ {0}: {1}'.format(translations.get_text('download_failed'), message))
+            QMessageBox.warning(self.dialog, translations.get_text('download_failed'), message)
 
     def _apply_downloaded_tool(self, tool, path):
         from ..translation_manager import translations
@@ -69,7 +70,7 @@ class DownloadHandlers:
             self.onMkgmapPathChanged()
         else:
             self.dialog.tools_widget.splitter_path_line.setText(path)
-            self.settings_manager.set('splitter_path', path)
+            self.onSplitterPathChanged()
         self.dialog.log_message(
             '✅ {0}: {1}'.format(
                 translations.get_text('download_complete'), path))

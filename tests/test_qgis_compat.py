@@ -166,14 +166,14 @@ class CompatibilityBoundaryTest(unittest.TestCase):
         self.assertIn('HighlightedText', styles)
         self.assertIn('url("__CHECKMARK__")', styles)
         self.assertIn('url("__RADIO_DOT__")', styles)
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
-                                                     'checkmark.svg')))
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
-                                                     'radio_dot.svg')))
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
-                                                     'spin_up.svg')))
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, 'resources',
-                                                     'spin_down.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            ROOT, 'resources', 'checkmark.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            ROOT, 'resources', 'radio_dot.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            ROOT, 'resources', 'spin_up.svg')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            ROOT, 'resources', 'spin_down.svg')))
 
     def test_support_title_is_wrap_safe(self):
         source = _source('gui/simple_donation.py')

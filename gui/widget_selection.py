@@ -10,7 +10,6 @@ from .gui_components import create_styled_button, create_info_label
 from .widget_i18n import (
     retranslate_layer_selection, retranslate_export_settings,
 )
-from ..translation_manager import translations
 from ..qgis_compat import qt_enum
 
 

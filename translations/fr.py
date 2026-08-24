@@ -55,6 +55,7 @@ translations = {
     'select_java': 'Sélectionner l\'exécutable java',
     'jar_valid': 'le fichier est valide',
     'jar_invalid': 'Le fichier n\'est pas un mkgmap.jar valide',
+    'tool_invalid': 'distribution incomplète ou non valide (JAR + lib/ requis)',
     'java_not_found': 'Java introuvable. Veuillez installer Java (JRE 8+).',
     'downloading': 'Téléchargement...',
     'download_in_progress': 'Un téléchargement est déjà en cours.',

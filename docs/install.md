@@ -195,3 +195,22 @@ plugins/garmin_export/
 ---
 
 🎯 **Успешной установки и работы с плагином!**
+
+
+## G4/G5 reliability notes (release 1.2.1)
+
+The Tools tab downloads complete mkgmap and splitter ZIP distributions, including
+the required lib/ directory. Source order is language-aware:
+
+- Russian UI: Yandex.Disk -> GitHub wheels -> Dropbox -> official site.
+- Other UI languages: official site -> GitHub wheels -> Dropbox -> Yandex.Disk.
+
+A download is staged and validated before promotion. A failed or cancelled attempt
+does not replace a working installation. The UI distinguishes network, archive,
+missing-dependency, permission and cancellation failures.
+
+During export, Cancel is terminal: it cannot be followed by a false success
+notification. A successful or failed run writes a redacted
+.garmin_export/run_manifest.json; output path and size are recorded only after
+success. The manifest is useful for support diagnostics and contains no raw
+settings or secrets.

@@ -22,6 +22,7 @@ class GuiEventHandlers(
         self.dialog = dialog
         self.worker = None
         self.worker_thread = None
+        self.current_export_status = 'idle'
         self.download_thread = None
         self.download_worker = None
         self.settings_manager = SettingsManager()

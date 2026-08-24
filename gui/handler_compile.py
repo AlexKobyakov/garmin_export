@@ -13,6 +13,10 @@ from ..core import mkgmap_compiler
 class CompilationHandlers:
     def startCompilation(self):
         from ..translation_manager import translations
+        if self.worker is not None or self.worker_thread is not None:
+            self.dialog.log_message(
+                '⚠️ ' + translations.get_text('compiling'))
+            return
         if not self.validateInputs():
             return
         layers = self.dialog.layer_selection.get_selected_layers()
@@ -23,6 +27,8 @@ class CompilationHandlers:
             return
         settings = self.getExportSettings()
         self.saveSettings()
+        self.dialog.results_table.clear_results()
+        self.current_export_status = 'idle'
         self.createWorker(layers, settings)
         self.setCompilationMode(True)
         self.dialog.log_message('🚀 ' + translations.get_text('compile_map'))
@@ -30,9 +36,9 @@ class CompilationHandlers:
     def cancelCompilation(self):
         if self.worker and self.worker_thread:
             self.worker.stop()
-            self.worker_thread.quit()
-            self.worker_thread.wait(5000)
             self.setCompilationMode(False)
+            self.worker_thread.quit()
+            self.worker_thread.wait(10000)
             from ..translation_manager import translations
             self.dialog.log_message('❌ ' + translations.get_text('cancel'))
 
@@ -59,7 +65,7 @@ class CompilationHandlers:
                 self.dialog, translations.get_text('error'),
                 translations.get_text('error_no_mkgmap'))
             return False
-        if not mkgmap_compiler.validate_mkgmap_jar(mkgmap):
+        if not mkgmap_compiler.validate_tool_installation(mkgmap, 'mkgmap'):
             QMessageBox.warning(
                 self.dialog, translations.get_text('error'),
                 translations.get_text('error_invalid_mkgmap'))
@@ -130,11 +136,25 @@ class CompilationHandlers:
         self.worker = ExportWorker(selected_layers, settings)
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.onCompilationFinished)
-        self.worker.error.connect(self.onCompilationError)
-        self.worker.progress.connect(self.onProgressUpdate)
-        self.worker.log_message.connect(self.onLogMessage)
-        self.worker.layer_processed.connect(self.onLayerProcessed)
+        worker = self.worker
+        worker.finished.connect(
+            lambda success, path, source=worker:
+            self.onCompilationFinished(success, path, source))
+        worker.error.connect(
+            lambda message, source=worker:
+            self.onCompilationError(message, source))
+        worker.progress.connect(
+            lambda value, message, source=worker:
+            self.onProgressUpdate(value, message, source))
+        worker.log_message.connect(
+            lambda message, source=worker:
+            self.onLogMessage(message, source))
+        worker.layer_processed.connect(
+            lambda name, success, message, source=worker:
+            self.onLayerProcessed(name, success, message, source))
+        worker.status.connect(
+            lambda status, source=worker:
+            self.onWorkerStatus(status, source))
         self.worker_thread.start()
 
     def setCompilationMode(self, compiling):
@@ -154,8 +174,22 @@ class CompilationHandlers:
             button.cancel_button.setEnabled(False)
             self.dialog.progress_bar.setVisible(False)
 
-    def onCompilationFinished(self, success, output_file):
+    def _is_current_worker(self, worker):
+        return worker is None or worker is self.worker
+
+    def _cleanup_worker(self):
+        thread = self.worker_thread
+        self.worker_thread = None
+        self.worker = None
+        if thread:
+            thread.quit()
+            thread.wait(10000)
+            thread.deleteLater()
+
+    def onCompilationFinished(self, success, output_file, worker=None):
         from ..translation_manager import translations
+        if not self._is_current_worker(worker):
+            return
         self.setCompilationMode(False)
         if success:
             text = translations.get_text('success_export_complete')
@@ -163,29 +197,39 @@ class CompilationHandlers:
             QMessageBox.information(
                 self.dialog, translations.get_text('success'),
                 '{0}\n\n{1}'.format(text, output_file))
-        if self.worker_thread:
-            self.worker_thread.quit()
-            self.worker_thread.wait()
-            self.worker_thread = None
-            self.worker = None
+        self._cleanup_worker()
 
-    def onCompilationError(self, error_message):
+    def onCompilationError(self, error_message, worker=None):
         from ..translation_manager import translations
         from .gui_dialogs import ErrorDialog
+        if not self._is_current_worker(worker):
+            return
+        self.setCompilationMode(False)
         ErrorDialog(
             translations.get_text('critical_error'),
             translations.get_text('error_mkgmap_execution').format(error=''),
             error_message, self.dialog, title_key='critical_error',
             message_key='error_mkgmap_execution').exec()
 
-    def onProgressUpdate(self, value, message=''):
+    def onProgressUpdate(self, value, message='', worker=None):
+        if not self._is_current_worker(worker):
+            return
         self.dialog.progress_bar.setValue(value)
         if message:
             self.dialog.log_message('📊 {0}'.format(message))
 
-    def onLogMessage(self, message):
+    def onLogMessage(self, message, worker=None):
+        if not self._is_current_worker(worker):
+            return
         self.dialog.log_message(message)
 
-    def onLayerProcessed(self, layer_name, success, message):
+    def onLayerProcessed(self, layer_name, success, message, worker=None):
+        if not self._is_current_worker(worker):
+            return
         self.dialog.results_table.add_result(
             layer_name, 'success' if success else 'error', message)
+
+    def onWorkerStatus(self, status, worker=None):
+        if not self._is_current_worker(worker):
+            return
+        self.current_export_status = status

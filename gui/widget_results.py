@@ -2,7 +2,7 @@
 """Mapping, controls, log, result and level widgets."""
 
 from qgis.PyQt.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox, QLabel,
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox,
     QTextEdit, QTableWidget, QTableWidgetItem, QCheckBox,
     QAbstractItemView, QHeaderView,
 )

@@ -42,18 +42,25 @@ class DownloadWorker(QObject):
         self.tool = tool
         self.dest_dir = dest_dir or get_tools_directory()
         self.is_cancelled = False
+        self.error_code = 'download_failed'
 
     def run(self):
         """Выполнение скачивания (вызывается в рабочем потоке)"""
         try:
+            from ..translation_manager import translations
             path = downloader.download_tool(
                 self.tool,
                 self.dest_dir,
                 progress_callback=self._on_progress,
                 cancelled_callback=lambda: self.is_cancelled,
+                language=translations.get_current_language(),
             )
             self.finished.emit(True, path)
         except Exception as e:
+            if isinstance(e, downloader.DownloadCancelledError):
+                self.error_code = downloader.ERROR_CANCELLED
+            else:
+                self.error_code = getattr(e, 'code', 'download_failed')
             self.finished.emit(False, str(e))
 
     def _on_progress(self, received, total, status_text):

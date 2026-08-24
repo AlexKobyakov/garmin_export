@@ -18,6 +18,11 @@ mkgmap.log
 temp/
 *.part
 
+# Repository fallback archives: tracked for the public source repo, but never
+# shipped inside the installable plugin ZIP.
+!wheels/
+!wheels/*.zip
+
 # IDE / OS
 .idea/
 .vscode/

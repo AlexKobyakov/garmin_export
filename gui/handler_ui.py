@@ -59,7 +59,7 @@ class UiHandlers:
             os.path.expanduser('~'), 'JAR files (*.jar);;All files (*)')
         if path:
             self.dialog.tools_widget.splitter_path_line.setText(path)
-            self.settings_manager.set('splitter_path', path)
+            self.onSplitterPathChanged()
             self.dialog.log_message('⚙️ {0}'.format(path))
 
     def selectJavaPath(self):
@@ -103,14 +103,35 @@ class UiHandlers:
         if not path:
             label.setText('')
             return
-        if mkgmap_compiler.validate_mkgmap_jar(path):
+        if mkgmap_compiler.validate_tool_installation(path, 'mkgmap'):
             label.setText(
-                '✅ mkgmap.jar: ' + translations.get_text('jar_valid'))
+                '✅ mkgmap.jar + lib/: ' + translations.get_text('jar_valid'))
             label.setStyleSheet('color: #27ae60; font-size: 10px;')
             self.settings_manager.set('mkgmap_path', path)
         else:
-            label.setText('❌ ' + translations.get_text('jar_invalid'))
+            label.setText('❌ mkgmap.jar + lib/: ' +
+                          translations.get_text('jar_invalid'))
             label.setStyleSheet('color: #e74c3c; font-size: 10px;')
+
+    def onSplitterPathChanged(self):
+        from ..translation_manager import translations
+        path = self.dialog.tools_widget.splitter_path_line.text().strip()
+        label = self.dialog.tools_widget.splitter_status_label
+        if not path:
+            label.setText('')
+            self.settings_manager.set('splitter_path', '')
+            return
+        if mkgmap_compiler.validate_tool_installation(path, 'splitter'):
+            label.setText(
+                '✅ splitter.jar + lib/: ' + translations.get_text('jar_valid'))
+            label.setStyleSheet(
+                'color: #27ae60; font-size: 10px; padding: 2px 4px;')
+            self.settings_manager.set('splitter_path', path)
+        else:
+            label.setText('❌ splitter.jar + lib/: ' +
+                          translations.get_text('tool_invalid'))
+            label.setStyleSheet(
+                'color: #e74c3c; font-size: 10px; padding: 2px 4px;')
 
     def onJavaPathChanged(self):
         from ..translation_manager import translations

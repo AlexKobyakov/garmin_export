@@ -25,6 +25,10 @@ from .layer_processor import LayerProcessor
 from .layer_manager import LayerManager
 from .style_mapper import StyleMapper
 from . import typ_generator
+from .export_service import (
+    ExportService, STATUS_CANCELLED, STATUS_EXPORTING, STATUS_FAILED,
+    STATUS_SUCCESS, STATUS_VALIDATING,
+)
 from ..translation_manager import translations
 
 
@@ -37,6 +41,7 @@ class ExportWorker(QObject):
     progress = pyqtSignal(int, str)  # value, message
     log_message = pyqtSignal(str)  # message
     layer_processed = pyqtSignal(str, bool, str)  # layer_name, success, message
+    status = pyqtSignal(str)  # stable machine status
 
     def __init__(self, selected_layers, settings):
         """
@@ -48,6 +53,7 @@ class ExportWorker(QObject):
         self.selected_layers = selected_layers
         self.settings = settings
         self.is_cancelled = False
+        self.run_service = ExportService(selected_layers, settings)
 
         self.mp_generator = MPGenerator()
         self.mkgmap_compiler = MkgmapCompiler()
@@ -64,18 +70,20 @@ class ExportWorker(QObject):
     def run(self):
         """Основной метод выполнения экспорта"""
         try:
+            self._set_status(STATUS_VALIDATING)
             self.log_message.emit('🚀 ' + translations.get_text('compile_map'))
             self.progress.emit(0, translations.get_text('compiling'))
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             self.prepare_export()
+            self._set_status(STATUS_EXPORTING)
             self.process_layers()
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             if not self.processed_data:
@@ -84,11 +92,15 @@ class ExportWorker(QObject):
             self.generate_mp_file()
             self.generate_typ_file()
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             output_file = self.compile_to_img()
+            if not self.run_service.finish_success(output_file):
+                self._finish_cancelled()
+                return
+            self.status.emit(STATUS_SUCCESS)
 
             self.progress.emit(100, translations.get_text('success'))
             self.log_message.emit(
@@ -96,12 +108,32 @@ class ExportWorker(QObject):
             self.finished.emit(True, output_file)
 
         except Exception as e:
+            self.run_service.finish_failure(e)
+            if self.run_service.status == STATUS_CANCELLED:
+                self.status.emit(STATUS_CANCELLED)
+                self.finished.emit(False, '')
+                return
+            self.status.emit(STATUS_FAILED)
             self.log_message.emit(
                 '❌ {0}: {1}'.format(translations.get_text('error'), e))
             self.error.emit(str(e))
             self.finished.emit(False, '')
         finally:
             self.cleanup_temp_files()
+            self.run_service.write_manifest()
+
+    def _set_status(self, status):
+        self.run_service.set_status(status)
+        self.status.emit(status)
+
+    def _cancelled(self):
+        return self.is_cancelled or self.run_service.is_cancelled()
+
+    def _finish_cancelled(self):
+        self.is_cancelled = True
+        self.run_service.request_cancel()
+        self.status.emit(STATUS_CANCELLED)
+        self.finished.emit(False, '')
 
     # ------------------------------------------------------------------
 
@@ -126,7 +158,8 @@ class ExportWorker(QObject):
                         translations.get_text('error_invalid_json'), e))
 
         # Проверяем mkgmap
-        if not self.mkgmap_compiler.validate_mkgmap(self.settings['mkgmap_path']):
+        if not self.mkgmap_compiler.validate_tool_installation(
+                self.settings['mkgmap_path'], 'mkgmap'):
             raise Exception(translations.get_text('error_invalid_mkgmap'))
 
         self.log_message.emit('✅ ' + translations.get_text('success'))
@@ -141,7 +174,7 @@ class ExportWorker(QObject):
         self._layer_entries_for_typ = []
 
         for i, layer_info in enumerate(self.selected_layers):
-            if self.is_cancelled:
+            if self._cancelled():
                 return
 
             layer_name = layer_info.get('name', '?')
@@ -195,7 +228,7 @@ class ExportWorker(QObject):
         self.progress.emit(55, translations.get_text('compiling'))
         self.log_message.emit('📝 ' + translations.get_text('compiling'))
 
-        if self.is_cancelled:
+        if self._cancelled():
             return
 
         mp_filename = '{0}.mp'.format(self.settings.get('output_filename') or 'map')
@@ -297,7 +330,7 @@ class ExportWorker(QObject):
         self.progress.emit(70, translations.get_text('compiling'))
         self.log_message.emit('⚙️ ' + translations.get_text('compiling'))
 
-        if self.is_cancelled:
+        if self._cancelled():
             return ''
 
         input_files = [self.mp_file_path]
@@ -387,5 +420,6 @@ class ExportWorker(QObject):
     def stop(self):
         """Остановка выполнения"""
         self.is_cancelled = True
+        self.run_service.request_cancel()
         self.log_message.emit('🛑 ' + translations.get_text('cancel'))
         self.mkgmap_compiler.stop_compilation()

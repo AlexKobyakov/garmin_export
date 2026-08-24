@@ -55,6 +55,7 @@ translations = {
     'select_java': 'เลือกไฟล์ปฏิบัติการ java',
     'jar_valid': 'ไฟล์ถูกต้อง',
     'jar_invalid': 'ไฟล์ไม่ใช่ mkgmap.jar ที่ถูกต้อง',
+    'tool_invalid': 'ชุดไฟล์ไม่สมบูรณ์หรือไม่ถูกต้อง (ต้องมี JAR + lib/)',
     'java_not_found': 'ไม่พบ Java โปรดติดตั้ง Java (JRE 8+)',
     'downloading': 'กำลังดาวน์โหลด...',
     'download_in_progress': 'มีการดาวน์โหลดกำลังดำเนินอยู่แล้ว',

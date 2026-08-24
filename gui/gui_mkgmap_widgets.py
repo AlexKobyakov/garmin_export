@@ -58,7 +58,8 @@ class MkgmapToolsWidget(QWidget):
         grid.addLayout(mkgmap_layout, 0, 1)
 
         self.mkgmap_status_label = QLabel("")
-        self.mkgmap_status_label.setStyleSheet("color: #7f8c8d; font-size: 10px;")
+        self.mkgmap_status_label.setStyleSheet(
+            "color: #7f8c8d; font-size: 10px; padding: 2px 4px;")
         grid.addWidget(self.mkgmap_status_label, 1, 1)
 
         # --- splitter.jar ---
@@ -75,9 +76,14 @@ class MkgmapToolsWidget(QWidget):
         splitter_layout.addWidget(self.splitter_download_button)
         grid.addLayout(splitter_layout, 2, 1)
 
+        self.splitter_status_label = QLabel("")
+        self.splitter_status_label.setStyleSheet(
+            "color: #7f8c8d; font-size: 10px; padding: 2px 4px;")
+        grid.addWidget(self.splitter_status_label, 3, 1)
+
         # --- Java ---
         self.java_label = QLabel()
-        grid.addWidget(self.java_label, 3, 0)
+        grid.addWidget(self.java_label, 4, 0)
 
         java_layout = QHBoxLayout()
         self.java_path_line = QLineEdit()
@@ -87,14 +93,14 @@ class MkgmapToolsWidget(QWidget):
         java_layout.addWidget(self.java_path_line)
         java_layout.addWidget(self.java_browse_button)
         java_layout.addWidget(self.java_detect_button)
-        grid.addLayout(java_layout, 3, 1)
+        grid.addLayout(java_layout, 4, 1)
 
         self.java_status_label = QLabel("")
         self.java_status_label.setStyleSheet("color: #7f8c8d; font-size: 10px;")
-        grid.addWidget(self.java_status_label, 4, 1)
+        grid.addWidget(self.java_status_label, 5, 1)
 
         self.tools_info_label = create_info_label("")
-        grid.addWidget(self.tools_info_label, 5, 0, 1, 2)
+        grid.addWidget(self.tools_info_label, 6, 0, 1, 2)
 
         layout.addWidget(self.tools_group)
 
@@ -102,12 +108,16 @@ class MkgmapToolsWidget(QWidget):
 
     def retranslateUi(self):
         self.tools_group.setTitle("🧰 " + _t('tools_mkgmap'))
-        self.mkgmap_label.setText(_t('mkgmap_path_label'))
-        self.mkgmap_path_line.setPlaceholderText(_t('mkgmap_path_placeholder'))
+        self.mkgmap_label.setText(
+            _t('mkgmap_path_label') + '  [mkgmap.jar + lib/]')
+        self.mkgmap_path_line.setPlaceholderText(
+            _t('mkgmap_path_placeholder') + '  (ZIP distribution)')
         self.mkgmap_browse_button.setText("📂 " + _t('add_mkgmap'))
         self.mkgmap_download_button.setText("📥 " + _t('download_mkgmap'))
-        self.splitter_label.setText(_t('splitter_path_label'))
-        self.splitter_path_line.setPlaceholderText(_t('splitter_path_placeholder'))
+        self.splitter_label.setText(
+            _t('splitter_path_label') + '  [splitter.jar + lib/]')
+        self.splitter_path_line.setPlaceholderText(
+            _t('splitter_path_placeholder') + '  (ZIP distribution)')
         self.splitter_browse_button.setText("📂 " + _t('add_splitter'))
         self.splitter_download_button.setText("📥 " + _t('download_splitter'))
         self.java_label.setText(_t('java_path_label'))
