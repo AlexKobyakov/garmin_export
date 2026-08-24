@@ -16,10 +16,11 @@ Year: 2025-2026
 
 import glob
 import os
-import subprocess
+import subprocess  # nosec B404
 import sys
 import time
 import zipfile
+import re
 
 from . import mkgmap_command
 
@@ -66,6 +67,18 @@ def validate_splitter_jar(jar_path):
     return validate_jar(jar_path, 'uk/me/parabola/splitter')
 
 
+def validate_tool_installation(jar_path, tool):
+    """Проверяет JAR вместе с соседним каталогом зависимостей `lib/`."""
+    validators = {
+        'mkgmap': validate_mkgmap_jar,
+        'splitter': validate_splitter_jar,
+    }
+    validator = validators.get(tool)
+    if not validator or not validator(jar_path):
+        return False
+    return os.path.isdir(os.path.join(os.path.dirname(jar_path), 'lib'))
+
+
 def find_java():
     """Автоопределение пути к java.
 
@@ -107,7 +120,7 @@ def check_java_available(java_path=None):
     """Проверка доступности Java"""
     java = java_path or 'java'
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603
             [java, '-version'],
             capture_output=True, timeout=15, **_subprocess_flags())
         return result.returncode == 0
@@ -119,7 +132,7 @@ def get_java_version(java_path=None):
     """Строка версии Java или None"""
     java = java_path or 'java'
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603
             [java, '-version'],
             capture_output=True, text=True, timeout=15, **_subprocess_flags())
         # Java выводит версию в stderr
@@ -132,11 +145,44 @@ def get_java_version(java_path=None):
     return None
 
 
+def java_diagnostics(java_path=None, min_major=8):
+    """Возвращает стабильную диагностику Java для UI и журналов."""
+    selected = java_path or find_java()
+    if not selected:
+        return {'ok': False, 'code': 'not_found', 'path': '', 'version': None,
+                'message': 'Java executable was not found'}
+    version = get_java_version(selected)
+    if not version:
+        return {'ok': False, 'code': 'unreadable', 'path': selected,
+                'version': None, 'message': 'Java version could not be read'}
+    match = re.search(r'version[" ]+([0-9]+)(?:\.([0-9]+))?', version)
+    major = int(match.group(1)) if match else None
+    if major == 1 and match and match.group(2):
+        major = int(match.group(2))
+    if major is not None and major < min_major:
+        return {'ok': False, 'code': 'incompatible', 'path': selected,
+                'version': version, 'major': major,
+                'message': 'Java {0}+ is required'.format(min_major)}
+    return {'ok': True, 'code': 'ok', 'path': selected, 'version': version,
+            'major': major, 'message': ''}
+
+
+def validate_java_heap(heap_gb, available_gb=None):
+    """Проверяет -Xmx до запуска, не пытаясь резервировать память."""
+    try:
+        value = float(heap_gb or 0)
+    except (TypeError, ValueError):
+        return False
+    if value < 0:
+        return False
+    return available_gb is None or value == 0 or value <= float(available_gb)
+
+
 def get_mkgmap_version(jar_path, java_path=None):
     """Версия mkgmap (строка) или None"""
     java = java_path or 'java'
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603
             [java, '-jar', jar_path, '--version'],
             capture_output=True, text=True, timeout=30, **_subprocess_flags())
         output = (result.stderr or '') + (result.stdout or '')
@@ -159,6 +205,10 @@ class MkgmapCompiler:
     def validate_mkgmap(self, mkgmap_path):
         """Проверка корректности пути к mkgmap.jar"""
         return validate_mkgmap_jar(mkgmap_path)
+
+    def validate_tool_installation(self, jar_path, tool='mkgmap'):
+        """Проверка JAR вместе с окружением зависимостей."""
+        return validate_tool_installation(jar_path, tool)
 
     def check_java_available(self, java_path=None):
         return check_java_available(java_path)
@@ -220,7 +270,7 @@ class MkgmapCompiler:
     def _execute(self, cmd, working_dir, progress_callback):
         """Выполнение команды mkgmap с потоковым чтением вывода"""
         try:
-            self.process = subprocess.Popen(
+            self.process = subprocess.Popen(  # nosec B603
                 cmd,
                 cwd=working_dir,
                 stdout=subprocess.PIPE,

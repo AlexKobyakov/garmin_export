@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, big-update]
+  pull_request:
+    branches: [main]
+
+jobs:
+  qt6-checker:
+    name: PyQGIS 4 checker (Qt6)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    container:
+      image: ghcr.io/qgis/pyqgis4-checker:main-ubuntu
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report Qt6 incompatibilities without modifying sources
+        run: pyqt5_to_pyqt6.py --dry_run --logfile pyqt6_checker.log .
+
+      - name: Fail when the checker would rewrite a source file
+        run: |
+          pyqt5_to_pyqt6.py .
+          git diff --exit-code
+
+      - name: Upload checker report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pyqgis4-checker-report
+          path: pyqt6_checker.log
+          retention-days: 7
+
+  offline-tests:
+    name: Offline tests and static guards
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Install test tools
+        run: python -m pip install pytest flake8 bandit
+      - name: Critical lint
+        run: flake8 . --select=E9,F63,F7,F82
+      - name: Offline tests
+        env:
+          PYTHONPATH: tests
+        run: python -m pytest -q
+      - name: Compile Python sources
+        run: python -m compileall -q .
+      - name: Bandit
+        run: bandit -r core gui translation_manager.py garmin_exporter.py --severity-level medium

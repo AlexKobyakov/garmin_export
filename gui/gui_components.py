@@ -8,8 +8,15 @@ Email: kobyakov@lesburo.ru
 Year: 2025-2026
 """
 
-from qgis.PyQt.QtGui import QFont
-from qgis.PyQt.QtWidgets import QGroupBox, QPushButton, QProgressBar, QLabel, QFrame
+import os
+
+from qgis.PyQt.QtCore import QRect, QSize
+from qgis.PyQt.QtGui import QColor, QFont, QPalette
+from qgis.PyQt.QtWidgets import (
+    QComboBox, QGroupBox, QPushButton, QProgressBar, QLabel, QFrame,
+    QStyledItemDelegate, QStyle)
+
+from ..qgis_compat import qfont_weight, qt_class_enum, qt_enum
 
 
 class ModernGroupBox(QGroupBox):
@@ -45,7 +52,7 @@ class ModernButton(QPushButton):
         super().__init__(text, parent)
         self.button_type = button_type
         self.setMinimumHeight(40)
-        self.setFont(QFont("Segoe UI", 10, QFont.Medium))
+        self.setFont(QFont("Segoe UI", 10, qfont_weight('Medium')))
         self.apply_style()
 
     def apply_style(self):
@@ -122,6 +129,18 @@ class ModernProgressBar(QProgressBar):
 
 def apply_global_styles():
     """Применение глобальных стилей"""
+    checkmark = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'resources', 'checkmark.svg').replace('\\', '/')
+    radio_dot = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'resources', 'radio_dot.svg').replace('\\', '/')
+    spin_up = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'resources', 'spin_up.svg').replace('\\', '/')
+    spin_down = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'resources', 'spin_down.svg').replace('\\', '/')
     return """
         QDialog {
             background-color: #f8f9fa;
@@ -164,13 +183,57 @@ def apply_global_styles():
             border-right: 5px solid transparent;
             border-top: 5px solid #7f8c8d;
         }
-        QSpinBox {
+        QComboBox QAbstractItemView::item {
+            color: #2c3e50;
+            background-color: #ffffff;
+        }
+        QComboBox QAbstractItemView::item:hover,
+        QComboBox QAbstractItemView::item:selected {
+            color: #ffffff;
+            background-color: #3498db;
+        }
+        QAbstractItemView::item:selected,
+        QListView::item:selected {
+            color: #ffffff;
+            background-color: #3498db;
+        }
+        QAbstractItemView::item:hover,
+        QListView::item:hover {
+            color: #ffffff;
+            background-color: #3498db;
+        }
+        QSpinBox, QDoubleSpinBox {
             padding: 6px;
             border: 2px solid #bdc3c7;
             border-radius: 6px;
             background-color: white;
         }
-        QSpinBox:focus {
+        QSpinBox::up-button, QDoubleSpinBox::up-button,
+        QSpinBox::down-button, QDoubleSpinBox::down-button {
+            subcontrol-origin: border;
+            width: 22px;
+            height: 16px;
+            border-left: 1px solid #bdc3c7;
+            background-color: #ecf0f1;
+        }
+        QSpinBox::up-button, QDoubleSpinBox::up-button {
+            subcontrol-position: top right;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        QSpinBox::down-button, QDoubleSpinBox::down-button {
+            subcontrol-position: bottom right;
+        }
+        QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+        QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+            background-color: #3498db;
+        }
+        QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+            image: url("__SPIN_UP__");
+        }
+        QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+            image: url("__SPIN_DOWN__");
+        }
+        QSpinBox:focus, QDoubleSpinBox:focus {
             border-color: #3498db;
         }
         QCheckBox {
@@ -186,6 +249,7 @@ def apply_global_styles():
         QCheckBox::indicator:checked {
             background-color: #3498db;
             border-color: #3498db;
+            image: url("__CHECKMARK__");
         }
         QRadioButton {
             spacing: 8px;
@@ -200,6 +264,7 @@ def apply_global_styles():
         QRadioButton::indicator:checked {
             background-color: #3498db;
             border-color: #3498db;
+            image: url("__RADIO_DOT__");
         }
         QScrollArea {
             border: none;
@@ -218,7 +283,9 @@ def apply_global_styles():
         QScrollBar::handle:vertical:hover {
             background: #95a5a6;
         }
-    """
+    """.replace('__CHECKMARK__', checkmark).replace(
+        '__RADIO_DOT__', radio_dot).replace('__SPIN_UP__', spin_up).replace(
+            '__SPIN_DOWN__', spin_down)
 
 
 def create_styled_button(text, button_class="primary", icon_text=""):
@@ -227,11 +294,112 @@ def create_styled_button(text, button_class="primary", icon_text=""):
     return button
 
 
+class ComboPopupDelegate(QStyledItemDelegate):
+    """Paint combo rows explicitly, bypassing the native Qt6 delegate."""
+
+    def paint(self, painter, option, index):
+        painter.save()
+        selected_flag = qt_class_enum(
+            QStyle, 'StateFlag', 'State_Selected')
+        hover_flag = qt_class_enum(QStyle, 'StateFlag', 'State_MouseOver')
+        active = bool(option.state & (selected_flag | hover_flag))
+        painter.fillRect(option.rect, QColor('#3498db' if active else '#ffffff'))
+
+        rect = option.rect.adjusted(8, 0, -8, 0)
+        icon = index.data(qt_enum('ItemDataRole', 'DecorationRole'))
+        if hasattr(icon, 'isNull') and not icon.isNull():
+            side = min(option.rect.height() - 6, 20)
+            icon_rect = QRect(rect.left(), option.rect.top() + 3, side, side)
+            icon.paint(painter, icon_rect,
+                       qt_enum('AlignmentFlag', 'AlignCenter'))
+            rect.setLeft(icon_rect.right() + 8)
+
+        painter.setPen(QColor('#ffffff' if active else '#2c3e50'))
+        painter.drawText(
+            rect,
+            qt_enum('AlignmentFlag', 'AlignLeft')
+            | qt_enum('AlignmentFlag', 'AlignVCenter'),
+            str(index.data(qt_enum('ItemDataRole', 'DisplayRole')) or ''))
+        painter.restore()
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        return QSize(size.width(), max(size.height(), 28))
+
+
+class StyledComboBox(QComboBox):
+    """Combo whose popup colours survive the QGIS 4 Windows delegate."""
+
+    _POPUP_STYLE = """
+        QListView, QAbstractItemView {
+            background-color: #ffffff;
+            color: #2c3e50;
+        }
+        QListView::item, QAbstractItemView::item {
+            background-color: #ffffff;
+            color: #2c3e50;
+        }
+        QListView::item:hover, QListView::item:selected,
+        QAbstractItemView::item:hover, QAbstractItemView::item:selected {
+            background-color: #3498db;
+            color: #ffffff;
+        }
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._style_popup()
+
+    def _style_popup(self):
+        self.view().setStyleSheet(self._POPUP_STYLE)
+        self.view().setItemDelegate(ComboPopupDelegate(self.view()))
+
+    def showPopup(self):
+        self._style_popup()
+        super().showPopup()
+
+
+ReadableComboDelegate = ComboPopupDelegate
+
+
+def apply_combo_popup_style(combo):
+    """Make Qt5/Qt6 combo popup rows readable on Windows delegates."""
+    view = combo.view()
+    view.setItemDelegate(ComboPopupDelegate(view))
+    view.setStyleSheet("""
+        QListView {
+            background-color: #ffffff;
+            color: #2c3e50;
+            outline: none;
+        }
+        QListView::item {
+            color: #2c3e50;
+            background-color: #ffffff;
+            padding: 4px 8px;
+        }
+        QListView::item:hover, QListView::item:selected {
+            color: #ffffff;
+            background-color: #3498db;
+        }
+    """)
+    palette = view.palette()
+    palette.setColor(
+        qt_class_enum(QPalette, 'ColorRole', 'Base'), QColor('#ffffff'))
+    palette.setColor(
+        qt_class_enum(QPalette, 'ColorRole', 'Text'), QColor('#2c3e50'))
+    palette.setColor(
+        qt_class_enum(QPalette, 'ColorRole', 'Highlight'), QColor('#3498db'))
+    palette.setColor(
+        qt_class_enum(QPalette, 'ColorRole', 'HighlightedText'),
+        QColor('#ffffff'))
+    view.setPalette(palette)
+
+
 def create_section_separator():
     """Создает разделитель секций"""
     separator = QFrame()
-    separator.setFrameShape(QFrame.HLine)
-    separator.setFrameShadow(QFrame.Sunken)
+    separator.setFrameShape(qt_class_enum(QFrame, 'Shape', 'HLine'))
+    separator.setFrameShadow(qt_class_enum(QFrame, 'Shadow', 'Sunken'))
     separator.setStyleSheet("""
         QFrame {
             color: #bdc3c7;

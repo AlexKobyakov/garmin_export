@@ -16,6 +16,8 @@ from qgis.core import (
     QgsProject, QgsWkbTypes
 )
 
+from ..qgis_compat import qgis_geometry_type
+
 
 class LayerProcessor:
     """Процессор для обработки векторных слоёв"""
@@ -87,11 +89,11 @@ class LayerProcessor:
         """Определение типа геометрии слоя"""
         geom_type = layer.geometryType()
 
-        if geom_type == QgsWkbTypes.PointGeometry:
+        if geom_type == qgis_geometry_type('Point', QgsWkbTypes):
             return 'Point'
-        elif geom_type == QgsWkbTypes.LineGeometry:
+        elif geom_type == qgis_geometry_type('Line', QgsWkbTypes):
             return 'LineString'
-        elif geom_type == QgsWkbTypes.PolygonGeometry:
+        elif geom_type == qgis_geometry_type('Polygon', QgsWkbTypes):
             return 'Polygon'
         return 'Unknown'
 
@@ -139,11 +141,11 @@ class LayerProcessor:
 
         geom_type = QgsWkbTypes.geometryType(geometry.wkbType())
 
-        if geom_type == QgsWkbTypes.PointGeometry:
+        if geom_type == qgis_geometry_type('Point', QgsWkbTypes):
             return self._point_to_coords(geometry)
-        elif geom_type == QgsWkbTypes.LineGeometry:
+        elif geom_type == qgis_geometry_type('Line', QgsWkbTypes):
             return self._linestring_to_coords(geometry)
-        elif geom_type == QgsWkbTypes.PolygonGeometry:
+        elif geom_type == qgis_geometry_type('Polygon', QgsWkbTypes):
             return self._polygon_to_coords(geometry)
 
         return None

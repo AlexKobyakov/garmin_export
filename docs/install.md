@@ -71,8 +71,9 @@ java -version
 
 Начиная с версии 1.1, **mkgmap не нужно скачивать вручную**. Откройте плагин,
 перейдите на вкладку **«Инструменты»** и нажмите **«Скачать mkgmap»** — плагин
-сам получит последнюю версию с официального сайта (или с резервного
-Яндекс.Диска, если сайт недоступен) и сохранит её в профиле QGIS.
+сам получит полный ZIP-дистрибутив с официального сайта или из резервных
+источников GitHub, Dropbox и Яндекс.Диска, распакует его вместе с lib/ и
+сохранит рабочую установку в профиле QGIS.
 
 Если у вас уже есть `mkgmap.jar`, нажмите **«Добавить mkgmap»** и укажите файл.
 
@@ -195,3 +196,29 @@ plugins/garmin_export/
 ---
 
 🎯 **Успешной установки и работы с плагином!**
+
+
+## G4/G5 reliability notes (release 1.2.1)
+
+The Tools tab downloads complete mkgmap and splitter ZIP distributions, including
+the required lib/ directory. Source order is language-aware:
+
+- Russian UI: Yandex.Disk -> GitHub wheels -> Dropbox -> official site.
+- Other UI languages: official site -> GitHub wheels -> Dropbox -> Yandex.Disk.
+
+A download is staged and validated before promotion. A failed or cancelled attempt
+does not replace a working installation. The UI distinguishes network, archive,
+missing-dependency, permission and cancellation failures.
+
+During export, Cancel is terminal: it cannot be followed by a false success
+notification. A successful or failed run writes a redacted
+.garmin_export/run_manifest.json; output path and size are recorded only after
+success. The manifest is useful for support diagnostics and contains no raw
+settings or secrets.
+
+
+### Правило полного дистрибутива
+
+Для mkgmap и splitter нужен полный ZIP-дистрибутив, а не одиночный JAR:
+рядом с главным JAR должен находиться каталог lib/. Плагин проверяет это
+условие до установки и оставляет прежнюю рабочую версию при ошибке.

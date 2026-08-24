@@ -25,6 +25,11 @@ from .layer_processor import LayerProcessor
 from .layer_manager import LayerManager
 from .style_mapper import StyleMapper
 from . import typ_generator
+from .export_service import (
+    ExportService, STATUS_CANCELLED, STATUS_EXPORTING, STATUS_FAILED,
+    STATUS_SUCCESS, STATUS_VALIDATING,
+)
+from ..translation_manager import translations
 
 
 class ExportWorker(QObject):
@@ -36,6 +41,7 @@ class ExportWorker(QObject):
     progress = pyqtSignal(int, str)  # value, message
     log_message = pyqtSignal(str)  # message
     layer_processed = pyqtSignal(str, bool, str)  # layer_name, success, message
+    status = pyqtSignal(str)  # stable machine status
 
     def __init__(self, selected_layers, settings):
         """
@@ -47,6 +53,7 @@ class ExportWorker(QObject):
         self.selected_layers = selected_layers
         self.settings = settings
         self.is_cancelled = False
+        self.run_service = ExportService(selected_layers, settings)
 
         self.mp_generator = MPGenerator()
         self.mkgmap_compiler = MkgmapCompiler()
@@ -63,49 +70,77 @@ class ExportWorker(QObject):
     def run(self):
         """Основной метод выполнения экспорта"""
         try:
-            self.log_message.emit('🚀 Начало экспорта данных в формат Garmin IMG')
-            self.progress.emit(0, 'Инициализация экспорта...')
+            self._set_status(STATUS_VALIDATING)
+            self.log_message.emit('🚀 ' + translations.get_text('compile_map'))
+            self.progress.emit(0, translations.get_text('compiling'))
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             self.prepare_export()
+            self._set_status(STATUS_EXPORTING)
             self.process_layers()
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             if not self.processed_data:
-                raise Exception('Ни один слой не был обработан успешно')
+                raise Exception(translations.get_text('error_no_layers'))
 
             self.generate_mp_file()
             self.generate_typ_file()
 
-            if self.is_cancelled:
-                self.finished.emit(False, '')
+            if self._cancelled():
+                self._finish_cancelled()
                 return
 
             output_file = self.compile_to_img()
+            if not self.run_service.finish_success(output_file):
+                self._finish_cancelled()
+                return
+            self.status.emit(STATUS_SUCCESS)
 
-            self.progress.emit(100, 'Экспорт завершён успешно!')
-            self.log_message.emit('🎉 Экспорт завершён успешно!')
+            self.progress.emit(100, translations.get_text('success'))
+            self.log_message.emit(
+                '🎉 ' + translations.get_text('success_export_complete'))
             self.finished.emit(True, output_file)
 
         except Exception as e:
-            self.log_message.emit('❌ Ошибка экспорта: {0}'.format(str(e)))
+            self.run_service.finish_failure(e)
+            if self.run_service.status == STATUS_CANCELLED:
+                self.status.emit(STATUS_CANCELLED)
+                self.finished.emit(False, '')
+                return
+            self.status.emit(STATUS_FAILED)
+            self.log_message.emit(
+                '❌ {0}: {1}'.format(translations.get_text('error'), e))
             self.error.emit(str(e))
             self.finished.emit(False, '')
         finally:
             self.cleanup_temp_files()
+            self.run_service.write_manifest()
+
+    def _set_status(self, status):
+        self.run_service.set_status(status)
+        self.status.emit(status)
+
+    def _cancelled(self):
+        return self.is_cancelled or self.run_service.is_cancelled()
+
+    def _finish_cancelled(self):
+        self.is_cancelled = True
+        self.run_service.request_cancel()
+        self.status.emit(STATUS_CANCELLED)
+        self.finished.emit(False, '')
 
     # ------------------------------------------------------------------
 
     def prepare_export(self):
         """Подготовка к экспорту"""
-        self.progress.emit(5, 'Подготовка к экспорту...')
-        self.log_message.emit('📋 Подготовка параметров экспорта')
+        self.progress.emit(5, translations.get_text('compiling'))
+        self.log_message.emit('📋 ' + translations.get_text('compiling'))
 
         # Временная папка вне выходного каталога пользователя
         self.temp_folder = tempfile.mkdtemp(prefix='garmin_export_')
@@ -115,34 +150,35 @@ class ExportWorker(QObject):
             try:
                 mapping_data = json.loads(self.settings['mapping_json'])
                 self.style_mapper.load_mapping(mapping_data)
-                self.log_message.emit('🎨 JSON-сопоставление загружено')
+                self.log_message.emit(
+                    '🎨 ' + translations.get_text('success_mapping_loaded'))
             except json.JSONDecodeError as e:
                 self.log_message.emit(
-                    '⚠️ Ошибка загрузки JSON-сопоставления: {0}'.format(str(e)))
+                    '⚠️ {0}: {1}'.format(
+                        translations.get_text('error_invalid_json'), e))
 
         # Проверяем mkgmap
-        if not self.mkgmap_compiler.validate_mkgmap(self.settings['mkgmap_path']):
-            raise Exception(
-                'Неверный путь к mkgmap.jar. Скачайте mkgmap кнопкой '
-                '"Скачать mkgmap" или укажите файл вручную.')
+        if not self.mkgmap_compiler.validate_tool_installation(
+                self.settings['mkgmap_path'], 'mkgmap'):
+            raise Exception(translations.get_text('error_invalid_mkgmap'))
 
-        self.log_message.emit('✅ Подготовка завершена')
+        self.log_message.emit('✅ ' + translations.get_text('success'))
 
     def process_layers(self):
         """Обработка выбранных слоёв"""
-        self.progress.emit(10, 'Обработка слоёв...')
-        self.log_message.emit('📁 Начало обработки слоёв')
+        self.progress.emit(10, translations.get_text('compiling'))
+        self.log_message.emit('📁 ' + translations.get_text('tab_layers'))
 
         total_layers = len(self.selected_layers)
         self.processed_data = []
         self._layer_entries_for_typ = []
 
         for i, layer_info in enumerate(self.selected_layers):
-            if self.is_cancelled:
+            if self._cancelled():
                 return
 
             layer_name = layer_info.get('name', '?')
-            self.log_message.emit('🔄 Обработка слоя: {0}'.format(layer_name))
+            self.log_message.emit('🔄 {0}'.format(layer_name))
 
             try:
                 layer = None
@@ -151,7 +187,8 @@ class ExportWorker(QObject):
                 if layer is None:
                     layer = LayerManager.get_layer_by_name(layer_name)
                 if layer is None:
-                    raise Exception('Слой "{0}" не найден'.format(layer_name))
+                    raise Exception('{0}: {1}'.format(
+                        translations.get_text('error'), layer_name))
 
                 layer_data = self.layer_processor.process_layer(
                     layer,
@@ -170,27 +207,28 @@ class ExportWorker(QObject):
 
                 progress_value = 10 + int((i + 1) / total_layers * 40)
                 self.progress.emit(progress_value,
-                                   'Обработан слой: {0}'.format(layer_name))
+                                   layer_name)
                 self.layer_processed.emit(
                     layer_name, True,
-                    'Обработано объектов: {0}'.format(layer_data.get('feature_count', 0)))
+                    str(layer_data.get('feature_count', 0)))
 
             except Exception as e:
                 error_msg = str(e)
                 self.log_message.emit(
-                    '❌ Ошибка обработки слоя "{0}": {1}'.format(layer_name, error_msg))
+                    '❌ {0}: {1}'.format(
+                        translations.get_text('error'), error_msg))
                 self.layer_processed.emit(layer_name, False, error_msg)
                 continue
 
-        self.log_message.emit('📊 Обработано слоёв: {0} из {1}'.format(
+        self.log_message.emit('📊 {0}/{1}'.format(
             len(self.processed_data), total_layers))
 
     def generate_mp_file(self):
         """Генерация MP файла"""
-        self.progress.emit(55, 'Генерация MP файла...')
-        self.log_message.emit('📝 Генерация файла формата Polish (MP)')
+        self.progress.emit(55, translations.get_text('compiling'))
+        self.log_message.emit('📝 ' + translations.get_text('compiling'))
 
-        if self.is_cancelled:
+        if self._cancelled():
             return
 
         mp_filename = '{0}.mp'.format(self.settings.get('output_filename') or 'map')
@@ -211,25 +249,27 @@ class ExportWorker(QObject):
             self.mp_generator.generate_mp_file(
                 self.processed_data, self.mp_file_path, mp_settings)
         except Exception as e:
-            raise Exception('Ошибка генерации MP файла: {0}'.format(str(e)))
+            raise Exception('{0}: {1}'.format(
+                translations.get_text('error'), e))
 
         stats = self.mp_generator.get_statistics()
         self.log_message.emit(
-            '📄 MP файл создан: {0} (POI: {1}, линий: {2}, полигонов: {3})'.format(
+            '📄 {0} ({1}, {2}, {3})'.format(
                 self.mp_file_path, stats['poi_count'],
                 stats['polyline_count'], stats['polygon_count']))
         if stats.get('skipped_count'):
             self.log_message.emit(
-                '⚠️ Пропущено некорректных геометрий: {0}'.format(stats['skipped_count']))
+                '⚠️ {0}: {1}'.format(
+                    translations.get_text('warning'), stats['skipped_count']))
 
         if self.settings.get('keep_temp_files'):
             keep_path = os.path.join(self.settings['output_folder'], mp_filename)
             try:
                 shutil.copy2(self.mp_file_path, keep_path)
-                self.log_message.emit('💾 Копия MP файла: {0}'.format(keep_path))
+                self.log_message.emit('💾 {0}'.format(keep_path))
             except OSError as e:
                 self.log_message.emit(
-                    '⚠️ Не удалось сохранить копию MP файла: {0}'.format(str(e)))
+                    '⚠️ {0}: {1}'.format(translations.get_text('error'), e))
 
     def generate_typ_file(self):
         """Генерация TYP файла (стилизация из QGIS) при необходимости"""
@@ -239,17 +279,20 @@ class ExportWorker(QObject):
             typ_path = self.settings.get('typ_file_path', '')
             if typ_path and os.path.isfile(typ_path):
                 self.typ_file_path = typ_path
-                self.log_message.emit('🎨 Используется TYP файл: {0}'.format(typ_path))
+                self.log_message.emit(
+                    '🎨 {0}: {1}'.format(
+                        translations.get_text('typ_file'), typ_path))
             else:
                 self.log_message.emit(
-                    '⚠️ TYP файл не найден, стилизация пропущена: {0}'.format(typ_path))
+                    '⚠️ {0}: {1}'.format(
+                        translations.get_text('error_typ_not_found'), typ_path))
             return
 
         if typ_mode != 'generate':
             return
 
-        self.progress.emit(65, 'Генерация TYP из стилей QGIS...')
-        self.log_message.emit('🎨 Генерация TYP файла из символики слоёв QGIS')
+        self.progress.emit(65, translations.get_text('compiling'))
+        self.log_message.emit('🎨 ' + translations.get_text('typ_generate'))
 
         try:
             typ_text = typ_generator.build_typ_from_layers(
@@ -265,15 +308,14 @@ class ExportWorker(QObject):
                 f.write('; -*- coding: utf-8 -*-\n')
                 f.write(typ_text)
 
-            self.log_message.emit('🎨 TYP файл сгенерирован: {0}'.format(
-                self.typ_file_path))
+            self.log_message.emit('🎨 {0}'.format(self.typ_file_path))
 
             if self.settings.get('keep_temp_files'):
                 keep_path = os.path.join(
                     self.settings['output_folder'], 'style.typ.txt')
                 try:
                     shutil.copy2(self.typ_file_path, keep_path)
-                    self.log_message.emit('💾 Копия TYP файла: {0}'.format(keep_path))
+                    self.log_message.emit('💾 {0}'.format(keep_path))
                 except OSError:
                     pass
 
@@ -281,15 +323,14 @@ class ExportWorker(QObject):
             # TYP не критичен: карта соберётся со стилем Garmin по умолчанию
             self.typ_file_path = None
             self.log_message.emit(
-                '⚠️ Не удалось сгенерировать TYP, используется стиль Garmin '
-                'по умолчанию: {0}'.format(str(e)))
+                '⚠️ {0}: {1}'.format(translations.get_text('error'), e))
 
     def compile_to_img(self):
         """Компиляция MP в IMG через mkgmap"""
-        self.progress.emit(70, 'Компиляция через mkgmap...')
-        self.log_message.emit('⚙️ Запуск компиляции mkgmap')
+        self.progress.emit(70, translations.get_text('compiling'))
+        self.log_message.emit('⚙️ ' + translations.get_text('compiling'))
 
-        if self.is_cancelled:
+        if self._cancelled():
             return ''
 
         input_files = [self.mp_file_path]
@@ -314,10 +355,10 @@ class ExportWorker(QObject):
                     f.write(mkgmap_command.build_logging_config(
                         log_file, verbose=self.settings.get('mkgmap_verbose', False)))
                 mkgmap_options['log_config'] = log_config_path
-                self.log_message.emit('📜 Журнал mkgmap: {0}'.format(log_file))
+                self.log_message.emit('📜 {0}'.format(log_file))
             except OSError as e:
                 self.log_message.emit(
-                    '⚠️ Не удалось создать конфигурацию логирования: {0}'.format(str(e)))
+                    '⚠️ {0}: {1}'.format(translations.get_text('error'), e))
 
         compilation_settings = {
             'mkgmap_path': self.settings['mkgmap_path'],
@@ -333,14 +374,13 @@ class ExportWorker(QObject):
                 compilation_settings,
                 progress_callback=self.on_mkgmap_progress)
         except Exception as e:
-            raise Exception('Ошибка компиляции mkgmap: {0}'.format(str(e)))
+            raise Exception(translations.get_text(
+                'error_mkgmap_execution').format(error=e))
 
         output_file = self._rename_output(output_file)
 
-        self.log_message.emit('🎯 IMG файл создан: {0}'.format(output_file))
-        self.log_message.emit(
-            '💡 Для загрузки в навигатор скопируйте файл в папку /Garmin '
-            'на устройстве или карте памяти.')
+        self.log_message.emit('🎯 {0}'.format(output_file))
+        self.log_message.emit('💡 /Garmin: {0}'.format(output_file))
 
         return output_file
 
@@ -380,5 +420,6 @@ class ExportWorker(QObject):
     def stop(self):
         """Остановка выполнения"""
         self.is_cancelled = True
-        self.log_message.emit('🛑 Получена команда остановки экспорта')
+        self.run_service.request_cancel()
+        self.log_message.emit('🛑 ' + translations.get_text('cancel'))
         self.mkgmap_compiler.stop_compilation()

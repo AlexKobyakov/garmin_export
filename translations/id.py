@@ -55,6 +55,7 @@ translations = {
     'select_java': 'Pilih berkas java yang dapat dieksekusi',
     'jar_valid': 'berkas valid',
     'jar_invalid': 'Berkas bukan mkgmap.jar yang valid',
+    'tool_invalid': 'distribusi tidak lengkap atau tidak valid (JAR + lib/ diperlukan)',
     'java_not_found': 'Java tidak ditemukan. Silakan pasang Java (JRE 8+).',
     'downloading': 'Mengunduh...',
     'download_in_progress': 'Unduhan sedang berlangsung.',

@@ -55,6 +55,7 @@ translations = {
     'select_java': 'Chọn tệp thực thi java',
     'jar_valid': 'tệp hợp lệ',
     'jar_invalid': 'Tệp không phải là mkgmap.jar hợp lệ',
+    'tool_invalid': 'gói phân phối không đầy đủ hoặc không hợp lệ (cần JAR + lib/)',
     'java_not_found': 'Không tìm thấy Java. Vui lòng cài đặt Java (JRE 8+).',
     'downloading': 'Đang tải...',
     'download_in_progress': 'Đã có một quá trình tải đang diễn ra.',

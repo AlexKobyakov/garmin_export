@@ -2,6 +2,7 @@
 """Тесты системы переводов и языков интерфейса (без QGIS/Qt)."""
 
 import importlib
+import json
 import os
 import unittest
 
@@ -41,12 +42,28 @@ class LanguageRegistryTest(unittest.TestCase):
         # У каждого языка непустое отображаемое имя
         for code, label in labels:
             self.assertTrue(label.strip(), 'empty label for {0}'.format(code))
+            self.assertFalse(any(ord(char) > 0x1F000 for char in label),
+                             'emoji flag leaked into {0}'.format(code))
 
     def test_every_language_has_a_file(self):
         for lang in EXPECTED_LANGUAGES:
             path = os.path.join(TRANSLATIONS_DIR, '{0}.py'.format(lang))
             self.assertTrue(os.path.isfile(path),
                             'missing translation file: {0}'.format(path))
+
+    def test_every_language_has_svg_flag(self):
+        for lang in EXPECTED_LANGUAGES:
+            path = self.tm.get_language_flag_path(lang)
+            self.assertTrue(os.path.isfile(path),
+                            'missing flag: {0}'.format(lang))
+
+    def test_flag_manifest_matches_registry(self):
+        root = os.path.dirname(TRANSLATIONS_DIR)
+        path = os.path.join(root, 'resources', 'flags', 'manifest.json')
+        with open(path, encoding='utf-8') as handle:
+            manifest = json.load(handle)
+        self.assertEqual(set(manifest['flags']), set(EXPECTED_LANGUAGES))
+        self.assertEqual(manifest['license'], 'AGPL-3.0-or-later')
 
     def test_all_languages_load(self):
         for lang in EXPECTED_LANGUAGES:

@@ -1,0 +1,5 @@
+{
+  "license": "AGPL-3.0-or-later",
+  "source": "project-authored SVG artwork",
+  "flags": ["ru", "en", "zh", "hi", "es", "ar", "fr", "pt", "de", "id", "th", "vi"]
+}

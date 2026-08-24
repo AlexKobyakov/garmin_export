@@ -2,7 +2,7 @@
 
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.1.4  
+Версия: 1.2.1
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026
@@ -25,9 +25,8 @@ Garmin GPS devices.
 - 🗺️ **Exports every geometry type**: points (POI), lines (roads, rivers),
   polygons (forests, water bodies), including multipart geometries.
 - 📥 **Built-in mkgmap/splitter download**: the "Download mkgmap" / "Download
-  splitter" buttons fetch the **full ZIP distribution** from mkgmap.org.uk
-  (variable link) or from a permanent Yandex.Disk backup and unpack it with all
-  dependency libraries (`lib/`: osmpbf, protobuf, fastutil…) so OSM/PBF reading
+  splitter" buttons fetch the **full ZIP distribution** from mkgmap.org.uk, GitHub wheels, Dropbox or a permanent Yandex.Disk backup
+  (the Russian UI starts with Yandex.Disk) and unpack it with all dependency libraries (`lib/`: osmpbf, protobuf, fastutil…) so OSM/PBF reading
   works. You can also "Add" a local jar. QGIS rules forbid bundling jars, so it
   is fetched on demand.
 - 🖌️ **Automatic TYP styling**: the plugin generates a TYP file from the QGIS
@@ -48,6 +47,7 @@ Garmin GPS devices.
   850/852/866 — so labels in any script export correctly.
 - 📋 **mkgmap logging**: optional mkgmap.log file with a configurable verbosity.
 - 💾 **Persistent settings** between sessions.
+- 🧾 **Reliable lifecycle**: cancellation-safe export runs, stale-worker isolation and an anonymized .garmin_export/run_manifest.json on every completed run.
 
 ### Requirements
 
@@ -82,7 +82,7 @@ Garmin Export Plugin - это современный инструмент для
 ## ✨ Основные возможности
 
 - 🗺️ **Экспорт всех типов геометрии**: точки (POI), линии (дороги, реки), полигоны (леса, водоёмы), включая мультигеометрии
-- 📥 **Встроенное скачивание mkgmap/splitter**: кнопки «Скачать mkgmap» и «Скачать splitter» получают **полный ZIP-дистрибутив** с mkgmap.org.uk (переменная ссылка) или с Яндекс.Диска (постоянная ссылка) и распаковывают его со всеми зависимыми библиотеками (`lib/`: osmpbf, protobuf, fastutil…), чтобы работало чтение OSM/PBF. Также можно «Добавить» локальный jar. QGIS запрещает включать jar в состав плагина, поэтому файл загружается по требованию
+- 📥 **Встроенное скачивание mkgmap/splitter**: кнопки «Скачать mkgmap» и «Скачать splitter» получают **полный ZIP-дистрибутив** с mkgmap.org.uk, GitHub wheels, Dropbox или Яндекс.Диска и распаковывают его со всеми зависимыми библиотеками. Для русского интерфейса первым используется Яндекс.Диск (`lib/`: osmpbf, protobuf, fastutil…), чтобы работало чтение OSM/PBF. Также можно «Добавить» локальный jar. QGIS запрещает включать jar в состав плагина, поэтому файл загружается по требованию
 - 🖌️ **Автоматическая стилизация TYP**: плагин генерирует TYP-файл из символики слоёв QGIS (цвета полигонов, толщина и цвет линий, иконки точек) — карта на навигаторе выглядит как в QGIS
 - 🎨 **Гибкое сопоставление стилей**: JSON-система для настройки типов объектов Garmin
 - 📊 **Многоуровневые карты**: поддержка 4 уровней детализации (Level0-Level3)
@@ -93,6 +93,7 @@ Garmin Export Plugin - это современный инструмент для
 - 🔤 **Полный набор кодовых страниц подписей**: 18 вариантов — UTF-8/Unicode (покрывает любой язык), Windows 1250–1258, тайская 874, CJK 932/936/949/950 и DOS 850/852/866 — подписи на любом письме экспортируются корректно
 - 📋 **Логирование mkgmap**: опциональный файл журнала mkgmap.log с настраиваемым уровнем детализации
 - 💾 **Сохранение настроек** между сеансами работы
+- 🧾 **Надёжный жизненный цикл**: безопасная отмена, защита от устаревших worker-сигналов и обезличенный .garmin_export/run_manifest.json для каждого завершённого запуска
 
 ## 🔧 Требования
 
@@ -268,9 +269,9 @@ Garmin Export Plugin - это современный инструмент для
 
 ## 📄 Лицензия
 
-GNU General Public License v3.0
+GNU Affero General Public License v3.0
 
-Плагин распространяется бесплатно под лицензией GPL v3. Вы можете свободно использовать, модифицировать и распространять код согласно условиям лицензии.
+Плагин распространяется бесплатно под лицензией AGPL v3. Вы можете свободно использовать, модифицировать и распространять код согласно условиям лицензии. Полный текст лицензии находится в файле `LICENSE`.
 
 ## 👨‍💻 Об авторе
 
@@ -286,7 +287,7 @@ GNU General Public License v3.0
 ## 🧪 Тесты
 
 Логика ядра (генерация MP/TYP, построение команды mkgmap, разбор ссылок
-скачивания, валидация jar, сопоставление стилей) покрыта офлайн-тестами,
+скачивания, валидация jar, сопоставление стилей, отмена и run manifest) покрыта офлайн-тестами,
 которые запускаются без QGIS:
 
 ```bash

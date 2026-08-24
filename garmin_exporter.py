@@ -11,11 +11,11 @@ Year: 2025-2026
 import os
 import configparser
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import QgsApplication
 
-from .translation_manager import translations
+from .translation_manager import PLUGIN_NAME, translations
 
 
 class GarminExporter:
@@ -40,8 +40,9 @@ class GarminExporter:
             translations.set_language('en')
 
         self.actions = []
-        self.menu = 'Garmin Export'
+        self.menu = PLUGIN_NAME
         self.dialog = None
+        self.main_action = None
         self.first_start = True
 
     # ------------------------------------------------------------------
@@ -67,7 +68,7 @@ class GarminExporter:
     def get_plugin_info():
         """Полная информация о плагине из metadata.txt"""
         default = {
-            'name': 'Garmin Export',
+            'name': PLUGIN_NAME,
             'version': 'Unknown',
             'author': 'Кобяков Александр Викторович',
             'email': 'kobyakov@lesburo.ru',
@@ -124,9 +125,9 @@ class GarminExporter:
         if not os.path.exists(icon_path):
             icon_path = None
 
-        self.add_action(
+        self.main_action = self.add_action(
             icon_path,
-            text=f"🎯 {translations.get_text('window_title')}",
+            text='🎯 ' + PLUGIN_NAME,
             callback=self.run,
             parent=self.iface.mainWindow(),
             status_tip=translations.get_text('plugin_description'),
@@ -134,6 +135,16 @@ class GarminExporter:
         )
 
         self.first_start = True
+
+    def retranslateUi(self):
+        """Обновляет текст QAction после live-переключения языка."""
+        if self.main_action is None:
+            return
+        title = PLUGIN_NAME
+        description = translations.get_text('plugin_description')
+        self.main_action.setText('🎯 ' + title)
+        self.main_action.setStatusTip(description)
+        self.main_action.setWhatsThis(description)
 
     def unload(self):
         """Удаление элементов GUI при выгрузке плагина"""
@@ -161,7 +172,8 @@ class GarminExporter:
         # Пересоздаём диалог каждый раз, чтобы подхватить актуальные слои
         if self.dialog is None:
             from .gui.gui_main import GarminExportDialog
-            self.dialog = GarminExportDialog(self.iface.mainWindow())
+            self.dialog = GarminExportDialog(
+                self.iface.mainWindow(), plugin=self)
         else:
             self.dialog.loadProjectLayers()
 

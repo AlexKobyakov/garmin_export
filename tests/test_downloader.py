@@ -20,7 +20,7 @@ def _make_inner_jar(class_prefix):
     return buf.getvalue()
 
 
-def _make_archive(tool='mkgmap', version='9999'):
+def _make_archive(tool='mkgmap', version='9999', include_lib=True):
     """Синтетический дистрибутив: <name>/main.jar + <name>/lib/dep.jar"""
     config = downloader.TOOLS[tool]
     main = config['main_jar_name']
@@ -30,8 +30,10 @@ def _make_archive(tool='mkgmap', version='9999'):
     with zipfile.ZipFile(buf, 'w') as z:
         z.writestr(root + '/', b'')
         z.writestr(root + '/' + main, _make_inner_jar(prefix))
-        z.writestr(root + '/lib/', b'')
-        z.writestr(root + '/lib/osmpbf-1.3.3.jar', _make_inner_jar('crosby/binary'))
+        if include_lib:
+            z.writestr(root + '/lib/', b'')
+            z.writestr(root + '/lib/osmpbf-1.3.3.jar',
+                       _make_inner_jar('crosby/binary'))
         z.writestr(root + '/README', b'readme')
     return buf.getvalue(), root
 
@@ -115,9 +117,31 @@ class CandidatesTest(unittest.TestCase):
         self.assertTrue(url.endswith('splitter-r654.zip'))
         self.assertEqual(filename, 'splitter-r654.zip')
 
-    def test_three_candidates(self):
+    def test_five_candidates(self):
         self.assertEqual(
-            len(downloader.build_download_candidates('mkgmap')), 3)
+            len(downloader.build_download_candidates('mkgmap')), 5)
+
+    def test_russian_order_starts_with_yandex(self):
+        def fake_opener(url, timeout=30):
+            if 'cloud-api.yandex.net' in url:
+                return _FakeResponse(
+                    b'{"href":"https://downloader.disk.yandex.ru/m.zip"}')
+            return _FakeResponse(b'mkgmap-r4924.zip')
+
+        candidates = downloader.build_download_candidates(
+            'mkgmap', fake_opener, language='ru')
+        urls = [candidate()[0] for candidate in candidates]
+        self.assertIn('disk.yandex.ru', urls[0])
+        self.assertIn('raw.githubusercontent.com', urls[1])
+        self.assertIn('dropbox.com', urls[2])
+        self.assertIn('mkgmap.org.uk', urls[3])
+
+    def test_non_russian_order_uses_github_and_dropbox(self):
+        candidates = downloader.build_download_candidates('splitter')
+        urls = [candidate()[0] for candidate in candidates[2:4]]
+        self.assertTrue(urls[0].startswith('https://raw.githubusercontent.com/'))
+        self.assertIn('dropbox.com', urls[1])
+        self.assertIn('dl=1', urls[1])
 
     def test_yandex_url_is_zip_link(self):
         # Ссылки Яндекс.Диска обновлены на zip-архивы
@@ -125,6 +149,10 @@ class CandidatesTest(unittest.TestCase):
                          'https://disk.yandex.ru/d/H39zRcOscXvDiw')
         self.assertEqual(downloader.TOOLS['splitter']['yandex_public_url'],
                          'https://disk.yandex.ru/d/h5kqHSN7CqYzLw')
+        self.assertIn('/wheels/mkgmap-r4924.zip',
+                      downloader.TOOLS['mkgmap']['github_archive_url'])
+        self.assertIn('dropbox.com',
+                      downloader.TOOLS['splitter']['dropbox_public_url'])
 
 
 class ArchiveValidationTest(unittest.TestCase):
@@ -220,6 +248,119 @@ class DownloadToolEndToEndTest(unittest.TestCase):
         self.assertIn(downloader.STATUS_EXTRACT, statuses)
         # архив тоже сохранён в каталоге
         self.assertTrue(os.path.isfile(os.path.join(self.tmp, 'mkgmap-r4924.zip')))
+
+    def test_manifest_declares_runtime_dependencies(self):
+        manifest = downloader.tool_manifest('mkgmap')
+        self.assertEqual(manifest['main_jar_name'], 'mkgmap.jar')
+        self.assertIn('lib', manifest['required_dirs'])
+        self.assertTrue(manifest['archive_url'].startswith('https://'))
+
+    def test_existing_install_is_reused_on_second_download(self):
+        data, _ = _make_archive('mkgmap', '4924')
+
+        def fake_opener(url, timeout=30):
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            return _FakeResponse(data)
+
+        first = downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        second = downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        self.assertEqual(first, second)
+        self.assertTrue(os.path.isdir(os.path.join(
+            self.tmp, 'mkgmap-r4924', 'lib')))
+
+    def test_invalid_archive_reports_stable_error_code(self):
+        def fake_opener(url, timeout=30):
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            return _FakeResponse(b'not-a-zip')
+
+        with self.assertRaises(downloader.DownloadError) as ctx:
+            downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        self.assertEqual(ctx.exception.code, downloader.ERROR_ARCHIVE)
+
+    def test_cancel_keeps_existing_install_and_cleans_part(self):
+        root = os.path.join(self.tmp, 'mkgmap-r4000')
+        os.makedirs(os.path.join(root, 'lib'))
+        with open(os.path.join(root, 'mkgmap.jar'), 'wb') as f:
+            f.write(b'last-good')
+        with open(os.path.join(self.tmp, 'mkgmap-r4924.zip.part'), 'wb') as f:
+            f.write(b'abandoned')
+
+        data, _ = _make_archive('mkgmap', '4924')
+
+        def fake_opener(url, timeout=30):
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            return _FakeResponse(data)
+
+        with self.assertRaises(downloader.DownloadCancelledError):
+            downloader.download_tool(
+                'mkgmap', self.tmp, cancelled_callback=lambda: True,
+                opener=fake_opener)
+        self.assertTrue(os.path.isfile(os.path.join(root, 'mkgmap.jar')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.tmp, 'mkgmap-r4924.zip.part')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.tmp, '.mkgmap.install.lock')))
+
+    def test_invalid_archive_does_not_replace_last_good(self):
+        root = os.path.join(self.tmp, 'mkgmap-r4000')
+        os.makedirs(os.path.join(root, 'lib'))
+        with open(os.path.join(root, 'mkgmap.jar'), 'wb') as f:
+            f.write(b'last-good')
+
+        def fake_opener(url, timeout=30):
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            return _FakeResponse(b'not-a-zip')
+
+        with self.assertRaises(Exception):
+            downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        with open(os.path.join(root, 'mkgmap.jar'), 'rb') as f:
+            self.assertEqual(f.read(), b'last-good')
+        self.assertFalse(any(name.startswith('.mkgmap-staging-')
+                             for name in os.listdir(self.tmp)))
+
+    def test_install_lock_rejects_concurrent_download(self):
+        lock = os.path.join(self.tmp, '.mkgmap.install.lock')
+        with open(lock, 'w') as f:
+            f.write('other-process')
+        with self.assertRaises(RuntimeError):
+            downloader.download_tool('mkgmap', self.tmp)
+
+    def test_missing_lib_is_rejected(self):
+        data, _ = _make_archive('mkgmap', '4924', include_lib=False)
+
+        def fake_opener(url, timeout=30):
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            return _FakeResponse(data)
+
+        with self.assertRaises(downloader.DownloadError) as ctx:
+            downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        self.assertEqual(ctx.exception.code, downloader.ERROR_DEPENDENCIES)
+        self.assertIn('lib', str(ctx.exception))
+        self.assertFalse(any(name.startswith('.mkgmap-staging-')
+                             for name in os.listdir(self.tmp)))
+
+    def test_retry_uses_next_source_after_bad_archive(self):
+        data, _ = _make_archive('mkgmap', '4924')
+        calls = []
+
+        def fake_opener(url, timeout=30):
+            calls.append(url)
+            if url.endswith('.html'):
+                return _FakeResponse(b'mkgmap-r4924.zip')
+            if 'r4924.zip' in url and len(calls) == 2:
+                return _FakeResponse(b'bad zip')
+            if url.endswith('.zip'):
+                return _FakeResponse(data)
+            raise AssertionError('unexpected url ' + url)
+
+        jar = downloader.download_tool('mkgmap', self.tmp, opener=fake_opener)
+        self.assertTrue(os.path.isfile(jar))
+        self.assertGreaterEqual(len(calls), 3)
 
 
 class OpenUrlSchemeTest(unittest.TestCase):

@@ -1,14 +1,28 @@
 [general]
 name=Garmin Export
 qgisMinimumVersion=3.22
+qgisMaximumVersion=4.99
 description=Professional export tool for converting QGIS vector data to Garmin IMG format via mkgmap
-version=1.1.4
+version=1.2.1
 author=Alex Kobyakov
 email=kobyakov@lesburo.ru
 about=Professional Garmin Export tool for converting QGIS vector layers to Garmin IMG format using the mkgmap compiler. Features: one-click download of the full mkgmap/splitter distributions (zip archives with all dependency libraries; QGIS forbids bundling jars), automatic TYP styling generated from QGIS layer symbology, JSON-based type mapping, multi-level map support, advanced mkgmap tuning and logging options, comprehensive label code-page support (UTF-8 plus Windows/DOS/CJK pages), batch processing of all project layers, and a 12-language interface (EN, RU, DE, ES, FR, PT, ZH, HI, AR, ID, TH, VI). Requires Java (JRE 8+) which the plugin can auto-detect.
 tracker=https://github.com/AlexKobyakov/garmin_export/issues
 repository=https://github.com/AlexKobyakov/garmin_export
-changelog=1.1.4 - Security scan fix (QGIS plugin repository)
+changelog=1.2.1 - G4/G5 reliability release
+    - Added transactional mkgmap/splitter ZIP installation with staging, lock,
+      cancellation cleanup, last-good preservation and required lib/ validation
+    - Added language-aware fallback sources: Russian Yandex.Disk -> GitHub ->
+      Dropbox -> official site; other languages official site -> GitHub ->
+      Dropbox -> Yandex.Disk
+    - Added stable download error taxonomy and translated UI presentation
+    - Added Java compatibility/heap diagnostics and export lifecycle states
+    - Added redacted atomic run_manifest.json with success-only output metadata
+    - Added duplicate-run guards, stale-worker signal isolation and cancellation
+      correctness in the export worker
+    - Added offline G0-G5 regression coverage; release archive excludes plan,
+      tests and wheels while retaining wheels in the public source repository
+    1.1.4 - Security scan fix (QGIS plugin repository)
     - Restrict downloads to http/https via a dedicated URL opener without
       file/ftp/data handlers, resolving the Bandit B310 critical finding (CWE-22)
     - Remove hardcoded /tmp paths from tests (Bandit B108) and add URL-scheme tests

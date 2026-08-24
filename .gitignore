@@ -9,14 +9,25 @@ __pycache__/
 *.jar
 
 # Build / temp output
+build/
+dist/
+*.zip
 *.img
 *.mp
 mkgmap.log
 temp/
 *.part
 
+# Repository fallback archives: tracked for the public source repo, but never
+# shipped inside the installable plugin ZIP.
+!wheels/
+!wheels/*.zip
+
 # IDE / OS
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local planning and audit workspace (never publish to GitHub)
+plan/
