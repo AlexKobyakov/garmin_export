@@ -138,6 +138,11 @@ translations = {
     'contact': 'ติดต่อ',
     'year': 'ปี',
     'organization': 'องค์กร',
+    'tags': 'แท็ก',
+    'metadata_details': 'ข้อมูลเมตา',
+    'qgis_support': 'รองรับ QGIS',
+    'processing_provider': 'ผู้ให้บริการ Processing',
+    'changelog': 'บันทึกการเปลี่ยนแปลง',
     'plugin_description': 'เครื่องมือระดับมืออาชีพสำหรับส่งออกข้อมูล QGIS '
                           'ไปยังแผนที่ Garmin IMG ผ่าน mkgmap',
     'multilingual_support': 'จัดสไตล์จาก QGIS, สร้าง TYP, ปรับแต่ง mkgmap, '

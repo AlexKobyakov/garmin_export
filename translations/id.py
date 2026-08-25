@@ -138,6 +138,11 @@ translations = {
     'contact': 'Kontak',
     'year': 'Tahun',
     'organization': 'Organisasi',
+    'tags': 'Tag',
+    'metadata_details': 'Metadata',
+    'qgis_support': 'Dukungan QGIS',
+    'processing_provider': 'Penyedia Processing',
+    'changelog': 'Catatan perubahan',
     'plugin_description': 'Alat profesional untuk mengekspor data QGIS '
                           'ke peta Garmin IMG melalui mkgmap',
     'multilingual_support': 'Penggayaan QGIS, pembuatan TYP, penyetelan mkgmap, '

@@ -138,6 +138,11 @@ translations = {
     'contact': 'Контакт',
     'year': 'Год',
     'organization': 'Организация',
+    'tags': 'Теги',
+    'metadata_details': 'Метаданные',
+    'qgis_support': 'Поддержка QGIS',
+    'processing_provider': 'Провайдер Processing',
+    'changelog': 'История изменений',
     'plugin_description': 'Профессиональный инструмент экспорта данных QGIS '
                           'в формат карт Garmin IMG через mkgmap',
     'multilingual_support': 'Стилизация из QGIS, генерация TYP, тонкая '

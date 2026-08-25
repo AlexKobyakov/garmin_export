@@ -138,6 +138,11 @@ translations = {
     'contact': '联系方式',
     'year': '年份',
     'organization': '组织',
+    'tags': '标签',
+    'metadata_details': '元数据',
+    'qgis_support': 'QGIS 支持',
+    'processing_provider': 'Processing 提供程序',
+    'changelog': '更新日志',
     'plugin_description': '通过 mkgmap 将 QGIS 数据导出为 '
                           'Garmin IMG 地图的专业工具',
     'multilingual_support': 'QGIS 样式、TYP 生成、mkgmap 精细调优、'

@@ -138,6 +138,11 @@ translations = {
     'contact': 'Liên hệ',
     'year': 'Năm',
     'organization': 'Tổ chức',
+    'tags': 'Thẻ',
+    'metadata_details': 'Siêu dữ liệu',
+    'qgis_support': 'Hỗ trợ QGIS',
+    'processing_provider': 'Nhà cung cấp Processing',
+    'changelog': 'Nhật ký thay đổi',
     'plugin_description': 'Công cụ chuyên nghiệp để xuất dữ liệu QGIS '
                           'sang bản đồ Garmin IMG qua mkgmap',
     'multilingual_support': 'Tạo kiểu từ QGIS, tạo TYP, tinh chỉnh mkgmap, '

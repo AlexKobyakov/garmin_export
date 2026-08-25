@@ -8,6 +8,12 @@ from .algorithms import (
     ExportSelectedLayersAlgorithm,
     ValidateEnvironmentAlgorithm,
 )
+from .extra_algorithms import (
+    DependencyDiagnosticsDownloadAlgorithm,
+    GenerateMpPreviewAlgorithm,
+    ValidateMappingJsonAlgorithm,
+    ValidateTypCodePageAlgorithm,
+)
 
 
 class GarminProcessingProvider(QgsProcessingProvider):
@@ -33,3 +39,7 @@ class GarminProcessingProvider(QgsProcessingProvider):
         self.addAlgorithm(ValidateEnvironmentAlgorithm())
         self.addAlgorithm(BuildTypMappingAlgorithm())
         self.addAlgorithm(ExportSelectedLayersAlgorithm())
+        self.addAlgorithm(ValidateTypCodePageAlgorithm())
+        self.addAlgorithm(GenerateMpPreviewAlgorithm())
+        self.addAlgorithm(ValidateMappingJsonAlgorithm())
+        self.addAlgorithm(DependencyDiagnosticsDownloadAlgorithm())

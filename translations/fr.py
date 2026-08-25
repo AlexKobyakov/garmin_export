@@ -138,6 +138,11 @@ translations = {
     'contact': 'Contact',
     'year': 'Année',
     'organization': 'Organisation',
+    'tags': 'Balises',
+    'metadata_details': 'Métadonnées',
+    'qgis_support': 'Compatibilité QGIS',
+    'processing_provider': 'Fournisseur Processing',
+    'changelog': 'Journal des modifications',
     'plugin_description': 'Outil professionnel pour exporter les données QGIS '
                           'vers des cartes Garmin IMG via mkgmap',
     'multilingual_support': 'Style depuis QGIS, génération de TYP, réglage fin de mkgmap, '

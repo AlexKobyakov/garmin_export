@@ -19,8 +19,9 @@ The carried scope includes:
 
 Release 1.2.1 closes the bounded G0-G5 track. It contains the Qt5/Qt6 boundary,
 UI and translation contract, 12-language flags/RTL support, dependency
-reliability and the cancellation-safe export lifecycle. Processing Provider and
-other feature work are outside this release.
+reliability and the cancellation-safe export lifecycle. Processing Provider work is tracked as the post-1.2.1 G6 feature scope;
+the current branch contains the implementation and owner smoke confirmation,
+while the separate 1.3.0 release gate remains a metadata/tag decision.
 
 ## Runtime prerequisites
 
@@ -48,7 +49,7 @@ contain wheels/, plan/, tests/ or docs/.
 
 ## Offline release gates
 
-- pytest -q: 155 passed.
+- pytest -q: 167 passed (current branch baseline).
 - Critical and full Flake8: passed.
 - compileall: passed.
 - Bandit: passed.
@@ -59,3 +60,19 @@ contain wheels/, plan/, tests/ or docs/.
 - metadata.txt version: 1.2.1.
 - Git tag: v1.2.1.
 - Build command: python scripts/build_plugin.py --output dist/garmin_export-1.2.1.zip.
+
+## Post-1.2.1 Processing smoke
+
+For the G6 feature scope, repeat in QGIS 3.44/Qt5 and QGIS 4.2/Qt6:
+
+1. Confirm the Garmin Export group and plugin icon in Processing -> Toolbox.
+2. Run environment validation with valid and invalid Java/mkgmap/splitter paths.
+3. Validate mapping JSON, build TYP, and generate an MP preview.
+4. Run IMG export with generated, existing and disabled TYP modes, levels,
+   code page and advanced tuning.
+5. Run dependency diagnostics with AUTO_DOWNLOAD off and on only when network
+   access is intended.
+6. Check STATUS, ERRORS, MANIFEST and cancellation behavior.
+7. Open the algorithms in Modeler and run a small batch with distinct outputs.
+
+The owner confirmed the QGIS 3.44 and 4.2 smoke matrix for the current branch.

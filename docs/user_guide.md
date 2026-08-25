@@ -10,6 +10,7 @@
 6. [Процесс компиляции](#процесс-компиляции)
 7. [Примеры использования](#примеры-использования)
 8. [Советы и рекомендации](#советы-и-рекомендации)
+9. [Processing Toolbox и Modeler](#-processing-toolbox-и-modeler)
 
 ## 🖥️ Обзор интерфейса
 
@@ -279,3 +280,31 @@ Garmin использует 4 уровня детализации для опт�
 результате. После запуска проверяйте файл
 .garmin_export/run_manifest.json в выходной папке: он содержит обезличенные
 параметры запуска, версии инструментов и размер результата только при успехе.
+
+## 🧰 Processing Toolbox и Modeler
+
+После активации группа **Garmin Export** появляется в **Обработка →
+Панель инструментов**. Доступны семь алгоритмов: Validate environment, Build
+TYP mapping, Export selected layers, Validate TYP/code page, Generate MP
+preview, Validate mapping JSON и Dependency diagnostics/download.
+
+Провайдер поддерживает выбранные слои или все векторные слои проекта,
+генерируемый/существующий/отключённый TYP, уровни, кодовую страницу,
+типизированный tuning и явный выход MANIFEST
+(.garmin_export/run_manifest.json). Полные mkgmap/splitter с lib/ находятся
+автоматически; скачивание выполняется только при AUTO_DOWNLOAD.
+
+В Modeler соберите цепочку Validate mapping JSON -> Build TYP mapping или
+Generate MP preview -> Export selected layers. QGIS может выполнять независимые
+ветви Processing и пакетные задачи параллельно; число задач контролирует QGIS.
+Для одновременных экспортов используйте разные output, map id и временные
+каталоги. Имена параметров остаются стабильными ASCII-ключами для QGIS 3.44
+и 4.2.
+
+Пример:
+
+    processing.run("garmin_export:validate_mapping_json", {"MAPPING_FILE": r"C:\maps\mapping.json"})
+    processing.run("garmin_export:export_selected_layers", {"USE_PROJECT_LAYERS": True, "OUTPUT": r"C:\maps\out"})
+
+В Modeler вынесите OUTPUT, AUTO_DOWNLOAD, кодовую страницу, режим TYP и tuning
+в параметры модели и проверяйте STATUS, ERRORS и MANIFEST.
