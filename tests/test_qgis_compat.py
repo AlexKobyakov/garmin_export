@@ -55,6 +55,8 @@ class CompatibilityBoundaryTest(unittest.TestCase):
             r'QAbstractItemView\.(NoEditTriggers|SelectRows)',
             r'QPainter\.Antialiasing', r'QFrame\.(NoFrame|HLine|Sunken)',
             r'\b(?:cursor|QTextCursor)\.End\b',
+            r'\bQDialog\.Accepted\b',
+            r'\bQMessageBox\.(?:Yes|No|Ok|Cancel)\b',
         )
         for path in _python_files():
             if path == 'qgis_compat.py':

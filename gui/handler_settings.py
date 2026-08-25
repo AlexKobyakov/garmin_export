@@ -3,6 +3,8 @@
 
 from qgis.PyQt.QtWidgets import QMessageBox
 
+from ..qgis_compat import qt_class_enum
+
 
 class SettingsHandlers:
     def loadSettings(self):
@@ -93,11 +95,12 @@ class SettingsHandlers:
         running = (self.worker and self.worker_thread and
                    self.worker_thread.isRunning())
         if running:
+            yes = qt_class_enum(QMessageBox, 'StandardButton', 'Yes')
+            no = qt_class_enum(QMessageBox, 'StandardButton', 'No')
             reply = QMessageBox.question(
                 self.dialog, translations.get_text('confirmation'),
-                translations.get_text('confirm_close'), QMessageBox.Yes |
-                QMessageBox.No, QMessageBox.No)
-            if reply == QMessageBox.Yes:
+                translations.get_text('confirm_close'), yes | no, no)
+            if reply == yes:
                 self.cancelCompilation()
                 self.saveSettings()
                 event.accept()
