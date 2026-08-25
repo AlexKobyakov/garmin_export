@@ -76,3 +76,17 @@ For the G6 feature scope, repeat in QGIS 3.44/Qt5 and QGIS 4.2/Qt6:
 7. Open the algorithms in Modeler and run a small batch with distinct outputs.
 
 The owner confirmed the QGIS 3.44 and 4.2 smoke matrix for the current branch.
+
+## Release asset policy
+
+The installable release asset must be built by scripts/build_plugin.py, then
+checked by scripts/verify_plugin_archive.py. The GitHub workflow
+.github/workflows/release.yml performs both steps for vX.Y.Z tags and uploads
+garmin_export-X.Y.Z.zip.
+
+That ZIP contains only the garmin_export/ plugin tree: runtime Python modules,
+resources, translations, metadata.txt, LICENSE and the icon. It excludes
+repository documentation, tests, CI files, build scripts, examples, wheels,
+planning files and development caches. A GitHub-generated Source code (zip)
+snapshot is a repository archive, not the installable plugin package; users
+must download the named garmin_export-X.Y.Z.zip release asset.

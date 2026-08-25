@@ -1,0 +1,66 @@
+name: Build plugin release asset
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the leading v, for example 1.3.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Build plugin-only ZIP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+
+      - name: Set package version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ inputs.version }}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build installable plugin ZIP
+        run: |
+          python scripts/build_plugin.py \
+            --output "dist/garmin_export-${{ steps.version.outputs.version }}.zip"
+
+      - name: Verify plugin-only ZIP
+        run: |
+          python scripts/verify_plugin_archive.py \
+            "dist/garmin_export-${{ steps.version.outputs.version }}.zip"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: garmin_export-${{ steps.version.outputs.version }}
+          path: dist/garmin_export-${{ steps.version.outputs.version }}.zip
+          if-no-files-found: error
+
+      - name: Create or update GitHub release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="v${{ steps.version.outputs.version }}"
+          asset="dist/garmin_export-${{ steps.version.outputs.version }}.zip"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            gh release create "$tag" "$asset" \
+              --title "Garmin Export $tag" \
+              --generate-notes
+          fi

@@ -17,10 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Run PyQGIS 4 migration check
+      - name: Report Qt6 incompatibilities without modifying sources
+        run: pyqt5_to_pyqt6.py --dry_run --logfile pyqt6_checker.log .
+
+      - name: Fail when the checker would rewrite a source file
         run: |
-          pyqt5_to_pyqt6.py --dry_run --logfile pyqt6_checker.log .
           pyqt5_to_pyqt6.py .
+          git diff --exit-code
 
       - name: Upload checker report
         uses: actions/upload-artifact@v7
