@@ -4,12 +4,12 @@
 [![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 ![QGIS 3.22+ / 4.x](https://img.shields.io/badge/QGIS-3.22%2B%20%2F%204.x-589632.svg)
 ![Qt5 + Qt6](https://img.shields.io/badge/Qt5%20%2B%20Qt6-compatible-informational.svg)
-![Version](https://img.shields.io/badge/version-1.2.1-informational.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-informational.svg)
 ![Tests](https://img.shields.io/badge/tests-167%20offline-success.svg)
 
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.2.1
+Версия: 1.3.0
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026

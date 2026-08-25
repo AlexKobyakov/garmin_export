@@ -21,7 +21,7 @@ Release 1.2.1 closes the bounded G0-G5 track. It contains the Qt5/Qt6 boundary,
 UI and translation contract, 12-language flags/RTL support, dependency
 reliability and the cancellation-safe export lifecycle. Processing Provider work is tracked as the post-1.2.1 G6 feature scope;
 the current branch contains the implementation and owner smoke confirmation,
-while the separate 1.3.0 release gate remains a metadata/tag decision.
+The Processing scope was released separately as 1.3.0; see RELEASE_1.3.0_CHECKLIST.md.
 
 ## Runtime prerequisites
 
