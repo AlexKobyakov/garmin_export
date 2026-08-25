@@ -4,7 +4,9 @@
 import json
 import os
 
-from qgis.PyQt.QtWidgets import QFileDialog, QMessageBox
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox
+
+from ..qgis_compat import qt_class_enum
 
 
 class MappingHandlers:
@@ -54,7 +56,7 @@ class MappingHandlers:
         from .gui_dialogs import MappingEditorDialog
         editor = MappingEditorDialog(
             self.dialog.mapping_widget.get_mapping_json(), self.dialog)
-        if editor.exec() == MappingEditorDialog.Accepted:
+        if editor.exec() == qt_class_enum(QDialog, 'DialogCode', 'Accepted'):
             self.dialog.mapping_widget.set_mapping_json(
                 editor.get_mapping_json())
             self.dialog.log_message(
