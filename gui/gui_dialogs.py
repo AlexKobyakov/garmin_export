@@ -125,8 +125,12 @@ class AuthorInfoDialog(QDialog):
         try:
             from ..garmin_exporter import GarminExporter
             self._info = GarminExporter.get_plugin_info()
-        except Exception:
-            pass
+        except Exception as error:
+            # Keep the last known metadata when a live refresh races with a
+            # file update or a transient import failure. Do not silently
+            # swallow the exception: retain it for diagnostics while the
+            # dialog renders with its existing fallback data.
+            self._metadata_refresh_error = str(error)
         info = self._info
         self.setWindowTitle(
             '{0} — {1}'.format(PLUGIN_NAME, t('header_about_author')))
