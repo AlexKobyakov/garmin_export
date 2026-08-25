@@ -222,3 +222,20 @@ settings or secrets.
 Для mkgmap и splitter нужен полный ZIP-дистрибутив, а не одиночный JAR:
 рядом с главным JAR должен находиться каталог lib/. Плагин проверяет это
 условие до установки и оставляет прежнюю рабочую версию при ошибке.
+
+## 🧰 Проверка Processing Toolbox
+
+После активации проверьте **Обработка → Панель инструментов → Garmin Export**.
+Если группа не видна, перезапустите QGIS и убедитесь, что
+hasProcessingProvider=yes есть в metadata.txt. Должны быть семь алгоритмов,
+включая Validate mapping JSON и Dependency diagnostics/download.
+
+Validate environment с AUTO_DOWNLOAD выключенным проверяет Java и автоматически
+ищет полный mkgmap/splitter в профиле QGIS. Загрузка запускается отдельно и
+только после явного включения AUTO_DOWNLOAD. Export selected layers принимает
+выбранные или все проектные векторные слои и возвращает IMG плюс MANIFEST.
+
+QGIS Modeler и Batch могут выполнять независимые ветви параллельно; задавайте
+разные output/map id и временные каталоги. В скриптах используйте
+processing.run("garmin_export:<algorithm_id>", {...}); имена параметров
+одинаковы во всех 12 языках.

@@ -1,11 +1,19 @@
 # Garmin Export Plugin для QGIS
 
+[![CI](https://github.com/AlexKobyakov/garmin_export/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexKobyakov/garmin_export/actions/workflows/ci.yml)
+[![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
+![QGIS 3.22+ / 4.x](https://img.shields.io/badge/QGIS-3.22%2B%20%2F%204.x-589632.svg)
+![Qt5 + Qt6](https://img.shields.io/badge/Qt5%20%2B%20Qt6-compatible-informational.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-informational.svg)
+![Tests](https://img.shields.io/badge/tests-167%20offline-success.svg)
+
 🎯 **Профессиональный плагин для экспорта векторных данных QGIS в формат Garmin IMG**
 
-Версия: 1.2.1
+Версия: 1.3.0
 Автор: Кобяков Александр Викторович (Alex Kobyakov)  
 Email: kobyakov@lesburo.ru  
 Год: 2025-2026
+Совместимость: QGIS 3.44/Qt5 и QGIS 4.2/Qt6
 
 🌐 **Языки интерфейса / UI languages:** 🇷🇺 Русский · 🇺🇸 English · 🇩🇪 Deutsch · 🇪🇸 Español · 🇫🇷 Français · 🇧🇷 Português · 🇨🇳 中文 · 🇮🇳 हिन्दी · 🇸🇦 العربية · 🇮🇩 Bahasa Indonesia · 🇹🇭 ไทย · 🇻🇳 Tiếng Việt
 
@@ -48,10 +56,56 @@ Garmin GPS devices.
 - 📋 **mkgmap logging**: optional mkgmap.log file with a configurable verbosity.
 - 💾 **Persistent settings** between sessions.
 - 🧾 **Reliable lifecycle**: cancellation-safe export runs, stale-worker isolation and an anonymized .garmin_export/run_manifest.json on every completed run.
+- 🧰 **Processing Toolbox (G6)**: validate the environment, build TYP mappings, validate TYP/code pages and mapping JSON, diagnose/download dependencies, generate MP previews and export IMG through Processing with generated, existing or disabled TYP styling, selected levels and advanced mkgmap options. Existing complete mkgmap/splitter installations are auto-detected; network download is explicit via the AUTO_DOWNLOAD parameter and reuses the UI fallback order with feedback cancellation.
+- 🖥️ **Qt5/Qt6 dual support**: one compatibility boundary for QGIS 3.44/Qt5 and QGIS 4.2/Qt6, with scoped enum fallbacks and no direct PyQt5/PyQt6 imports.
+- 🎛️ **Polished UI contract**: live/restart-safe language switching, SVG flags, readable combo/check controls, retranslate-safe dialogs, translated tooltips, placeholders and actions.
+
+
+### Processing Toolbox and QGIS Modeler
+
+The provider is available under **Processing → Toolbox → Garmin Export** and in
+QGIS Modeler, Batch and the Python Processing API. It provides seven
+GUI-independent algorithms:
+
+1. **Validate environment** — reports Java, mkgmap and splitter separately.
+2. **Build TYP mapping** — creates TYP from QGIS layer symbology.
+3. **Export selected layers to Garmin IMG** — selected layers or all valid
+   project vectors, generated/existing/default TYP, levels, code page and typed
+   mkgmap tuning; returns IMG plus a redacted run_manifest.json.
+4. **Validate TYP/code page** — checks a TYP/TXT path and label encoding.
+5. **Generate MP preview** — writes Polish MP without Java or mkgmap.
+6. **Validate mapping JSON** — validates file/inline JSON, geometry, Garmin type
+   and level ranges.
+7. **Dependency diagnostics/download** — discovers a complete local distribution
+   and downloads only when AUTO_DOWNLOAD is enabled.
+
+Parameter names are stable ASCII identifiers across QGIS 3.44/Qt5 and QGIS
+4.2/Qt6. Existing complete distributions are auto-detected; network download
+is opt-in and reuses the UI fallback order, transactional install and
+cancellable feedback.
+
+QGIS can run many independent Processing algorithms as tasks, and Modeler can
+chain validation → MP/TYP generation → export. QGIS controls task parallelism;
+the provider does not create duplicate GUI workers. For parallel exports use a
+distinct output directory, map id and temporary directory per task.
+
+Python console example:
+
+    processing.run("garmin_export:validate_mapping_json", {
+        "MAPPING_FILE": r"C:\maps\mapping.json"
+    })
+    processing.run("garmin_export:export_selected_layers", {
+        "USE_PROJECT_LAYERS": True,
+        "OUTPUT": r"C:\maps\out"
+    })
+
+In Modeler, connect validation outputs to export inputs and expose OUTPUT,
+AUTO_DOWNLOAD, code page, TYP mode and tuning as model inputs.
 
 ### Requirements
 
-- QGIS 3.22 or newer, Python 3.9+
+- QGIS 3.22 or newer (Qt5 on QGIS 3.x; Qt6 on QGIS 4.x), Python 3.9+
+- Manually verified in QGIS 3.44/Qt5 and QGIS 4.2/Qt6.
 - Java Runtime Environment (JRE 8+) for mkgmap (the plugin can auto-detect it)
 
 ### Quick start
@@ -94,11 +148,40 @@ Garmin Export Plugin - это современный инструмент для
 - 📋 **Логирование mkgmap**: опциональный файл журнала mkgmap.log с настраиваемым уровнем детализации
 - 💾 **Сохранение настроек** между сеансами работы
 - 🧾 **Надёжный жизненный цикл**: безопасная отмена, защита от устаревших worker-сигналов и обезличенный .garmin_export/run_manifest.json для каждого завершённого запуска
+- 🧰 **Processing Toolbox (G6)**: проверка окружения, построение и проверка TYP, проверка кодовой страницы и mapping JSON, диагностика/загрузка зависимостей, MP-preview и экспорт IMG с выбором TYP, уровней карты и расширенных параметров mkgmap. Установленные дистрибутивы mkgmap/splitter с каталогом lib/ определяются автоматически; скачивание выполняется только при включённом параметре AUTO_DOWNLOAD и использует тот же порядок зеркал и отмену через feedback.
+
+
+### Processing Toolbox и QGIS Modeler
+
+Провайдер доступен в **Обработка → Панель инструментов → Garmin Export**, а
+также в QGIS Modeler, пакетном запуске и Python API Processing. Семь алгоритмов
+не зависят от окна плагина: проверка окружения; построение TYP; экспорт IMG с
+генерацией/существующим/отключённым TYP, уровнями, кодовой страницей и tuning;
+проверка TYP и кодовой страницы; MP-preview; проверка mapping JSON; диагностика
+и загрузка зависимостей. Экспорт возвращает обезличенный run_manifest.json.
+
+Имена параметров Processing — стабильные ASCII-идентификаторы для QGIS
+3.44/Qt5 и QGIS 4.2/Qt6. Полные дистрибутивы определяются автоматически;
+сеть включается только через AUTO_DOWNLOAD и использует порядок зеркал и
+отмену из UI.
+
+QGIS может выполнять много независимых алгоритмов Processing как задачи, а
+Modeler — связывать проверку -> генерацию MP/TYP -> экспорт. Параллелизм
+контролирует QGIS. Для параллельных экспортов используйте разные выходные
+каталоги, map id и временные папки.
+
+Пример в Python-консоли QGIS:
+
+    processing.run("garmin_export:validate_mapping_json", {"MAPPING_FILE": r"C:\maps\mapping.json"})
+    processing.run("garmin_export:export_selected_layers", {"USE_PROJECT_LAYERS": True, "OUTPUT": r"C:\maps\out"})
+
+В Modeler соедините результаты проверок с экспортом и вынесите OUTPUT,
+AUTO_DOWNLOAD, кодовую страницу, режим TYP и tuning в параметры модели.
 
 ## 🔧 Требования
 
 ### Обязательные:
-- QGIS версии 3.22 или выше
+- QGIS версии 3.22 или выше (Qt5 в QGIS 3.x; Qt6 в QGIS 4.x)
 - Python 3.9+
 - Java Runtime Environment (JRE) для работы mkgmap
 

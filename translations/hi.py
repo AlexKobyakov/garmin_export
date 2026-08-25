@@ -138,6 +138,11 @@ translations = {
     'contact': 'संपर्क',
     'year': 'वर्ष',
     'organization': 'संगठन',
+    'tags': 'टैग',
+    'metadata_details': 'मेटाडेटा',
+    'qgis_support': 'QGIS समर्थन',
+    'processing_provider': 'Processing प्रदाता',
+    'changelog': 'परिवर्तन लॉग',
     'plugin_description': 'mkgmap के माध्यम से QGIS डेटा को '
                           'Garmin IMG मानचित्रों में निर्यात करने का पेशेवर उपकरण',
     'multilingual_support': 'QGIS शैली, TYP निर्माण, mkgmap फ़ाइन-ट्यूनिंग, '

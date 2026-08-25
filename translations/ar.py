@@ -138,6 +138,11 @@ translations = {
     'contact': 'التواصل',
     'year': 'السنة',
     'organization': 'المؤسّسة',
+    'tags': 'الوسوم',
+    'metadata_details': 'البيانات الوصفية',
+    'qgis_support': 'دعم QGIS',
+    'processing_provider': 'مزود Processing',
+    'changelog': 'سجل التغييرات',
     'plugin_description': 'أداة احترافية لتصدير بيانات QGIS '
                           'إلى خرائط Garmin IMG عبر mkgmap',
     'multilingual_support': 'التنسيق من QGIS، وإنشاء TYP، والضبط الدقيق لـ mkgmap، '

@@ -2,10 +2,26 @@
 
 ## Scope
 
+The 1.2.1 release includes the previously planned 1.2.0 modernization scope.
+There is no separate 1.2.0 tag or archive: the Qt5/Qt6 boundary, UI contract,
+bounded GUI refactor and 12-language/i18n work were completed and released
+together with the G4/G5 reliability work as 1.2.1.
+
+The carried scope includes:
+
+- shared QGIS 3/Qt5 and QGIS 4/Qt6 compatibility helpers and checker guards;
+- retranslate-safe composite widgets/dialogs, retained layout references,
+  translated tooltips/placeholders/actions and readable combo/check controls;
+- 12-language registry, SVG flags, Arabic RTL, live/restart persistence and
+  translation parity tests;
+- production Python modules bounded to 500 lines or less.
+
+
 Release 1.2.1 closes the bounded G0-G5 track. It contains the Qt5/Qt6 boundary,
 UI and translation contract, 12-language flags/RTL support, dependency
-reliability and the cancellation-safe export lifecycle. Processing Provider and
-other feature work are outside this release.
+reliability and the cancellation-safe export lifecycle. Processing Provider work is tracked as the post-1.2.1 G6 feature scope;
+the current branch contains the implementation and owner smoke confirmation,
+The Processing scope was released separately as 1.3.0; see RELEASE_1.3.0_CHECKLIST.md.
 
 ## Runtime prerequisites
 
@@ -33,7 +49,7 @@ contain wheels/, plan/, tests/ or docs/.
 
 ## Offline release gates
 
-- pytest -q: 155 passed.
+- pytest -q: 167 passed (current branch baseline).
 - Critical and full Flake8: passed.
 - compileall: passed.
 - Bandit: passed.
@@ -44,3 +60,33 @@ contain wheels/, plan/, tests/ or docs/.
 - metadata.txt version: 1.2.1.
 - Git tag: v1.2.1.
 - Build command: python scripts/build_plugin.py --output dist/garmin_export-1.2.1.zip.
+
+## Post-1.2.1 Processing smoke
+
+For the G6 feature scope, repeat in QGIS 3.44/Qt5 and QGIS 4.2/Qt6:
+
+1. Confirm the Garmin Export group and plugin icon in Processing -> Toolbox.
+2. Run environment validation with valid and invalid Java/mkgmap/splitter paths.
+3. Validate mapping JSON, build TYP, and generate an MP preview.
+4. Run IMG export with generated, existing and disabled TYP modes, levels,
+   code page and advanced tuning.
+5. Run dependency diagnostics with AUTO_DOWNLOAD off and on only when network
+   access is intended.
+6. Check STATUS, ERRORS, MANIFEST and cancellation behavior.
+7. Open the algorithms in Modeler and run a small batch with distinct outputs.
+
+The owner confirmed the QGIS 3.44 and 4.2 smoke matrix for the current branch.
+
+## Release asset policy
+
+The installable release asset must be built by scripts/build_plugin.py, then
+checked by scripts/verify_plugin_archive.py. The GitHub workflow
+.github/workflows/release.yml performs both steps for vX.Y.Z tags and uploads
+garmin_export-X.Y.Z.zip.
+
+That ZIP contains only the garmin_export/ plugin tree: runtime Python modules,
+resources, translations, metadata.txt, LICENSE and the icon. It excludes
+repository documentation, tests, CI files, build scripts, examples, wheels,
+planning files and development caches. A GitHub-generated Source code (zip)
+snapshot is a repository archive, not the installable plugin package; users
+must download the named garmin_export-X.Y.Z.zip release asset.

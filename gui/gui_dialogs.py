@@ -11,8 +11,11 @@ Email: kobyakov@lesburo.ru
 Year: 2025-2026
 """
 
+import html
 import json
+import os
 
+from qgis.PyQt.QtCore import QFileSystemWatcher
 from qgis.PyQt.QtWidgets import (
     QMessageBox, QDialog, QVBoxLayout, QHBoxLayout,
     QLabel, QTextEdit, QGroupBox
@@ -39,14 +42,28 @@ class AuthorInfoDialog(QDialog):
                 'author': 'Кобяков Александр Викторович',
                 'email': 'kobyakov@lesburo.ru',
             }
-        self.setMinimumSize(560, 640)
-        self.resize(560, 640)
+        self.setMinimumSize(560, 760)
+        self.resize(560, 760)
         self.setModal(True)
         self.setWindowFlags(
             qt_enum('WindowType', 'Dialog')
             | qt_enum('WindowType', 'WindowTitleHint')
             | qt_enum('WindowType', 'WindowCloseButtonHint'))
         self.setupUi()
+        self._watch_metadata()
+        self.retranslateUi()
+
+    def _watch_metadata(self):
+        # Refresh the metadata card when metadata.txt changes on disk.
+        path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                            'metadata.txt')
+        self._metadata_path = path
+        self._metadata_watcher = QFileSystemWatcher([path], self)
+        self._metadata_watcher.fileChanged.connect(self._metadata_changed)
+
+    def _metadata_changed(self, path):
+        if os.path.exists(path) and path not in self._metadata_watcher.files():
+            self._metadata_watcher.addPath(path)
         self.retranslateUi()
 
     def setupUi(self):
@@ -80,6 +97,14 @@ class AuthorInfoDialog(QDialog):
         self.contact_label.setOpenExternalLinks(True)
         self.contact_label.setStyleSheet(self._card('#f8f9fa', '#dee2e6'))
 
+        self.metadata_label = QTextEdit()
+        self.metadata_label.setReadOnly(True)
+        self.metadata_label.setMinimumHeight(150)
+        self.metadata_label.setMaximumHeight(230)
+        self.metadata_label.setStyleSheet(
+            'background-color: #f8f9fa; border: 1px solid #dee2e6; '
+            'border-radius: 8px; padding: 15px; color: #2c3e50;')
+
         self.close_button = create_styled_button(t('close'), 'secondary', '✖️')
         self.close_button.clicked.connect(self.accept)
 
@@ -88,6 +113,7 @@ class AuthorInfoDialog(QDialog):
         layout.addWidget(self.version_label)
         layout.addWidget(self.about_label)
         layout.addWidget(self.contact_label)
+        layout.addWidget(self.metadata_label)
         layout.addStretch()
         layout.addWidget(
             self.close_button, 0, qt_enum('AlignmentFlag', 'AlignCenter'))
@@ -96,6 +122,11 @@ class AuthorInfoDialog(QDialog):
 
     def retranslateUi(self):
         t = translations.get_text
+        try:
+            from ..garmin_exporter import GarminExporter
+            self._info = GarminExporter.get_plugin_info()
+        except Exception:
+            pass
         info = self._info
         self.setWindowTitle(
             '{0} — {1}'.format(PLUGIN_NAME, t('header_about_author')))
@@ -116,6 +147,34 @@ class AuthorInfoDialog(QDialog):
                 contact_l=t('contact'), email=info['email'],
                 org_l=t('organization'), year_l=t('year'),
                 multi=t('multilingual_support')))
+        minimum = html.escape(info.get('qgis_minimum', '') or '?')
+        maximum = html.escape(info.get('qgis_maximum', '') or '?')
+        changelog = html.escape(info.get('changelog', '').strip())
+        changelog = changelog.replace('\n', '<br>')
+        repository = html.escape(info.get('repository', '') or '')
+        tags = html.escape(info.get('tags', '') or '')
+        self.metadata_label.setHtml(
+            '<b style="color:#2980b9;">📦 {metadata}</b><br>'
+            '🧩 {version}: <b>v{plugin_version}</b><br>'
+            '🗺️ {qgis}: {minimum} – {maximum}<br>'
+            '⚙️ {processing}: {provider}<br>'
+            '🔖 {tags_label}: {tags}<br>'
+            '🔗 <a href="{repository}">{repository}</a><br><br>'
+            '<b>{changelog_label}</b><br>{changelog}'.format(
+                metadata=t('metadata_details'),
+                version=t('version'),
+                plugin_version=html.escape(info.get('version', 'Unknown')),
+                qgis=t('qgis_support'),
+                minimum=minimum,
+                maximum=maximum,
+                processing=t('processing_provider'),
+                provider=html.escape(
+                    info.get('has_processing_provider', '') or 'no'),
+                tags_label=t('tags'),
+                tags=tags,
+                repository=repository,
+                changelog_label=t('changelog'),
+                changelog=changelog or '—'))
         self.close_button.setText('✖️ ' + t('close'))
 
     @staticmethod

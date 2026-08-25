@@ -65,6 +65,12 @@ class CompatibilityBoundaryTest(unittest.TestCase):
                     re.search(pattern, source),
                     '{0}: forbidden {1}'.format(path, pattern))
 
+    def test_ci_reports_checker_and_rejects_rewrites(self):
+        workflow = _source('.github/workflows/ci.yml')
+        self.assertIn('pyqt5_to_pyqt6.py --dry_run', workflow)
+        self.assertIn('pyqt5_to_pyqt6.py .', workflow)
+        self.assertIn('git diff --exit-code', workflow)
+
     def test_compat_imports_are_package_relative(self):
         for path in _python_files():
             if path == 'qgis_compat.py':

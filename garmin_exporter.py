@@ -43,6 +43,7 @@ class GarminExporter:
         self.menu = PLUGIN_NAME
         self.dialog = None
         self.main_action = None
+        self.processing_provider = None
         self.first_start = True
 
     # ------------------------------------------------------------------
@@ -73,6 +74,13 @@ class GarminExporter:
             'author': 'Кобяков Александр Викторович',
             'email': 'kobyakov@lesburo.ru',
             'description': '',
+            'qgis_minimum': '',
+            'qgis_maximum': '',
+            'has_processing_provider': '',
+            'repository': '',
+            'homepage': '',
+            'tags': '',
+            'changelog': '',
         }
         try:
             plugin_dir = os.path.dirname(__file__)
@@ -88,6 +96,14 @@ class GarminExporter:
                         'author': section.get('author', default['author']),
                         'email': section.get('email', default['email']),
                         'description': section.get('description', ''),
+                        'qgis_minimum': section.get('qgisMinimumVersion', ''),
+                        'qgis_maximum': section.get('qgisMaximumVersion', ''),
+                        'has_processing_provider': section.get(
+                            'hasProcessingProvider', ''),
+                        'repository': section.get('repository', ''),
+                        'homepage': section.get('homepage', ''),
+                        'tags': section.get('tags', ''),
+                        'changelog': section.get('changelog', ''),
                     }
         except Exception as e:
             print(f"Error reading plugin info: {e}")
@@ -134,7 +150,30 @@ class GarminExporter:
             whats_this=translations.get_text('plugin_description')
         )
 
+        self._register_processing_provider()
+
         self.first_start = True
+
+    def _register_processing_provider(self):
+        """Register the provider once, including after plugin reloads."""
+        from .processing_provider import GarminProcessingProvider
+
+        registry = QgsApplication.processingRegistry()
+        provider = registry.providerById('garmin_export')
+        if provider is None:
+            provider = GarminProcessingProvider()
+            registry.addProvider(provider)
+        self.processing_provider = provider
+
+    def _unregister_processing_provider(self):
+        """Remove only the provider owned by this plugin instance."""
+        provider = self.processing_provider
+        if provider is None:
+            return
+        registry = QgsApplication.processingRegistry()
+        if registry.providerById(provider.id()) is provider:
+            registry.removeProvider(provider.id())
+        self.processing_provider = None
 
     def retranslateUi(self):
         """Обновляет текст QAction после live-переключения языка."""
@@ -148,6 +187,7 @@ class GarminExporter:
 
     def unload(self):
         """Удаление элементов GUI при выгрузке плагина"""
+        self._unregister_processing_provider()
         for action in self.actions:
             self.iface.removePluginVectorMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
